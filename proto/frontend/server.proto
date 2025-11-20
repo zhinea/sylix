@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package frontend;
+
+option go_package = "sylix-engine/internal/infra/proto/server";
+
+service ServerService {
+    rpc Create(Server) returns (ServerResponse);
+    rpc Get(Id) returns (ServerResponse);
+    rpc All(Empty) returns (ServersResponse);
+    rpc Update(Server) returns (ServerResponse);
+    rpc Delete(Id) returns (MessageResponse);
+}
+
+enum StatusCode {
+    UNSPECIFIED = 0;
+    OK = 200;
+    CREATED = 201;
+    NOT_FOUND = 404;
+    INTERNAL_ERROR = 500;
+    BAD_REQUEST = 400;
+    VALIDATION_FAILED = 402;
+}
+
+
+message Empty {}
+
+message Id {
+    string id = 1;
+}
+
+message ServerResponse {
+    StatusCode status = 1;
+    Server server = 2;
+    repeated ValidationError errors = 3;
+    optional string error = 4; 
+}
+
+message ServersResponse {
+    StatusCode status = 1;
+    repeated Server servers = 2;
+    repeated ValidationError errors = 3;
+    optional string error = 4; 
+}
+
+message ValidationError {
+    string field = 1;
+    string message = 2;
+}
+
+message Server {
+    string id = 1;
+    string name = 2;
+    string ipAddress = 3;
+    int32 port = 4;
+    string protocol = 5;
+    ServerCredential credential = 6;
+    int32 isRoot = 7;
+}
+
+message ServerCredential {
+    string username = 1;
+    optional string password = 2;
+    optional string sshKey = 3;
+}
+
+message MessageResponse {
+    StatusCode status = 1;
+    string message = 2;
+}
