@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package frontend;
 
-option go_package = "sylix-engine/internal/infra/proto/server";
+option go_package = "internal/infra/proto/frontend";
+
+import "./../common/validation.proto";
 
 service ServerService {
     rpc Create(Server) returns (ServerResponse);
@@ -41,11 +43,6 @@ message ServersResponse {
     repeated Server servers = 2;
     repeated ValidationError errors = 3;
     optional string error = 4; 
-}
-
-message ValidationError {
-    string field = 1;
-    string message = 2;
 }
 
 message Server {

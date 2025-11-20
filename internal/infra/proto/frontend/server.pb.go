@@ -4,7 +4,7 @@
 // 	protoc        v3.12.4
 // source: frontend/server.proto
 
-package server
+package frontend
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -298,58 +298,6 @@ func (x *ServersResponse) GetError() string {
 	return ""
 }
 
-type ValidationError struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Field         string                 `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ValidationError) Reset() {
-	*x = ValidationError{}
-	mi := &file_frontend_server_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ValidationError) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidationError) ProtoMessage() {}
-
-func (x *ValidationError) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ValidationError.ProtoReflect.Descriptor instead.
-func (*ValidationError) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *ValidationError) GetField() string {
-	if x != nil {
-		return x.Field
-	}
-	return ""
-}
-
-func (x *ValidationError) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
 type Server struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -365,7 +313,7 @@ type Server struct {
 
 func (x *Server) Reset() {
 	*x = Server{}
-	mi := &file_frontend_server_proto_msgTypes[5]
+	mi := &file_frontend_server_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -377,7 +325,7 @@ func (x *Server) String() string {
 func (*Server) ProtoMessage() {}
 
 func (x *Server) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[5]
+	mi := &file_frontend_server_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -390,7 +338,7 @@ func (x *Server) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Server.ProtoReflect.Descriptor instead.
 func (*Server) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{5}
+	return file_frontend_server_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Server) GetId() string {
@@ -453,7 +401,7 @@ type ServerCredential struct {
 
 func (x *ServerCredential) Reset() {
 	*x = ServerCredential{}
-	mi := &file_frontend_server_proto_msgTypes[6]
+	mi := &file_frontend_server_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -465,7 +413,7 @@ func (x *ServerCredential) String() string {
 func (*ServerCredential) ProtoMessage() {}
 
 func (x *ServerCredential) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[6]
+	mi := &file_frontend_server_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -478,7 +426,7 @@ func (x *ServerCredential) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerCredential.ProtoReflect.Descriptor instead.
 func (*ServerCredential) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{6}
+	return file_frontend_server_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ServerCredential) GetUsername() string {
@@ -512,7 +460,7 @@ type MessageResponse struct {
 
 func (x *MessageResponse) Reset() {
 	*x = MessageResponse{}
-	mi := &file_frontend_server_proto_msgTypes[7]
+	mi := &file_frontend_server_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -524,7 +472,7 @@ func (x *MessageResponse) String() string {
 func (*MessageResponse) ProtoMessage() {}
 
 func (x *MessageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[7]
+	mi := &file_frontend_server_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -537,7 +485,7 @@ func (x *MessageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MessageResponse.ProtoReflect.Descriptor instead.
 func (*MessageResponse) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{7}
+	return file_frontend_server_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *MessageResponse) GetStatus() StatusCode {
@@ -548,6 +496,58 @@ func (x *MessageResponse) GetStatus() StatusCode {
 }
 
 func (x *MessageResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type ValidationError struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Field         string                 `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ValidationError) Reset() {
+	*x = ValidationError{}
+	mi := &file_frontend_server_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ValidationError) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ValidationError) ProtoMessage() {}
+
+func (x *ValidationError) ProtoReflect() protoreflect.Message {
+	mi := &file_frontend_server_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ValidationError.ProtoReflect.Descriptor instead.
+func (*ValidationError) Descriptor() ([]byte, []int) {
+	return file_frontend_server_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ValidationError) GetField() string {
+	if x != nil {
+		return x.Field
+	}
+	return ""
+}
+
+func (x *ValidationError) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
@@ -573,10 +573,7 @@ const file_frontend_server_proto_rawDesc = "" +
 	"\aservers\x18\x02 \x03(\v2\x10.frontend.ServerR\aservers\x121\n" +
 	"\x06errors\x18\x03 \x03(\v2\x19.frontend.ValidationErrorR\x06errors\x12\x19\n" +
 	"\x05error\x18\x04 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error\"A\n" +
-	"\x0fValidationError\x12\x14\n" +
-	"\x05field\x18\x01 \x01(\tR\x05field\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xce\x01\n" +
+	"\x06_error\"\xce\x01\n" +
 	"\x06Server\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
@@ -595,6 +592,9 @@ const file_frontend_server_proto_rawDesc = "" +
 	"\a_sshKey\"Y\n" +
 	"\x0fMessageResponse\x12,\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x14.frontend.StatusCodeR\x06status\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"A\n" +
+	"\x0fValidationError\x12\x14\n" +
+	"\x05field\x18\x01 \x01(\tR\x05field\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage*\x83\x01\n" +
 	"\n" +
 	"StatusCode\x12\x0f\n" +
@@ -610,7 +610,7 @@ const file_frontend_server_proto_rawDesc = "" +
 	"\x03Get\x12\f.frontend.Id\x1a\x18.frontend.ServerResponse\x121\n" +
 	"\x03All\x12\x0f.frontend.Empty\x1a\x19.frontend.ServersResponse\x124\n" +
 	"\x06Update\x12\x10.frontend.Server\x1a\x18.frontend.ServerResponse\x121\n" +
-	"\x06Delete\x12\f.frontend.Id\x1a\x19.frontend.MessageResponseB*Z(sylix-engine/internal/infra/proto/serverb\x06proto3"
+	"\x06Delete\x12\f.frontend.Id\x1a\x19.frontend.MessageResponseB\x1fZ\x1dinternal/infra/proto/frontendb\x06proto3"
 
 var (
 	file_frontend_server_proto_rawDescOnce sync.Once
@@ -632,30 +632,30 @@ var file_frontend_server_proto_goTypes = []any{
 	(*Id)(nil),               // 2: frontend.Id
 	(*ServerResponse)(nil),   // 3: frontend.ServerResponse
 	(*ServersResponse)(nil),  // 4: frontend.ServersResponse
-	(*ValidationError)(nil),  // 5: frontend.ValidationError
-	(*Server)(nil),           // 6: frontend.Server
-	(*ServerCredential)(nil), // 7: frontend.ServerCredential
-	(*MessageResponse)(nil),  // 8: frontend.MessageResponse
+	(*Server)(nil),           // 5: frontend.Server
+	(*ServerCredential)(nil), // 6: frontend.ServerCredential
+	(*MessageResponse)(nil),  // 7: frontend.MessageResponse
+	(*ValidationError)(nil),  // 8: frontend.ValidationError
 }
 var file_frontend_server_proto_depIdxs = []int32{
 	0,  // 0: frontend.ServerResponse.status:type_name -> frontend.StatusCode
-	6,  // 1: frontend.ServerResponse.server:type_name -> frontend.Server
-	5,  // 2: frontend.ServerResponse.errors:type_name -> frontend.ValidationError
+	5,  // 1: frontend.ServerResponse.server:type_name -> frontend.Server
+	8,  // 2: frontend.ServerResponse.errors:type_name -> frontend.ValidationError
 	0,  // 3: frontend.ServersResponse.status:type_name -> frontend.StatusCode
-	6,  // 4: frontend.ServersResponse.servers:type_name -> frontend.Server
-	5,  // 5: frontend.ServersResponse.errors:type_name -> frontend.ValidationError
-	7,  // 6: frontend.Server.credential:type_name -> frontend.ServerCredential
+	5,  // 4: frontend.ServersResponse.servers:type_name -> frontend.Server
+	8,  // 5: frontend.ServersResponse.errors:type_name -> frontend.ValidationError
+	6,  // 6: frontend.Server.credential:type_name -> frontend.ServerCredential
 	0,  // 7: frontend.MessageResponse.status:type_name -> frontend.StatusCode
-	6,  // 8: frontend.ServerService.Create:input_type -> frontend.Server
+	5,  // 8: frontend.ServerService.Create:input_type -> frontend.Server
 	2,  // 9: frontend.ServerService.Get:input_type -> frontend.Id
 	1,  // 10: frontend.ServerService.All:input_type -> frontend.Empty
-	6,  // 11: frontend.ServerService.Update:input_type -> frontend.Server
+	5,  // 11: frontend.ServerService.Update:input_type -> frontend.Server
 	2,  // 12: frontend.ServerService.Delete:input_type -> frontend.Id
 	3,  // 13: frontend.ServerService.Create:output_type -> frontend.ServerResponse
 	3,  // 14: frontend.ServerService.Get:output_type -> frontend.ServerResponse
 	4,  // 15: frontend.ServerService.All:output_type -> frontend.ServersResponse
 	3,  // 16: frontend.ServerService.Update:output_type -> frontend.ServerResponse
-	8,  // 17: frontend.ServerService.Delete:output_type -> frontend.MessageResponse
+	7,  // 17: frontend.ServerService.Delete:output_type -> frontend.MessageResponse
 	13, // [13:18] is the sub-list for method output_type
 	8,  // [8:13] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
@@ -670,7 +670,7 @@ func file_frontend_server_proto_init() {
 	}
 	file_frontend_server_proto_msgTypes[2].OneofWrappers = []any{}
 	file_frontend_server_proto_msgTypes[3].OneofWrappers = []any{}
-	file_frontend_server_proto_msgTypes[6].OneofWrappers = []any{}
+	file_frontend_server_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

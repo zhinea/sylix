@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package common.validation;
+
+option go_package = "internal/infra/proto/common";
+
+message ValidationError {
+    string field = 1;
+    string message = 2;
+}
