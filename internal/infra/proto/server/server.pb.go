@@ -416,6 +416,9 @@ type Server struct {
 	Protocol      string                 `protobuf:"bytes,5,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	Credential    *ServerCredential      `protobuf:"bytes,6,opt,name=credential,proto3" json:"credential,omitempty"`
 	IsRoot        int32                  `protobuf:"varint,7,opt,name=isRoot,proto3" json:"isRoot,omitempty"`
+	Status        StatusServer           `protobuf:"varint,8,opt,name=status,proto3,enum=server.StatusServer" json:"status,omitempty"`
+	AgentStatus   AgentStatusServer      `protobuf:"varint,9,opt,name=agentStatus,proto3,enum=server.AgentStatusServer" json:"agentStatus,omitempty"`
+	AgentLogs     string                 `protobuf:"bytes,10,opt,name=agentLogs,proto3" json:"agentLogs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -497,6 +500,27 @@ func (x *Server) GetIsRoot() int32 {
 		return x.IsRoot
 	}
 	return 0
+}
+
+func (x *Server) GetStatus() StatusServer {
+	if x != nil {
+		return x.Status
+	}
+	return StatusServer_STATUS_SERVER_UNSPECIFIED
+}
+
+func (x *Server) GetAgentStatus() AgentStatusServer {
+	if x != nil {
+		return x.AgentStatus
+	}
+	return AgentStatusServer_AGENT_STATUS_SERVER_UNSPECIFIED
+}
+
+func (x *Server) GetAgentLogs() string {
+	if x != nil {
+		return x.AgentLogs
+	}
+	return ""
 }
 
 type ServerCredential struct {
@@ -630,7 +654,7 @@ const file_server_server_proto_rawDesc = "" +
 	"\aservers\x18\x02 \x03(\v2\x0e.server.ServerR\aservers\x12/\n" +
 	"\x06errors\x18\x03 \x03(\v2\x17.common.ValidationErrorR\x06errors\x12\x19\n" +
 	"\x05error\x18\x04 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error\"\xcc\x01\n" +
+	"\x06_error\"\xd5\x02\n" +
 	"\x06Server\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
@@ -640,7 +664,11 @@ const file_server_server_proto_rawDesc = "" +
 	"\n" +
 	"credential\x18\x06 \x01(\v2\x18.server.ServerCredentialR\n" +
 	"credential\x12\x16\n" +
-	"\x06isRoot\x18\a \x01(\x05R\x06isRoot\"\x84\x01\n" +
+	"\x06isRoot\x18\a \x01(\x05R\x06isRoot\x12,\n" +
+	"\x06status\x18\b \x01(\x0e2\x14.server.StatusServerR\x06status\x12;\n" +
+	"\vagentStatus\x18\t \x01(\x0e2\x19.server.AgentStatusServerR\vagentStatus\x12\x1c\n" +
+	"\tagentLogs\x18\n" +
+	" \x01(\tR\tagentLogs\"\x84\x01\n" +
 	"\x10ServerCredential\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1f\n" +
 	"\bpassword\x18\x02 \x01(\tH\x00R\bpassword\x88\x01\x01\x12\x1b\n" +
@@ -718,24 +746,26 @@ var file_server_server_proto_depIdxs = []int32{
 	7,  // 4: server.ServersResponse.servers:type_name -> server.Server
 	10, // 5: server.ServersResponse.errors:type_name -> common.ValidationError
 	8,  // 6: server.Server.credential:type_name -> server.ServerCredential
-	0,  // 7: server.MessageResponse.status:type_name -> server.StatusCode
-	7,  // 8: server.ServerService.Create:input_type -> server.Server
-	4,  // 9: server.ServerService.Get:input_type -> server.Id
-	3,  // 10: server.ServerService.All:input_type -> server.Empty
-	7,  // 11: server.ServerService.Update:input_type -> server.Server
-	4,  // 12: server.ServerService.Delete:input_type -> server.Id
-	4,  // 13: server.ServerService.InstallAgent:input_type -> server.Id
-	5,  // 14: server.ServerService.Create:output_type -> server.ServerResponse
-	5,  // 15: server.ServerService.Get:output_type -> server.ServerResponse
-	6,  // 16: server.ServerService.All:output_type -> server.ServersResponse
-	5,  // 17: server.ServerService.Update:output_type -> server.ServerResponse
-	9,  // 18: server.ServerService.Delete:output_type -> server.MessageResponse
-	9,  // 19: server.ServerService.InstallAgent:output_type -> server.MessageResponse
-	14, // [14:20] is the sub-list for method output_type
-	8,  // [8:14] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	1,  // 7: server.Server.status:type_name -> server.StatusServer
+	2,  // 8: server.Server.agentStatus:type_name -> server.AgentStatusServer
+	0,  // 9: server.MessageResponse.status:type_name -> server.StatusCode
+	7,  // 10: server.ServerService.Create:input_type -> server.Server
+	4,  // 11: server.ServerService.Get:input_type -> server.Id
+	3,  // 12: server.ServerService.All:input_type -> server.Empty
+	7,  // 13: server.ServerService.Update:input_type -> server.Server
+	4,  // 14: server.ServerService.Delete:input_type -> server.Id
+	4,  // 15: server.ServerService.InstallAgent:input_type -> server.Id
+	5,  // 16: server.ServerService.Create:output_type -> server.ServerResponse
+	5,  // 17: server.ServerService.Get:output_type -> server.ServerResponse
+	6,  // 18: server.ServerService.All:output_type -> server.ServersResponse
+	5,  // 19: server.ServerService.Update:output_type -> server.ServerResponse
+	9,  // 20: server.ServerService.Delete:output_type -> server.MessageResponse
+	9,  // 21: server.ServerService.InstallAgent:output_type -> server.MessageResponse
+	16, // [16:22] is the sub-list for method output_type
+	10, // [10:16] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_server_server_proto_init() }

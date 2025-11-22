@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/zhinea/sylix/internal/common/logger"
 	"github.com/zhinea/sylix/internal/common/util"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
 	"github.com/zhinea/sylix/internal/module/controlplane/entity"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"go.uber.org/zap"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type ServerUseCase struct {
@@ -24,9 +26,14 @@ func NewServerUseCase(repo repository.ServerRepository) *ServerUseCase {
 }
 
 func (uc *ServerUseCase) Create(ctx context.Context, server *entity.Server) (*entity.Server, error) {
+	// Set initial status
+	server.Status = entity.ServerStatusDisconnected
+
 	// Check connection before creating
-	if err := uc.CheckConnection(server); err != nil {
-		return nil, fmt.Errorf("failed to connect to server: %w", err)
+	if err := uc.CheckConnection(server); err == nil {
+		server.Status = entity.ServerStatusConnected
+	} else {
+		logger.Log.Warn("Failed to connect to server during creation", zap.Error(err), zap.String("ip", server.IpAddress))
 	}
 
 	return uc.repo.Create(ctx, server)
@@ -66,33 +73,60 @@ func (uc *ServerUseCase) InstallAgent(ctx context.Context, serverID string) erro
 		return fmt.Errorf("failed to get server: %w", err)
 	}
 
+	if server.Status != entity.ServerStatusConnected {
+		return fmt.Errorf("server must be connected to install agent")
+	}
+
+	// Start async installation
+	go uc.runAgentInstallation(context.Background(), server)
+
+	return nil
+}
+
+func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entity.Server) {
+	uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusInstalling)
+	uc.appendAgentLog(ctx, server.Id, "Starting installation...")
+
 	client, err := util.NewSSHClient(server.IpAddress, server.Port, server.Credential.Username, server.Credential.Password, server.Credential.SSHKey)
 	if err != nil {
-		return fmt.Errorf("failed to connect via SSH: %w", err)
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to connect via SSH: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
 	}
 	defer client.Close()
 
+	// Check if scp is installed on remote
+	if _, err := client.RunCommand("which scp"); err != nil {
+		uc.appendAgentLog(ctx, server.Id, "scp not found on remote server. Please install openssh-client or equivalent.")
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+
 	// 1. Copy Agent Binary
-	// Assuming the binary is in the current working directory under bin/agent
-	// In a real deployment, this path should be configured or the binary embedded.
+	uc.appendAgentLog(ctx, server.Id, "Copying agent binary...")
 	localBinaryPath := "bin/agent"
 	remoteBinaryPath := "/usr/local/bin/sylix-agent"
 
-	// Check if local binary exists
 	if _, err := os.Stat(localBinaryPath); os.IsNotExist(err) {
-		return fmt.Errorf("agent binary not found at %s", localBinaryPath)
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Agent binary not found at %s", localBinaryPath))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
 	}
 
 	if err := client.CopyFile(localBinaryPath, remoteBinaryPath); err != nil {
-		return fmt.Errorf("failed to copy agent binary: %w", err)
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy agent binary: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
 	}
 
-	// Make it executable
 	if _, err := client.RunCommand("chmod +x " + remoteBinaryPath); err != nil {
-		return fmt.Errorf("failed to make agent executable: %w", err)
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to make agent executable: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
 	}
 
 	// 2. Create Systemd Service
+	uc.appendAgentLog(ctx, server.Id, "Creating systemd service...")
 	serviceContent := `[Unit]
 Description=Sylix Agent
 After=network.target
@@ -105,19 +139,23 @@ User=root
 [Install]
 WantedBy=multi-user.target
 `
-	// Write service file to a temporary file locally, then copy it
 	tmpServiceFile := "sylix-agent.service"
 	if err := os.WriteFile(tmpServiceFile, []byte(serviceContent), 0644); err != nil {
-		return fmt.Errorf("failed to create temp service file: %w", err)
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to create temp service file: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
 	}
 	defer os.Remove(tmpServiceFile)
 
 	remoteServicePath := "/etc/systemd/system/sylix-agent.service"
 	if err := client.CopyFile(tmpServiceFile, remoteServicePath); err != nil {
-		return fmt.Errorf("failed to copy service file: %w", err)
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy service file: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
 	}
 
 	// 3. Start Service
+	uc.appendAgentLog(ctx, server.Id, "Starting service...")
 	commands := []string{
 		"systemctl daemon-reload",
 		"systemctl enable sylix-agent",
@@ -126,24 +164,45 @@ WantedBy=multi-user.target
 
 	for _, cmd := range commands {
 		if _, err := client.RunCommand(cmd); err != nil {
-			return fmt.Errorf("failed to run command %s: %w", cmd, err)
+			uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to run command %s: %v", cmd, err))
+			uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+			return
 		}
 	}
 
-	// 4. Check Agent Connection via gRPC
-	// Wait a bit for the agent to start
-	time.Sleep(2 * time.Second)
+	uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusSuccess)
+	uc.appendAgentLog(ctx, server.Id, "Agent installed successfully.")
+}
 
-	// Assuming agent runs on port 8083 (needs to be consistent with agent config)
-	agentAddr := fmt.Sprintf("%s:8083", server.IpAddress)
-	conn, err := grpc.DialContext(ctx, agentAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(), grpc.WithTimeout(5*time.Second))
+func (uc *ServerUseCase) updateAgentStatus(ctx context.Context, serverID string, status int) {
+	server, err := uc.repo.GetByID(ctx, serverID)
 	if err != nil {
-		return fmt.Errorf("failed to connect to agent at %s: %w", agentAddr, err)
+		logger.Log.Error("Failed to get server for status update", zap.Error(err))
+		return
 	}
-	defer conn.Close()
+	server.AgentStatus = status
+	uc.repo.Update(ctx, server)
+}
 
-	// Ideally we should call a Ping method on the agent, but connection success is a good start.
-	// If we had an AgentService client, we would use it here.
+func (uc *ServerUseCase) appendAgentLog(ctx context.Context, serverID string, logMsg string) {
+	logDir := fmt.Sprintf("logs/servers/%s", serverID)
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		logger.Log.Error("Failed to create log dir", zap.Error(err))
+		return
+	}
 
-	return nil
+	logFile := filepath.Join(logDir, "setup_agent.log")
+	l := &lumberjack.Logger{
+		Filename:   logFile,
+		MaxSize:    25, // MB
+		MaxBackups: 3,
+		MaxAge:     28,
+		Compress:   true,
+	}
+	defer l.Close()
+
+	msg := fmt.Sprintf("[%s] %s\n", time.Now().Format(time.RFC3339), logMsg)
+	if _, err := l.Write([]byte(msg)); err != nil {
+		logger.Log.Error("Failed to write agent log", zap.Error(err))
+	}
 }

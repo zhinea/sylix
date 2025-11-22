@@ -148,6 +148,9 @@ func (s *ServerService) entityToProto(server *entity.Server) *pbServer.Server {
 			Password: server.Credential.Password,
 			SshKey:   server.Credential.SSHKey,
 		},
+		Status:      pbServer.StatusServer(server.Status),
+		AgentStatus: pbServer.AgentStatusServer(server.AgentStatus),
+		AgentLogs:   server.AgentLogs,
 	}
 }
 
@@ -162,6 +165,9 @@ func (s *ServerService) protoToEntity(pb *pbServer.Server) *entity.Server {
 			Password: pb.Credential.Password,
 			SSHKey:   pb.Credential.SshKey,
 		},
+		Status:      int(pb.Status),
+		AgentStatus: int(pb.AgentStatus),
+		AgentLogs:   pb.AgentLogs,
 	}
 	server.Id = pb.Id
 	return server

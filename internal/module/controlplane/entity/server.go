@@ -10,9 +10,27 @@ type ServerCredential struct {
 
 type Server struct {
 	model.Model
-	Name       string           `json:"name"`
-	IpAddress  string           `json:"ip_address"`
-	Port       int              `json:"port"`
-	Protocol   string           `json:"protocol"`
-	Credential ServerCredential `json:"credential" gorm:"embedded;embeddedPrefix:credential_"`
+	Name        string           `json:"name"`
+	IpAddress   string           `json:"ip_address"`
+	Port        int              `json:"port"`
+	Protocol    string           `json:"protocol"`
+	Credential  ServerCredential `json:"credential" gorm:"embedded;embeddedPrefix:credential_"`
+	Status      int              `json:"status"`
+	AgentStatus int              `json:"agent_status"`
+	AgentLogs   string           `json:"agent_logs"`
 }
+
+const (
+	ServerStatusUnspecified  = 0
+	ServerStatusConnected    = 1
+	ServerStatusDisconnected = 2
+)
+
+const (
+	AgentStatusUnspecified     = 0
+	AgentStatusInstalling      = 1
+	AgentStatusConfiguring     = 2
+	AgentStatusFinalizingSetup = 3
+	AgentStatusSuccess         = 4
+	AgentStatusFailed          = 5
+)

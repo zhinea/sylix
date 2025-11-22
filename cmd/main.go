@@ -6,7 +6,9 @@ import (
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/rs/cors"
+	"github.com/zhinea/sylix/internal/common/logger"
 	database "github.com/zhinea/sylix/internal/infra/db"
+	logsPb "github.com/zhinea/sylix/internal/infra/proto/logs"
 	serverPb "github.com/zhinea/sylix/internal/infra/proto/server"
 	"github.com/zhinea/sylix/internal/module/controlplane/app"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
@@ -15,6 +17,15 @@ import (
 )
 
 func main() {
+	logger.Init(logger.Config{
+		Filename:   "logs/app/file.log",
+		MaxSize:    10, // MB
+		MaxBackups: 3,
+		MaxAge:     7, // days
+		Compress:   true,
+	})
+	defer logger.Log.Sync()
+
 	db, err := database.NewDB()
 
 	if err != nil {
@@ -32,7 +43,11 @@ func main() {
 	serverUseCase := app.NewServerUseCase(serverRepo)
 	serverService := grpcServices.NewServerService(serverUseCase)
 
+	logsUseCase := app.NewLogsUseCase()
+	logsService := grpcServices.NewLogsService(logsUseCase)
+
 	serverPb.RegisterServerServiceServer(grpcServer, serverService)
+	logsPb.RegisterLogsServiceServer(grpcServer, logsService)
 
 	// Wrap gRPC server for gRPC-Web support
 	wrappedGrpc := grpcweb.WrapServer(grpcServer,

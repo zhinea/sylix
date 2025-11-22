@@ -69,6 +69,9 @@ message Server {
     string protocol = 5;
     ServerCredential credential = 6;
     int32 isRoot = 7;
+    StatusServer status = 8;
+    AgentStatusServer agentStatus = 9;
+    string agentLogs = 10;
 }
 
 message ServerCredential {

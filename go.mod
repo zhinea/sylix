@@ -6,11 +6,14 @@ toolchain go1.24.10
 
 require (
 	github.com/go-playground/validator/v10 v10.28.0
+	github.com/google/uuid v1.6.0
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/rs/cors v1.11.1
+	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.44.0
 	google.golang.org/grpc v1.77.0
 	google.golang.org/protobuf v1.36.10
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.1
 )
@@ -26,6 +29,7 @@ require (
 	github.com/klauspost/compress v1.11.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.32 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.31.0 // indirect

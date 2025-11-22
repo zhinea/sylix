@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package logs;
+
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/logs";
+
+service LogsService {
+    rpc GetSystemLogs(Empty) returns (GetSystemLogsResponse);
+    rpc ReadSystemLog(ReadSystemLogRequest) returns (ReadSystemLogResponse);
+    
+    rpc GetServerLogs(GetServerLogsRequest) returns (GetServerLogsResponse);
+    rpc ReadServerLog(ReadServerLogRequest) returns (ReadServerLogResponse);
+}
+
+message Empty {}
+
+message LogFile {
+    string name = 1;
+    int64 size = 2;
+    string last_modified = 3;
+}
+
+message GetSystemLogsResponse {
+    repeated LogFile files = 1;
+}
+
+message ReadSystemLogRequest {
+    string filename = 1;
+    int32 page = 2;
+    int32 page_size = 3;
+}
+
+message ReadSystemLogResponse {
+    repeated string lines = 1;
+    int32 total_lines = 2;
+    int32 current_page = 3;
+    int32 total_pages = 4;
+}
+
+message GetServerLogsRequest {
+    string server_id = 1;
+}
+
+message GetServerLogsResponse {
+    repeated LogFile files = 1;
+}
+
+message ReadServerLogRequest {
+    string server_id = 1;
+    string filename = 2;
+    int32 page = 3;
+    int32 page_size = 4;
+}
+
+message ReadServerLogResponse {
+    repeated string lines = 1;
+    int32 total_lines = 2;
+    int32 current_page = 3;
+    int32 total_pages = 4;
+}

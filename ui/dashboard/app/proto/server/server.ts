@@ -199,6 +199,9 @@ export interface Server {
   protocol: string;
   credential: ServerCredential | undefined;
   isRoot: number;
+  status: StatusServer;
+  agentStatus: AgentStatusServer;
+  agentLogs: string;
 }
 
 export interface ServerCredential {
@@ -536,7 +539,18 @@ export const ServersResponse: MessageFns<ServersResponse> = {
 };
 
 function createBaseServer(): Server {
-  return { id: "", name: "", ipAddress: "", port: 0, protocol: "", credential: undefined, isRoot: 0 };
+  return {
+    id: "",
+    name: "",
+    ipAddress: "",
+    port: 0,
+    protocol: "",
+    credential: undefined,
+    isRoot: 0,
+    status: 0,
+    agentStatus: 0,
+    agentLogs: "",
+  };
 }
 
 export const Server: MessageFns<Server> = {
@@ -561,6 +575,15 @@ export const Server: MessageFns<Server> = {
     }
     if (message.isRoot !== 0) {
       writer.uint32(56).int32(message.isRoot);
+    }
+    if (message.status !== 0) {
+      writer.uint32(64).int32(message.status);
+    }
+    if (message.agentStatus !== 0) {
+      writer.uint32(72).int32(message.agentStatus);
+    }
+    if (message.agentLogs !== "") {
+      writer.uint32(82).string(message.agentLogs);
     }
     return writer;
   },
@@ -628,6 +651,30 @@ export const Server: MessageFns<Server> = {
           message.isRoot = reader.int32();
           continue;
         }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.status = reader.int32() as any;
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.agentStatus = reader.int32() as any;
+          continue;
+        }
+        case 10: {
+          if (tag !== 82) {
+            break;
+          }
+
+          message.agentLogs = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -646,6 +693,9 @@ export const Server: MessageFns<Server> = {
       protocol: isSet(object.protocol) ? globalThis.String(object.protocol) : "",
       credential: isSet(object.credential) ? ServerCredential.fromJSON(object.credential) : undefined,
       isRoot: isSet(object.isRoot) ? globalThis.Number(object.isRoot) : 0,
+      status: isSet(object.status) ? statusServerFromJSON(object.status) : 0,
+      agentStatus: isSet(object.agentStatus) ? agentStatusServerFromJSON(object.agentStatus) : 0,
+      agentLogs: isSet(object.agentLogs) ? globalThis.String(object.agentLogs) : "",
     };
   },
 
@@ -672,6 +722,15 @@ export const Server: MessageFns<Server> = {
     if (message.isRoot !== 0) {
       obj.isRoot = Math.round(message.isRoot);
     }
+    if (message.status !== 0) {
+      obj.status = statusServerToJSON(message.status);
+    }
+    if (message.agentStatus !== 0) {
+      obj.agentStatus = agentStatusServerToJSON(message.agentStatus);
+    }
+    if (message.agentLogs !== "") {
+      obj.agentLogs = message.agentLogs;
+    }
     return obj;
   },
 
@@ -689,6 +748,9 @@ export const Server: MessageFns<Server> = {
       ? ServerCredential.fromPartial(object.credential)
       : undefined;
     message.isRoot = object.isRoot ?? 0;
+    message.status = object.status ?? 0;
+    message.agentStatus = object.agentStatus ?? 0;
+    message.agentLogs = object.agentLogs ?? "";
     return message;
   },
 };

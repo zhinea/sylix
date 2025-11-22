@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -89,16 +90,23 @@ func (s *SSHClient) CopyFile(srcPath, dstPath string) error {
 	}
 	defer session.Close()
 
+	w, err := session.StdinPipe()
+	if err != nil {
+		return fmt.Errorf("failed to get stdin pipe: %w", err)
+	}
+
+	var stderr bytes.Buffer
+	session.Stderr = &stderr
+
 	go func() {
-		w, _ := session.StdinPipe()
 		defer w.Close()
-		fmt.Fprintf(w, "C%#o %d %s\n", stat.Mode().Perm(), stat.Size(), dstPath)
+		fmt.Fprintf(w, "C%#o %d %s\n", stat.Mode().Perm(), stat.Size(), filepath.Base(dstPath))
 		io.Copy(w, srcFile)
 		fmt.Fprint(w, "\x00")
 	}()
 
-	if err := session.Run("/usr/bin/scp -t " + dstPath); err != nil {
-		return fmt.Errorf("failed to run scp: %w", err)
+	if err := session.Run("scp -t " + dstPath); err != nil {
+		return fmt.Errorf("failed to run scp: %w, stderr: %s", err, stderr.String())
 	}
 
 	return nil
