@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package common.validation;
+package common;
 
-option go_package = "internal/infra/proto/common";
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/common";
 
 message ValidationError {
     string field = 1;

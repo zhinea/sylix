@@ -77,10 +77,10 @@ var File_common_validation_proto protoreflect.FileDescriptor
 
 const file_common_validation_proto_rawDesc = "" +
 	"\n" +
-	"\x17common/validation.proto\x12\x11common.validation\"A\n" +
+	"\x17common/validation.proto\x12\x06common\"A\n" +
 	"\x0fValidationError\x12\x14\n" +
 	"\x05field\x18\x01 \x01(\tR\x05field\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessageB\x1dZ\x1binternal/infra/proto/commonb\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessageB5Z3github.com/zhinea/sylix/internal/infra/proto/commonb\x06proto3"
 
 var (
 	file_common_validation_proto_rawDescOnce sync.Once
@@ -96,7 +96,7 @@ func file_common_validation_proto_rawDescGZIP() []byte {
 
 var file_common_validation_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_common_validation_proto_goTypes = []any{
-	(*ValidationError)(nil), // 0: common.validation.ValidationError
+	(*ValidationError)(nil), // 0: common.ValidationError
 }
 var file_common_validation_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type

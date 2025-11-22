@@ -5,7 +5,9 @@ import (
 	"net"
 
 	database "github.com/zhinea/sylix/internal/infra/db"
-	"github.com/zhinea/sylix/internal/infra/proto/server"
+	serverPb "github.com/zhinea/sylix/internal/infra/proto/server"
+	"github.com/zhinea/sylix/internal/module/controlplane/app"
+	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
 	grpcServices "github.com/zhinea/sylix/internal/module/controlplane/interface/grpc"
 	"google.golang.org/grpc"
 )
@@ -29,13 +31,15 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	serverService := grpcServices.ServerService{}
+	// Initialize dependencies
+	serverRepo := repository.NewServerRepository(db)
+	serverUseCase := app.NewServerUseCase(serverRepo)
+	serverService := grpcServices.NewServerService(serverUseCase)
 
-	server.RegisterServerServiceServer(grpcServer, &serverService)
+	serverPb.RegisterServerServiceServer(grpcServer, serverService)
 
 	log.Printf("Server started at: %v", port)
 	if err := grpcServer.Serve(netListen); err != nil {
 		log.Fatalf("Failed to serve gRPC server over port %s: %v", port, err)
 	}
-
 }

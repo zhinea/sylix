@@ -4,13 +4,14 @@ import (
 	"fmt"
 
 	"github.com/go-playground/validator/v10"
+	pbValidation "github.com/zhinea/sylix/internal/infra/proto/common"
 )
 
 // ValidationError represents a common validation error payload.
-type ValidationError struct {
-	Field   string `json:"field"`
-	Message string `json:"message"`
-}
+// type ValidationError struct {
+// 	Field   string `json:"field"`
+// 	Message string `json:"message"`
+// }
 
 // messageFunc defines how to build an error message for a validation tag.
 type messageFunc func(validator.FieldError) string
@@ -30,7 +31,7 @@ func NewBaseValidator() *BaseValidator {
 }
 
 // ValidateStruct validates a struct and returns formatted errors when present.
-func (b *BaseValidator) ValidateStruct(value interface{}) []ValidationError {
+func (b *BaseValidator) ValidateStruct(value interface{}) []*pbValidation.ValidationError {
 	if err := b.validate.Struct(value); err != nil {
 		return b.formatErrors(err)
 	}
@@ -49,12 +50,12 @@ func (b *BaseValidator) RegisterTagMessage(tag string, fn messageFunc) {
 }
 
 // formatErrors converts validator.ValidationErrors into the common payload format.
-func (b *BaseValidator) formatErrors(err error) []ValidationError {
-	var errors []ValidationError
+func (b *BaseValidator) formatErrors(err error) []*pbValidation.ValidationError {
+	var errors []*pbValidation.ValidationError
 
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {
 		for _, fieldErr := range validationErrors {
-			errors = append(errors, ValidationError{
+			errors = append(errors, &pbValidation.ValidationError{
 				Field:   fieldErr.Field(),
 				Message: b.getErrorMessage(fieldErr),
 			})

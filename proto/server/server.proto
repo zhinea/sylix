@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package frontend;
+package server;
 
-option go_package = "internal/infra/proto/frontend";
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/server";
 
-import "./../common/validation.proto";
+import "common/validation.proto";
 
 service ServerService {
     rpc Create(Server) returns (ServerResponse);
@@ -12,6 +12,7 @@ service ServerService {
     rpc All(Empty) returns (ServersResponse);
     rpc Update(Server) returns (ServerResponse);
     rpc Delete(Id) returns (MessageResponse);
+    rpc InstallAgent(Id) returns (MessageResponse);
 }
 
 enum StatusCode {
@@ -24,6 +25,21 @@ enum StatusCode {
     VALIDATION_FAILED = 402;
 }
 
+// Status dimana hanya untuk koneksi ke server, apakah koneksi berhasil atau tidak
+enum StatusServer {
+    STATUS_SERVER_UNSPECIFIED = 0;
+    CONNECTED = 1;
+    DISCONNECTED = 2;
+}
+
+enum AgentStatusServer {
+    AGENT_STATUS_SERVER_UNSPECIFIED = 0;
+    INSTALLING = 1;
+    CONFIGURING = 2;
+    FINALIZING_SETUP = 3;
+    SUCCESS = 4;
+    FAILED = 5;
+}
 
 message Empty {}
 
@@ -34,14 +50,14 @@ message Id {
 message ServerResponse {
     StatusCode status = 1;
     Server server = 2;
-    repeated ValidationError errors = 3;
+    repeated common.ValidationError errors = 3;
     optional string error = 4; 
 }
 
 message ServersResponse {
     StatusCode status = 1;
     repeated Server servers = 2;
-    repeated ValidationError errors = 3;
+    repeated common.ValidationError errors = 3;
     optional string error = 4; 
 }
 

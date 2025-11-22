@@ -2,11 +2,12 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        v3.12.4
-// source: frontend/server.proto
+// source: server/server.proto
 
-package frontend
+package server
 
 import (
+	common "github.com/zhinea/sylix/internal/infra/proto/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -66,11 +67,11 @@ func (x StatusCode) String() string {
 }
 
 func (StatusCode) Descriptor() protoreflect.EnumDescriptor {
-	return file_frontend_server_proto_enumTypes[0].Descriptor()
+	return file_server_server_proto_enumTypes[0].Descriptor()
 }
 
 func (StatusCode) Type() protoreflect.EnumType {
-	return &file_frontend_server_proto_enumTypes[0]
+	return &file_server_server_proto_enumTypes[0]
 }
 
 func (x StatusCode) Number() protoreflect.EnumNumber {
@@ -79,7 +80,115 @@ func (x StatusCode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use StatusCode.Descriptor instead.
 func (StatusCode) EnumDescriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{0}
+	return file_server_server_proto_rawDescGZIP(), []int{0}
+}
+
+// Status dimana hanya untuk koneksi ke server, apakah koneksi berhasil atau tidak
+type StatusServer int32
+
+const (
+	StatusServer_STATUS_SERVER_UNSPECIFIED StatusServer = 0
+	StatusServer_CONNECTED                 StatusServer = 1
+	StatusServer_DISCONNECTED              StatusServer = 2
+)
+
+// Enum value maps for StatusServer.
+var (
+	StatusServer_name = map[int32]string{
+		0: "STATUS_SERVER_UNSPECIFIED",
+		1: "CONNECTED",
+		2: "DISCONNECTED",
+	}
+	StatusServer_value = map[string]int32{
+		"STATUS_SERVER_UNSPECIFIED": 0,
+		"CONNECTED":                 1,
+		"DISCONNECTED":              2,
+	}
+)
+
+func (x StatusServer) Enum() *StatusServer {
+	p := new(StatusServer)
+	*p = x
+	return p
+}
+
+func (x StatusServer) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (StatusServer) Descriptor() protoreflect.EnumDescriptor {
+	return file_server_server_proto_enumTypes[1].Descriptor()
+}
+
+func (StatusServer) Type() protoreflect.EnumType {
+	return &file_server_server_proto_enumTypes[1]
+}
+
+func (x StatusServer) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use StatusServer.Descriptor instead.
+func (StatusServer) EnumDescriptor() ([]byte, []int) {
+	return file_server_server_proto_rawDescGZIP(), []int{1}
+}
+
+type AgentStatusServer int32
+
+const (
+	AgentStatusServer_AGENT_STATUS_SERVER_UNSPECIFIED AgentStatusServer = 0
+	AgentStatusServer_INSTALLING                      AgentStatusServer = 1
+	AgentStatusServer_CONFIGURING                     AgentStatusServer = 2
+	AgentStatusServer_FINALIZING_SETUP                AgentStatusServer = 3
+	AgentStatusServer_SUCCESS                         AgentStatusServer = 4
+	AgentStatusServer_FAILED                          AgentStatusServer = 5
+)
+
+// Enum value maps for AgentStatusServer.
+var (
+	AgentStatusServer_name = map[int32]string{
+		0: "AGENT_STATUS_SERVER_UNSPECIFIED",
+		1: "INSTALLING",
+		2: "CONFIGURING",
+		3: "FINALIZING_SETUP",
+		4: "SUCCESS",
+		5: "FAILED",
+	}
+	AgentStatusServer_value = map[string]int32{
+		"AGENT_STATUS_SERVER_UNSPECIFIED": 0,
+		"INSTALLING":                      1,
+		"CONFIGURING":                     2,
+		"FINALIZING_SETUP":                3,
+		"SUCCESS":                         4,
+		"FAILED":                          5,
+	}
+)
+
+func (x AgentStatusServer) Enum() *AgentStatusServer {
+	p := new(AgentStatusServer)
+	*p = x
+	return p
+}
+
+func (x AgentStatusServer) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AgentStatusServer) Descriptor() protoreflect.EnumDescriptor {
+	return file_server_server_proto_enumTypes[2].Descriptor()
+}
+
+func (AgentStatusServer) Type() protoreflect.EnumType {
+	return &file_server_server_proto_enumTypes[2]
+}
+
+func (x AgentStatusServer) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AgentStatusServer.Descriptor instead.
+func (AgentStatusServer) EnumDescriptor() ([]byte, []int) {
+	return file_server_server_proto_rawDescGZIP(), []int{2}
 }
 
 type Empty struct {
@@ -90,7 +199,7 @@ type Empty struct {
 
 func (x *Empty) Reset() {
 	*x = Empty{}
-	mi := &file_frontend_server_proto_msgTypes[0]
+	mi := &file_server_server_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -102,7 +211,7 @@ func (x *Empty) String() string {
 func (*Empty) ProtoMessage() {}
 
 func (x *Empty) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[0]
+	mi := &file_server_server_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -115,7 +224,7 @@ func (x *Empty) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Empty.ProtoReflect.Descriptor instead.
 func (*Empty) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{0}
+	return file_server_server_proto_rawDescGZIP(), []int{0}
 }
 
 type Id struct {
@@ -127,7 +236,7 @@ type Id struct {
 
 func (x *Id) Reset() {
 	*x = Id{}
-	mi := &file_frontend_server_proto_msgTypes[1]
+	mi := &file_server_server_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -139,7 +248,7 @@ func (x *Id) String() string {
 func (*Id) ProtoMessage() {}
 
 func (x *Id) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[1]
+	mi := &file_server_server_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -152,7 +261,7 @@ func (x *Id) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Id.ProtoReflect.Descriptor instead.
 func (*Id) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{1}
+	return file_server_server_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Id) GetId() string {
@@ -163,18 +272,18 @@ func (x *Id) GetId() string {
 }
 
 type ServerResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        StatusCode             `protobuf:"varint,1,opt,name=status,proto3,enum=frontend.StatusCode" json:"status,omitempty"`
-	Server        *Server                `protobuf:"bytes,2,opt,name=server,proto3" json:"server,omitempty"`
-	Errors        []*ValidationError     `protobuf:"bytes,3,rep,name=errors,proto3" json:"errors,omitempty"`
-	Error         *string                `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Status        StatusCode                `protobuf:"varint,1,opt,name=status,proto3,enum=server.StatusCode" json:"status,omitempty"`
+	Server        *Server                   `protobuf:"bytes,2,opt,name=server,proto3" json:"server,omitempty"`
+	Errors        []*common.ValidationError `protobuf:"bytes,3,rep,name=errors,proto3" json:"errors,omitempty"`
+	Error         *string                   `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ServerResponse) Reset() {
 	*x = ServerResponse{}
-	mi := &file_frontend_server_proto_msgTypes[2]
+	mi := &file_server_server_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -186,7 +295,7 @@ func (x *ServerResponse) String() string {
 func (*ServerResponse) ProtoMessage() {}
 
 func (x *ServerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[2]
+	mi := &file_server_server_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -199,7 +308,7 @@ func (x *ServerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerResponse.ProtoReflect.Descriptor instead.
 func (*ServerResponse) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{2}
+	return file_server_server_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ServerResponse) GetStatus() StatusCode {
@@ -216,7 +325,7 @@ func (x *ServerResponse) GetServer() *Server {
 	return nil
 }
 
-func (x *ServerResponse) GetErrors() []*ValidationError {
+func (x *ServerResponse) GetErrors() []*common.ValidationError {
 	if x != nil {
 		return x.Errors
 	}
@@ -231,18 +340,18 @@ func (x *ServerResponse) GetError() string {
 }
 
 type ServersResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        StatusCode             `protobuf:"varint,1,opt,name=status,proto3,enum=frontend.StatusCode" json:"status,omitempty"`
-	Servers       []*Server              `protobuf:"bytes,2,rep,name=servers,proto3" json:"servers,omitempty"`
-	Errors        []*ValidationError     `protobuf:"bytes,3,rep,name=errors,proto3" json:"errors,omitempty"`
-	Error         *string                `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Status        StatusCode                `protobuf:"varint,1,opt,name=status,proto3,enum=server.StatusCode" json:"status,omitempty"`
+	Servers       []*Server                 `protobuf:"bytes,2,rep,name=servers,proto3" json:"servers,omitempty"`
+	Errors        []*common.ValidationError `protobuf:"bytes,3,rep,name=errors,proto3" json:"errors,omitempty"`
+	Error         *string                   `protobuf:"bytes,4,opt,name=error,proto3,oneof" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ServersResponse) Reset() {
 	*x = ServersResponse{}
-	mi := &file_frontend_server_proto_msgTypes[3]
+	mi := &file_server_server_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -254,7 +363,7 @@ func (x *ServersResponse) String() string {
 func (*ServersResponse) ProtoMessage() {}
 
 func (x *ServersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[3]
+	mi := &file_server_server_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -267,7 +376,7 @@ func (x *ServersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServersResponse.ProtoReflect.Descriptor instead.
 func (*ServersResponse) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{3}
+	return file_server_server_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ServersResponse) GetStatus() StatusCode {
@@ -284,7 +393,7 @@ func (x *ServersResponse) GetServers() []*Server {
 	return nil
 }
 
-func (x *ServersResponse) GetErrors() []*ValidationError {
+func (x *ServersResponse) GetErrors() []*common.ValidationError {
 	if x != nil {
 		return x.Errors
 	}
@@ -313,7 +422,7 @@ type Server struct {
 
 func (x *Server) Reset() {
 	*x = Server{}
-	mi := &file_frontend_server_proto_msgTypes[4]
+	mi := &file_server_server_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -325,7 +434,7 @@ func (x *Server) String() string {
 func (*Server) ProtoMessage() {}
 
 func (x *Server) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[4]
+	mi := &file_server_server_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -338,7 +447,7 @@ func (x *Server) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Server.ProtoReflect.Descriptor instead.
 func (*Server) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{4}
+	return file_server_server_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Server) GetId() string {
@@ -401,7 +510,7 @@ type ServerCredential struct {
 
 func (x *ServerCredential) Reset() {
 	*x = ServerCredential{}
-	mi := &file_frontend_server_proto_msgTypes[5]
+	mi := &file_server_server_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -413,7 +522,7 @@ func (x *ServerCredential) String() string {
 func (*ServerCredential) ProtoMessage() {}
 
 func (x *ServerCredential) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[5]
+	mi := &file_server_server_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -426,7 +535,7 @@ func (x *ServerCredential) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerCredential.ProtoReflect.Descriptor instead.
 func (*ServerCredential) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{5}
+	return file_server_server_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ServerCredential) GetUsername() string {
@@ -452,7 +561,7 @@ func (x *ServerCredential) GetSshKey() string {
 
 type MessageResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        StatusCode             `protobuf:"varint,1,opt,name=status,proto3,enum=frontend.StatusCode" json:"status,omitempty"`
+	Status        StatusCode             `protobuf:"varint,1,opt,name=status,proto3,enum=server.StatusCode" json:"status,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -460,7 +569,7 @@ type MessageResponse struct {
 
 func (x *MessageResponse) Reset() {
 	*x = MessageResponse{}
-	mi := &file_frontend_server_proto_msgTypes[6]
+	mi := &file_server_server_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -472,7 +581,7 @@ func (x *MessageResponse) String() string {
 func (*MessageResponse) ProtoMessage() {}
 
 func (x *MessageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[6]
+	mi := &file_server_server_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -485,7 +594,7 @@ func (x *MessageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MessageResponse.ProtoReflect.Descriptor instead.
 func (*MessageResponse) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{6}
+	return file_server_server_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *MessageResponse) GetStatus() StatusCode {
@@ -502,86 +611,34 @@ func (x *MessageResponse) GetMessage() string {
 	return ""
 }
 
-type ValidationError struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Field         string                 `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
+var File_server_server_proto protoreflect.FileDescriptor
 
-func (x *ValidationError) Reset() {
-	*x = ValidationError{}
-	mi := &file_frontend_server_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ValidationError) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidationError) ProtoMessage() {}
-
-func (x *ValidationError) ProtoReflect() protoreflect.Message {
-	mi := &file_frontend_server_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ValidationError.ProtoReflect.Descriptor instead.
-func (*ValidationError) Descriptor() ([]byte, []int) {
-	return file_frontend_server_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *ValidationError) GetField() string {
-	if x != nil {
-		return x.Field
-	}
-	return ""
-}
-
-func (x *ValidationError) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-var File_frontend_server_proto protoreflect.FileDescriptor
-
-const file_frontend_server_proto_rawDesc = "" +
+const file_server_server_proto_rawDesc = "" +
 	"\n" +
-	"\x15frontend/server.proto\x12\bfrontend\"\a\n" +
+	"\x13server/server.proto\x12\x06server\x1a\x17common/validation.proto\"\a\n" +
 	"\x05Empty\"\x14\n" +
 	"\x02Id\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xc0\x01\n" +
-	"\x0eServerResponse\x12,\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x14.frontend.StatusCodeR\x06status\x12(\n" +
-	"\x06server\x18\x02 \x01(\v2\x10.frontend.ServerR\x06server\x121\n" +
-	"\x06errors\x18\x03 \x03(\v2\x19.frontend.ValidationErrorR\x06errors\x12\x19\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xba\x01\n" +
+	"\x0eServerResponse\x12*\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x12.server.StatusCodeR\x06status\x12&\n" +
+	"\x06server\x18\x02 \x01(\v2\x0e.server.ServerR\x06server\x12/\n" +
+	"\x06errors\x18\x03 \x03(\v2\x17.common.ValidationErrorR\x06errors\x12\x19\n" +
 	"\x05error\x18\x04 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error\"\xc3\x01\n" +
-	"\x0fServersResponse\x12,\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x14.frontend.StatusCodeR\x06status\x12*\n" +
-	"\aservers\x18\x02 \x03(\v2\x10.frontend.ServerR\aservers\x121\n" +
-	"\x06errors\x18\x03 \x03(\v2\x19.frontend.ValidationErrorR\x06errors\x12\x19\n" +
+	"\x06_error\"\xbd\x01\n" +
+	"\x0fServersResponse\x12*\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x12.server.StatusCodeR\x06status\x12(\n" +
+	"\aservers\x18\x02 \x03(\v2\x0e.server.ServerR\aservers\x12/\n" +
+	"\x06errors\x18\x03 \x03(\v2\x17.common.ValidationErrorR\x06errors\x12\x19\n" +
 	"\x05error\x18\x04 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error\"\xce\x01\n" +
+	"\x06_error\"\xcc\x01\n" +
 	"\x06Server\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
 	"\tipAddress\x18\x03 \x01(\tR\tipAddress\x12\x12\n" +
 	"\x04port\x18\x04 \x01(\x05R\x04port\x12\x1a\n" +
-	"\bprotocol\x18\x05 \x01(\tR\bprotocol\x12:\n" +
+	"\bprotocol\x18\x05 \x01(\tR\bprotocol\x128\n" +
 	"\n" +
-	"credential\x18\x06 \x01(\v2\x1a.frontend.ServerCredentialR\n" +
+	"credential\x18\x06 \x01(\v2\x18.server.ServerCredentialR\n" +
 	"credential\x12\x16\n" +
 	"\x06isRoot\x18\a \x01(\x05R\x06isRoot\"\x84\x01\n" +
 	"\x10ServerCredential\x12\x1a\n" +
@@ -589,12 +646,9 @@ const file_frontend_server_proto_rawDesc = "" +
 	"\bpassword\x18\x02 \x01(\tH\x00R\bpassword\x88\x01\x01\x12\x1b\n" +
 	"\x06sshKey\x18\x03 \x01(\tH\x01R\x06sshKey\x88\x01\x01B\v\n" +
 	"\t_passwordB\t\n" +
-	"\a_sshKey\"Y\n" +
-	"\x0fMessageResponse\x12,\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x14.frontend.StatusCodeR\x06status\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"A\n" +
-	"\x0fValidationError\x12\x14\n" +
-	"\x05field\x18\x01 \x01(\tR\x05field\x12\x18\n" +
+	"\a_sshKey\"W\n" +
+	"\x0fMessageResponse\x12*\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x12.server.StatusCodeR\x06status\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage*\x83\x01\n" +
 	"\n" +
 	"StatusCode\x12\x0f\n" +
@@ -604,89 +658,110 @@ const file_frontend_server_proto_rawDesc = "" +
 	"\tNOT_FOUND\x10\x94\x03\x12\x13\n" +
 	"\x0eINTERNAL_ERROR\x10\xf4\x03\x12\x10\n" +
 	"\vBAD_REQUEST\x10\x90\x03\x12\x16\n" +
-	"\x11VALIDATION_FAILED\x10\x92\x032\x90\x02\n" +
-	"\rServerService\x124\n" +
-	"\x06Create\x12\x10.frontend.Server\x1a\x18.frontend.ServerResponse\x12-\n" +
-	"\x03Get\x12\f.frontend.Id\x1a\x18.frontend.ServerResponse\x121\n" +
-	"\x03All\x12\x0f.frontend.Empty\x1a\x19.frontend.ServersResponse\x124\n" +
-	"\x06Update\x12\x10.frontend.Server\x1a\x18.frontend.ServerResponse\x121\n" +
-	"\x06Delete\x12\f.frontend.Id\x1a\x19.frontend.MessageResponseB\x1fZ\x1dinternal/infra/proto/frontendb\x06proto3"
+	"\x11VALIDATION_FAILED\x10\x92\x03*N\n" +
+	"\fStatusServer\x12\x1d\n" +
+	"\x19STATUS_SERVER_UNSPECIFIED\x10\x00\x12\r\n" +
+	"\tCONNECTED\x10\x01\x12\x10\n" +
+	"\fDISCONNECTED\x10\x02*\x88\x01\n" +
+	"\x11AgentStatusServer\x12#\n" +
+	"\x1fAGENT_STATUS_SERVER_UNSPECIFIED\x10\x00\x12\x0e\n" +
+	"\n" +
+	"INSTALLING\x10\x01\x12\x0f\n" +
+	"\vCONFIGURING\x10\x02\x12\x14\n" +
+	"\x10FINALIZING_SETUP\x10\x03\x12\v\n" +
+	"\aSUCCESS\x10\x04\x12\n" +
+	"\n" +
+	"\x06FAILED\x10\x052\xb1\x02\n" +
+	"\rServerService\x120\n" +
+	"\x06Create\x12\x0e.server.Server\x1a\x16.server.ServerResponse\x12)\n" +
+	"\x03Get\x12\n" +
+	".server.Id\x1a\x16.server.ServerResponse\x12-\n" +
+	"\x03All\x12\r.server.Empty\x1a\x17.server.ServersResponse\x120\n" +
+	"\x06Update\x12\x0e.server.Server\x1a\x16.server.ServerResponse\x12-\n" +
+	"\x06Delete\x12\n" +
+	".server.Id\x1a\x17.server.MessageResponse\x123\n" +
+	"\fInstallAgent\x12\n" +
+	".server.Id\x1a\x17.server.MessageResponseB5Z3github.com/zhinea/sylix/internal/infra/proto/serverb\x06proto3"
 
 var (
-	file_frontend_server_proto_rawDescOnce sync.Once
-	file_frontend_server_proto_rawDescData []byte
+	file_server_server_proto_rawDescOnce sync.Once
+	file_server_server_proto_rawDescData []byte
 )
 
-func file_frontend_server_proto_rawDescGZIP() []byte {
-	file_frontend_server_proto_rawDescOnce.Do(func() {
-		file_frontend_server_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_frontend_server_proto_rawDesc), len(file_frontend_server_proto_rawDesc)))
+func file_server_server_proto_rawDescGZIP() []byte {
+	file_server_server_proto_rawDescOnce.Do(func() {
+		file_server_server_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_server_server_proto_rawDesc), len(file_server_server_proto_rawDesc)))
 	})
-	return file_frontend_server_proto_rawDescData
+	return file_server_server_proto_rawDescData
 }
 
-var file_frontend_server_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_frontend_server_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_frontend_server_proto_goTypes = []any{
-	(StatusCode)(0),          // 0: frontend.StatusCode
-	(*Empty)(nil),            // 1: frontend.Empty
-	(*Id)(nil),               // 2: frontend.Id
-	(*ServerResponse)(nil),   // 3: frontend.ServerResponse
-	(*ServersResponse)(nil),  // 4: frontend.ServersResponse
-	(*Server)(nil),           // 5: frontend.Server
-	(*ServerCredential)(nil), // 6: frontend.ServerCredential
-	(*MessageResponse)(nil),  // 7: frontend.MessageResponse
-	(*ValidationError)(nil),  // 8: frontend.ValidationError
+var file_server_server_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_server_server_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_server_server_proto_goTypes = []any{
+	(StatusCode)(0),                // 0: server.StatusCode
+	(StatusServer)(0),              // 1: server.StatusServer
+	(AgentStatusServer)(0),         // 2: server.AgentStatusServer
+	(*Empty)(nil),                  // 3: server.Empty
+	(*Id)(nil),                     // 4: server.Id
+	(*ServerResponse)(nil),         // 5: server.ServerResponse
+	(*ServersResponse)(nil),        // 6: server.ServersResponse
+	(*Server)(nil),                 // 7: server.Server
+	(*ServerCredential)(nil),       // 8: server.ServerCredential
+	(*MessageResponse)(nil),        // 9: server.MessageResponse
+	(*common.ValidationError)(nil), // 10: common.ValidationError
 }
-var file_frontend_server_proto_depIdxs = []int32{
-	0,  // 0: frontend.ServerResponse.status:type_name -> frontend.StatusCode
-	5,  // 1: frontend.ServerResponse.server:type_name -> frontend.Server
-	8,  // 2: frontend.ServerResponse.errors:type_name -> frontend.ValidationError
-	0,  // 3: frontend.ServersResponse.status:type_name -> frontend.StatusCode
-	5,  // 4: frontend.ServersResponse.servers:type_name -> frontend.Server
-	8,  // 5: frontend.ServersResponse.errors:type_name -> frontend.ValidationError
-	6,  // 6: frontend.Server.credential:type_name -> frontend.ServerCredential
-	0,  // 7: frontend.MessageResponse.status:type_name -> frontend.StatusCode
-	5,  // 8: frontend.ServerService.Create:input_type -> frontend.Server
-	2,  // 9: frontend.ServerService.Get:input_type -> frontend.Id
-	1,  // 10: frontend.ServerService.All:input_type -> frontend.Empty
-	5,  // 11: frontend.ServerService.Update:input_type -> frontend.Server
-	2,  // 12: frontend.ServerService.Delete:input_type -> frontend.Id
-	3,  // 13: frontend.ServerService.Create:output_type -> frontend.ServerResponse
-	3,  // 14: frontend.ServerService.Get:output_type -> frontend.ServerResponse
-	4,  // 15: frontend.ServerService.All:output_type -> frontend.ServersResponse
-	3,  // 16: frontend.ServerService.Update:output_type -> frontend.ServerResponse
-	7,  // 17: frontend.ServerService.Delete:output_type -> frontend.MessageResponse
-	13, // [13:18] is the sub-list for method output_type
-	8,  // [8:13] is the sub-list for method input_type
+var file_server_server_proto_depIdxs = []int32{
+	0,  // 0: server.ServerResponse.status:type_name -> server.StatusCode
+	7,  // 1: server.ServerResponse.server:type_name -> server.Server
+	10, // 2: server.ServerResponse.errors:type_name -> common.ValidationError
+	0,  // 3: server.ServersResponse.status:type_name -> server.StatusCode
+	7,  // 4: server.ServersResponse.servers:type_name -> server.Server
+	10, // 5: server.ServersResponse.errors:type_name -> common.ValidationError
+	8,  // 6: server.Server.credential:type_name -> server.ServerCredential
+	0,  // 7: server.MessageResponse.status:type_name -> server.StatusCode
+	7,  // 8: server.ServerService.Create:input_type -> server.Server
+	4,  // 9: server.ServerService.Get:input_type -> server.Id
+	3,  // 10: server.ServerService.All:input_type -> server.Empty
+	7,  // 11: server.ServerService.Update:input_type -> server.Server
+	4,  // 12: server.ServerService.Delete:input_type -> server.Id
+	4,  // 13: server.ServerService.InstallAgent:input_type -> server.Id
+	5,  // 14: server.ServerService.Create:output_type -> server.ServerResponse
+	5,  // 15: server.ServerService.Get:output_type -> server.ServerResponse
+	6,  // 16: server.ServerService.All:output_type -> server.ServersResponse
+	5,  // 17: server.ServerService.Update:output_type -> server.ServerResponse
+	9,  // 18: server.ServerService.Delete:output_type -> server.MessageResponse
+	9,  // 19: server.ServerService.InstallAgent:output_type -> server.MessageResponse
+	14, // [14:20] is the sub-list for method output_type
+	8,  // [8:14] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
 	8,  // [8:8] is the sub-list for extension extendee
 	0,  // [0:8] is the sub-list for field type_name
 }
 
-func init() { file_frontend_server_proto_init() }
-func file_frontend_server_proto_init() {
-	if File_frontend_server_proto != nil {
+func init() { file_server_server_proto_init() }
+func file_server_server_proto_init() {
+	if File_server_server_proto != nil {
 		return
 	}
-	file_frontend_server_proto_msgTypes[2].OneofWrappers = []any{}
-	file_frontend_server_proto_msgTypes[3].OneofWrappers = []any{}
-	file_frontend_server_proto_msgTypes[5].OneofWrappers = []any{}
+	file_server_server_proto_msgTypes[2].OneofWrappers = []any{}
+	file_server_server_proto_msgTypes[3].OneofWrappers = []any{}
+	file_server_server_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_frontend_server_proto_rawDesc), len(file_frontend_server_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   8,
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_server_server_proto_rawDesc), len(file_server_server_proto_rawDesc)),
+			NumEnums:      3,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_frontend_server_proto_goTypes,
-		DependencyIndexes: file_frontend_server_proto_depIdxs,
-		EnumInfos:         file_frontend_server_proto_enumTypes,
-		MessageInfos:      file_frontend_server_proto_msgTypes,
+		GoTypes:           file_server_server_proto_goTypes,
+		DependencyIndexes: file_server_server_proto_depIdxs,
+		EnumInfos:         file_server_server_proto_enumTypes,
+		MessageInfos:      file_server_server_proto_msgTypes,
 	}.Build()
-	File_frontend_server_proto = out.File
-	file_frontend_server_proto_goTypes = nil
-	file_frontend_server_proto_depIdxs = nil
+	File_server_server_proto = out.File
+	file_server_server_proto_goTypes = nil
+	file_server_server_proto_depIdxs = nil
 }

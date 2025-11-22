@@ -18,23 +18,35 @@ func NewServerRepository(db *gorm.DB) ServerRepository {
 }
 
 func (s *ServerRepositoryImpl) Create(ctx context.Context, server *entity.Server) (*entity.Server, error) {
-	// tx := s.db.WithContext(ctx).Create(server)
-	// tx.
-	return &entity.Server{}, nil
+	if err := s.db.WithContext(ctx).Create(server).Error; err != nil {
+		return nil, err
+	}
+	return server, nil
 }
 
 func (s *ServerRepositoryImpl) GetByID(ctx context.Context, id string) (*entity.Server, error) {
-	return &entity.Server{}, nil
+	var server entity.Server
+	if err := s.db.WithContext(ctx).First(&server, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &server, nil
 }
 
 func (s *ServerRepositoryImpl) GetAll(ctx context.Context) ([]*entity.Server, error) {
-	return []*entity.Server{}, nil
+	var servers []*entity.Server
+	if err := s.db.WithContext(ctx).Find(&servers).Error; err != nil {
+		return nil, err
+	}
+	return servers, nil
 }
 
 func (s *ServerRepositoryImpl) Update(ctx context.Context, server *entity.Server) (*entity.Server, error) {
-	return &entity.Server{}, nil
+	if err := s.db.WithContext(ctx).Save(server).Error; err != nil {
+		return nil, err
+	}
+	return server, nil
 }
 
 func (s *ServerRepositoryImpl) Delete(ctx context.Context, id string) error {
-	return nil
+	return s.db.WithContext(ctx).Delete(&entity.Server{}, "id = ?", id).Error
 }

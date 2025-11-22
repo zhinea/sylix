@@ -3,6 +3,8 @@ package validator
 import (
 	"github.com/go-playground/validator/v10"
 	baseValidator "github.com/zhinea/sylix/internal/common/validator"
+	pbValidation "github.com/zhinea/sylix/internal/infra/proto/common"
+
 	"github.com/zhinea/sylix/internal/module/controlplane/entity"
 )
 
@@ -23,7 +25,7 @@ func NewServerValidator() *ServerValidator {
 	}
 }
 
-func (v *ServerValidator) Validate(server *entity.Server) []baseValidator.ValidationError {
+func (v *ServerValidator) Validate(server *entity.Server) []*pbValidation.ValidationError {
 	if errors := v.ValidateStruct(server); len(errors) > 0 {
 		return errors
 	}
@@ -31,12 +33,12 @@ func (v *ServerValidator) Validate(server *entity.Server) []baseValidator.Valida
 	return v.validateBusinessRules(server)
 }
 
-func (v *ServerValidator) validateBusinessRules(server *entity.Server) []baseValidator.ValidationError {
-	var errors []baseValidator.ValidationError
+func (v *ServerValidator) validateBusinessRules(server *entity.Server) []*pbValidation.ValidationError {
+	var errors []*pbValidation.ValidationError
 
 	// Custom business rule: Either password or SSH key must be provided
 	if server.Credential.Password == nil && server.Credential.SSHKey == nil {
-		errors = append(errors, baseValidator.ValidationError{
+		errors = append(errors, &pbValidation.ValidationError{
 			Field:   "Credential",
 			Message: "either password or SSH key must be provided",
 		})

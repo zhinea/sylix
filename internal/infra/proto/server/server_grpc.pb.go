@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.12.4
-// source: frontend/server.proto
+// source: server/server.proto
 
-package frontend
+package server
 
 import (
 	context "context"
@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ServerService_Create_FullMethodName = "/frontend.ServerService/Create"
-	ServerService_Get_FullMethodName    = "/frontend.ServerService/Get"
-	ServerService_All_FullMethodName    = "/frontend.ServerService/All"
-	ServerService_Update_FullMethodName = "/frontend.ServerService/Update"
-	ServerService_Delete_FullMethodName = "/frontend.ServerService/Delete"
+	ServerService_Create_FullMethodName       = "/server.ServerService/Create"
+	ServerService_Get_FullMethodName          = "/server.ServerService/Get"
+	ServerService_All_FullMethodName          = "/server.ServerService/All"
+	ServerService_Update_FullMethodName       = "/server.ServerService/Update"
+	ServerService_Delete_FullMethodName       = "/server.ServerService/Delete"
+	ServerService_InstallAgent_FullMethodName = "/server.ServerService/InstallAgent"
 )
 
 // ServerServiceClient is the client API for ServerService service.
@@ -35,6 +36,7 @@ type ServerServiceClient interface {
 	All(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ServersResponse, error)
 	Update(ctx context.Context, in *Server, opts ...grpc.CallOption) (*ServerResponse, error)
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
+	InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
 }
 
 type serverServiceClient struct {
@@ -95,6 +97,16 @@ func (c *serverServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.C
 	return out, nil
 }
 
+func (c *serverServiceClient) InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, ServerService_InstallAgent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ServerServiceServer is the server API for ServerService service.
 // All implementations must embed UnimplementedServerServiceServer
 // for forward compatibility.
@@ -104,6 +116,7 @@ type ServerServiceServer interface {
 	All(context.Context, *Empty) (*ServersResponse, error)
 	Update(context.Context, *Server) (*ServerResponse, error)
 	Delete(context.Context, *Id) (*MessageResponse, error)
+	InstallAgent(context.Context, *Id) (*MessageResponse, error)
 	mustEmbedUnimplementedServerServiceServer()
 }
 
@@ -128,6 +141,9 @@ func (UnimplementedServerServiceServer) Update(context.Context, *Server) (*Serve
 }
 func (UnimplementedServerServiceServer) Delete(context.Context, *Id) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedServerServiceServer) InstallAgent(context.Context, *Id) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InstallAgent not implemented")
 }
 func (UnimplementedServerServiceServer) mustEmbedUnimplementedServerServiceServer() {}
 func (UnimplementedServerServiceServer) testEmbeddedByValue()                       {}
@@ -240,11 +256,29 @@ func _ServerService_Delete_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServerService_InstallAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).InstallAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_InstallAgent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).InstallAgent(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ServerService_ServiceDesc is the grpc.ServiceDesc for ServerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ServerService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "frontend.ServerService",
+	ServiceName: "server.ServerService",
 	HandlerType: (*ServerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -267,7 +301,11 @@ var ServerService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Delete",
 			Handler:    _ServerService_Delete_Handler,
 		},
+		{
+			MethodName: "InstallAgent",
+			Handler:    _ServerService_InstallAgent_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "frontend/server.proto",
+	Metadata: "server/server.proto",
 }
