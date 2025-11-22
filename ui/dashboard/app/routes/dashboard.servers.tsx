@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useActionData, useNavigation, useSubmit } from "react-router";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ import type { ServerFormValues } from "~/components/servers/schema";
 import { ServerFormDialog } from "~/components/servers/server-form-dialog";
 import { ServerList } from "~/components/servers/server-list";
 import { serverService } from "~/lib/api";
-import { AgentStatusServer, Server, StatusCode, StatusServer } from "~/proto/server/server";
+import { AgentStatusServer, Server, StatusCode, StatusServer } from "~/proto/controlplane/server";
 import type { Route } from "./+types/dashboard.servers";
 
 // --- Loader ---
@@ -72,6 +72,45 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       await serverService.Delete({ id });
       return { success: true, message: "Server deleted successfully" };
     }
+
+    if (intent === "retry-connection") {
+      const id = formData.get("id") as string;
+      const response = await serverService.RetryConnection({ id });
+      if (response.status === StatusCode.OK) {
+        if (response.server?.status === StatusServer.CONNECTED) {
+          return { success: true, message: "Server connected successfully" };
+        } else {
+          return { success: true, warning: "Connection failed" };
+        }
+      }
+      return { success: false, error: response.error || "Failed to retry connection" };
+    }
+
+    if (intent === "update") {
+      const data = Object.fromEntries(formData);
+      const server: Server = {
+        id: data.id as string,
+        name: data.name as string,
+        ipAddress: data.ipAddress as string,
+        port: Number(data.port),
+        protocol: (data.protocol as string) || "ssh",
+        credential: {
+          username: data.username as string,
+          password: (data.password as string) || undefined,
+          sshKey: (data.sshKey as string) || undefined,
+        },
+        isRoot: 0,
+        status: StatusServer.STATUS_SERVER_UNSPECIFIED,
+        agentStatus: AgentStatusServer.AGENT_STATUS_SERVER_UNSPECIFIED,
+        agentLogs: "",
+      };
+
+      const response = await serverService.Update(server);
+      if (response.status === StatusCode.OK) {
+        return { success: true, message: "Server updated successfully" };
+      }
+      return { success: false, error: response.error || "Failed to update server" };
+    }
     
     if (intent === "install-agent") {
         const id = formData.get("id") as string;
@@ -91,11 +130,16 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
   const { servers } = loaderData;
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [serverToDelete, setServerToDelete] = useState<Server | null>(null);
+  const [serverToUpdate, setServerToUpdate] = useState<Server | null>(null);
   const [installingServerId, setInstallingServerId] = useState<string | null>(null);
   const submit = useSubmit();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const isDeleting = 
+    navigation.state === "submitting" && 
+    navigation.formData?.get("intent") === "delete";
   const actionData = useActionData<typeof clientAction>();
+  const wasDeleting = useRef(false);
 
   // Form handling
   const form = useForm<ServerFormValues>({
@@ -108,6 +152,21 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
   });
 
   useEffect(() => {
+    if (isDeleting) {
+      wasDeleting.current = true;
+    }
+    if (!isDeleting && wasDeleting.current && navigation.state === "idle") {
+      wasDeleting.current = false;
+      if (actionData?.success) {
+        setServerToDelete(null);
+        toast.success("Server deleted successfully");
+      } else if (actionData?.error) {
+        toast.error(actionData.error);
+      }
+    }
+  }, [isDeleting, navigation.state, actionData]);
+
+  useEffect(() => {
       if (actionData) {
           if (actionData.success) {
               if (actionData.warning) {
@@ -118,6 +177,7 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
               
               if (actionData.close) {
                   setIsCreateOpen(false);
+                  setServerToUpdate(null);
                   form.reset();
               }
           } else if (actionData.error) {
@@ -137,14 +197,25 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
     toast.info("Creating server...");
   };
 
+  const onUpdateSubmit = (data: ServerFormValues) => {
+    const formData = new FormData();
+    formData.append("intent", "update");
+    formData.append("id", serverToUpdate?.id || "");
+    Object.entries(data).forEach(([key, value]) => {
+      if (value) formData.append(key, value.toString());
+    });
+    
+    submit(formData, { method: "post" });
+    toast.info("Updating server...");
+  };
+
   const handleDelete = () => {
     if (serverToDelete) {
       const formData = new FormData();
       formData.append("intent", "delete");
       formData.append("id", serverToDelete.id);
       submit(formData, { method: "post" });
-      setServerToDelete(null);
-      toast.success("Deleting server...");
+      toast.info("Deleting server...");
     }
   };
   
@@ -156,6 +227,27 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
       setInstallingServerId(id);
       toast.info("Triggering agent installation...");
   }
+
+  const handleRetryConnection = (id: string) => {
+    const formData = new FormData();
+    formData.append("intent", "retry-connection");
+    formData.append("id", id);
+    submit(formData, { method: "post" });
+    toast.info("Retrying connection...");
+  };
+
+  const handleUpdate = (server: Server) => {
+    setServerToUpdate(server);
+    form.reset({
+      name: server.name,
+      ipAddress: server.ipAddress,
+      port: server.port,
+      username: server.credential?.username,
+      password: server.credential?.password || "",
+      sshKey: server.credential?.sshKey || "",
+      protocol: server.protocol,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -189,7 +281,9 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
         <ServerList 
           servers={servers} 
           onDelete={setServerToDelete} 
-          onInstallAgent={handleInstallAgent} 
+          onInstallAgent={handleInstallAgent}
+          onRetryConnection={handleRetryConnection}
+          onUpdate={handleUpdate}
         />
       )}
 
@@ -199,12 +293,28 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
         form={form as any}
         onSubmit={onSubmit}
         isSubmitting={isSubmitting}
+        mode="create"
+      />
+
+      <ServerFormDialog
+        open={!!serverToUpdate}
+        onOpenChange={(open) => {
+          if (!open) {
+            setServerToUpdate(null);
+            form.reset();
+          }
+        }}
+        form={form as any}
+        onSubmit={onUpdateSubmit}
+        isSubmitting={isSubmitting}
+        mode="edit"
       />
 
       <DeleteServerAlert
         server={serverToDelete}
         onClose={() => setServerToDelete(null)}
         onConfirm={handleDelete}
+        isDeleting={isDeleting}
       />
 
       <AgentLogsModal 

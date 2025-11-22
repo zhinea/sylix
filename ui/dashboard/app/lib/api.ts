@@ -1,5 +1,5 @@
-import { ServerServiceClientImpl } from "../proto/server/server";
-import { LogsServiceClientImpl } from "../proto/logs/logs";
+import { ServerServiceClientImpl } from "../proto/controlplane/server";
+import { LogsServiceClientImpl } from "../proto/controlplane/logs";
 import { grpcClient } from "./grpc-client";
 
 export const serverService = new ServerServiceClientImpl(grpcClient);

@@ -16,4 +16,4 @@ compile-proto:
 
 compile-proto-frontend:
 	mkdir -p ui/dashboard/app/proto
-	protoc --plugin=protoc-gen-ts_proto=./ui/dashboard/node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ui/dashboard/app/proto --proto_path=proto proto/server/*.proto proto/logs/*.proto proto/common/*.proto --ts_proto_opt=esModuleInterop=true --experimental_allow_proto3_optional
+	protoc --plugin=protoc-gen-ts_proto=./ui/dashboard/node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ui/dashboard/app/proto --proto_path=proto proto/controlplane/*.proto proto/common/*.proto --ts_proto_opt=esModuleInterop=true --experimental_allow_proto3_optional

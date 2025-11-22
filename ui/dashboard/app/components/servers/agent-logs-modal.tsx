@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { serverService } from "~/lib/api";
-import { AgentStatusServer } from "~/proto/server/server";
+import { AgentStatusServer } from "~/proto/controlplane/server";
 
 interface AgentLogsModalProps {
   serverId: string | null;

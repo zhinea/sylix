@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/common";
+
+message Empty {}

@@ -2,11 +2,12 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        v3.12.4
-// source: logs/logs.proto
+// source: controlplane/logs.proto
 
-package logs
+package controlplane
 
 import (
+	common "github.com/zhinea/sylix/internal/infra/proto/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -21,42 +22,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Empty struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Empty) Reset() {
-	*x = Empty{}
-	mi := &file_logs_logs_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Empty) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Empty) ProtoMessage() {}
-
-func (x *Empty) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_logs_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Empty.ProtoReflect.Descriptor instead.
-func (*Empty) Descriptor() ([]byte, []int) {
-	return file_logs_logs_proto_rawDescGZIP(), []int{0}
-}
-
 type LogFile struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -68,7 +33,7 @@ type LogFile struct {
 
 func (x *LogFile) Reset() {
 	*x = LogFile{}
-	mi := &file_logs_logs_proto_msgTypes[1]
+	mi := &file_controlplane_logs_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -80,7 +45,7 @@ func (x *LogFile) String() string {
 func (*LogFile) ProtoMessage() {}
 
 func (x *LogFile) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_logs_proto_msgTypes[1]
+	mi := &file_controlplane_logs_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -93,7 +58,7 @@ func (x *LogFile) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogFile.ProtoReflect.Descriptor instead.
 func (*LogFile) Descriptor() ([]byte, []int) {
-	return file_logs_logs_proto_rawDescGZIP(), []int{1}
+	return file_controlplane_logs_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *LogFile) GetName() string {
@@ -126,7 +91,7 @@ type GetSystemLogsResponse struct {
 
 func (x *GetSystemLogsResponse) Reset() {
 	*x = GetSystemLogsResponse{}
-	mi := &file_logs_logs_proto_msgTypes[2]
+	mi := &file_controlplane_logs_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -138,7 +103,7 @@ func (x *GetSystemLogsResponse) String() string {
 func (*GetSystemLogsResponse) ProtoMessage() {}
 
 func (x *GetSystemLogsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_logs_proto_msgTypes[2]
+	mi := &file_controlplane_logs_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -151,7 +116,7 @@ func (x *GetSystemLogsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSystemLogsResponse.ProtoReflect.Descriptor instead.
 func (*GetSystemLogsResponse) Descriptor() ([]byte, []int) {
-	return file_logs_logs_proto_rawDescGZIP(), []int{2}
+	return file_controlplane_logs_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetSystemLogsResponse) GetFiles() []*LogFile {
@@ -172,7 +137,7 @@ type ReadSystemLogRequest struct {
 
 func (x *ReadSystemLogRequest) Reset() {
 	*x = ReadSystemLogRequest{}
-	mi := &file_logs_logs_proto_msgTypes[3]
+	mi := &file_controlplane_logs_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -184,7 +149,7 @@ func (x *ReadSystemLogRequest) String() string {
 func (*ReadSystemLogRequest) ProtoMessage() {}
 
 func (x *ReadSystemLogRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_logs_proto_msgTypes[3]
+	mi := &file_controlplane_logs_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -197,7 +162,7 @@ func (x *ReadSystemLogRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReadSystemLogRequest.ProtoReflect.Descriptor instead.
 func (*ReadSystemLogRequest) Descriptor() ([]byte, []int) {
-	return file_logs_logs_proto_rawDescGZIP(), []int{3}
+	return file_controlplane_logs_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ReadSystemLogRequest) GetFilename() string {
@@ -233,7 +198,7 @@ type ReadSystemLogResponse struct {
 
 func (x *ReadSystemLogResponse) Reset() {
 	*x = ReadSystemLogResponse{}
-	mi := &file_logs_logs_proto_msgTypes[4]
+	mi := &file_controlplane_logs_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -245,7 +210,7 @@ func (x *ReadSystemLogResponse) String() string {
 func (*ReadSystemLogResponse) ProtoMessage() {}
 
 func (x *ReadSystemLogResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_logs_proto_msgTypes[4]
+	mi := &file_controlplane_logs_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -258,7 +223,7 @@ func (x *ReadSystemLogResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReadSystemLogResponse.ProtoReflect.Descriptor instead.
 func (*ReadSystemLogResponse) Descriptor() ([]byte, []int) {
-	return file_logs_logs_proto_rawDescGZIP(), []int{4}
+	return file_controlplane_logs_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ReadSystemLogResponse) GetLines() []string {
@@ -298,7 +263,7 @@ type GetServerLogsRequest struct {
 
 func (x *GetServerLogsRequest) Reset() {
 	*x = GetServerLogsRequest{}
-	mi := &file_logs_logs_proto_msgTypes[5]
+	mi := &file_controlplane_logs_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -310,7 +275,7 @@ func (x *GetServerLogsRequest) String() string {
 func (*GetServerLogsRequest) ProtoMessage() {}
 
 func (x *GetServerLogsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_logs_proto_msgTypes[5]
+	mi := &file_controlplane_logs_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -323,7 +288,7 @@ func (x *GetServerLogsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetServerLogsRequest.ProtoReflect.Descriptor instead.
 func (*GetServerLogsRequest) Descriptor() ([]byte, []int) {
-	return file_logs_logs_proto_rawDescGZIP(), []int{5}
+	return file_controlplane_logs_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetServerLogsRequest) GetServerId() string {
@@ -342,7 +307,7 @@ type GetServerLogsResponse struct {
 
 func (x *GetServerLogsResponse) Reset() {
 	*x = GetServerLogsResponse{}
-	mi := &file_logs_logs_proto_msgTypes[6]
+	mi := &file_controlplane_logs_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -354,7 +319,7 @@ func (x *GetServerLogsResponse) String() string {
 func (*GetServerLogsResponse) ProtoMessage() {}
 
 func (x *GetServerLogsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_logs_proto_msgTypes[6]
+	mi := &file_controlplane_logs_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -367,7 +332,7 @@ func (x *GetServerLogsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetServerLogsResponse.ProtoReflect.Descriptor instead.
 func (*GetServerLogsResponse) Descriptor() ([]byte, []int) {
-	return file_logs_logs_proto_rawDescGZIP(), []int{6}
+	return file_controlplane_logs_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetServerLogsResponse) GetFiles() []*LogFile {
@@ -389,7 +354,7 @@ type ReadServerLogRequest struct {
 
 func (x *ReadServerLogRequest) Reset() {
 	*x = ReadServerLogRequest{}
-	mi := &file_logs_logs_proto_msgTypes[7]
+	mi := &file_controlplane_logs_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -401,7 +366,7 @@ func (x *ReadServerLogRequest) String() string {
 func (*ReadServerLogRequest) ProtoMessage() {}
 
 func (x *ReadServerLogRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_logs_proto_msgTypes[7]
+	mi := &file_controlplane_logs_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -414,7 +379,7 @@ func (x *ReadServerLogRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReadServerLogRequest.ProtoReflect.Descriptor instead.
 func (*ReadServerLogRequest) Descriptor() ([]byte, []int) {
-	return file_logs_logs_proto_rawDescGZIP(), []int{7}
+	return file_controlplane_logs_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ReadServerLogRequest) GetServerId() string {
@@ -457,7 +422,7 @@ type ReadServerLogResponse struct {
 
 func (x *ReadServerLogResponse) Reset() {
 	*x = ReadServerLogResponse{}
-	mi := &file_logs_logs_proto_msgTypes[8]
+	mi := &file_controlplane_logs_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -469,7 +434,7 @@ func (x *ReadServerLogResponse) String() string {
 func (*ReadServerLogResponse) ProtoMessage() {}
 
 func (x *ReadServerLogResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_logs_proto_msgTypes[8]
+	mi := &file_controlplane_logs_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -482,7 +447,7 @@ func (x *ReadServerLogResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReadServerLogResponse.ProtoReflect.Descriptor instead.
 func (*ReadServerLogResponse) Descriptor() ([]byte, []int) {
-	return file_logs_logs_proto_rawDescGZIP(), []int{8}
+	return file_controlplane_logs_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ReadServerLogResponse) GetLines() []string {
@@ -513,18 +478,17 @@ func (x *ReadServerLogResponse) GetTotalPages() int32 {
 	return 0
 }
 
-var File_logs_logs_proto protoreflect.FileDescriptor
+var File_controlplane_logs_proto protoreflect.FileDescriptor
 
-const file_logs_logs_proto_rawDesc = "" +
+const file_controlplane_logs_proto_rawDesc = "" +
 	"\n" +
-	"\x0flogs/logs.proto\x12\x04logs\"\a\n" +
-	"\x05Empty\"V\n" +
+	"\x17controlplane/logs.proto\x12\fcontrolplane\x1a\x13common/common.proto\"V\n" +
 	"\aLogFile\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12#\n" +
-	"\rlast_modified\x18\x03 \x01(\tR\flastModified\"<\n" +
-	"\x15GetSystemLogsResponse\x12#\n" +
-	"\x05files\x18\x01 \x03(\v2\r.logs.LogFileR\x05files\"c\n" +
+	"\rlast_modified\x18\x03 \x01(\tR\flastModified\"D\n" +
+	"\x15GetSystemLogsResponse\x12+\n" +
+	"\x05files\x18\x01 \x03(\v2\x15.controlplane.LogFileR\x05files\"c\n" +
 	"\x14ReadSystemLogRequest\x12\x1a\n" +
 	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1b\n" +
@@ -537,9 +501,9 @@ const file_logs_logs_proto_rawDesc = "" +
 	"\vtotal_pages\x18\x04 \x01(\x05R\n" +
 	"totalPages\"3\n" +
 	"\x14GetServerLogsRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\tR\bserverId\"<\n" +
-	"\x15GetServerLogsResponse\x12#\n" +
-	"\x05files\x18\x01 \x03(\v2\r.logs.LogFileR\x05files\"\x80\x01\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\"D\n" +
+	"\x15GetServerLogsResponse\x12+\n" +
+	"\x05files\x18\x01 \x03(\v2\x15.controlplane.LogFileR\x05files\"\x80\x01\n" +
 	"\x14ReadServerLogRequest\x12\x1b\n" +
 	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bfilename\x18\x02 \x01(\tR\bfilename\x12\x12\n" +
@@ -551,48 +515,48 @@ const file_logs_logs_proto_rawDesc = "" +
 	"totalLines\x12!\n" +
 	"\fcurrent_page\x18\x03 \x01(\x05R\vcurrentPage\x12\x1f\n" +
 	"\vtotal_pages\x18\x04 \x01(\x05R\n" +
-	"totalPages2\xa6\x02\n" +
-	"\vLogsService\x129\n" +
-	"\rGetSystemLogs\x12\v.logs.Empty\x1a\x1b.logs.GetSystemLogsResponse\x12H\n" +
-	"\rReadSystemLog\x12\x1a.logs.ReadSystemLogRequest\x1a\x1b.logs.ReadSystemLogResponse\x12H\n" +
-	"\rGetServerLogs\x12\x1a.logs.GetServerLogsRequest\x1a\x1b.logs.GetServerLogsResponse\x12H\n" +
-	"\rReadServerLog\x12\x1a.logs.ReadServerLogRequest\x1a\x1b.logs.ReadServerLogResponseB3Z1github.com/zhinea/sylix/internal/infra/proto/logsb\x06proto3"
+	"totalPages2\xe0\x02\n" +
+	"\vLogsService\x12C\n" +
+	"\rGetSystemLogs\x12\r.common.Empty\x1a#.controlplane.GetSystemLogsResponse\x12X\n" +
+	"\rReadSystemLog\x12\".controlplane.ReadSystemLogRequest\x1a#.controlplane.ReadSystemLogResponse\x12X\n" +
+	"\rGetServerLogs\x12\".controlplane.GetServerLogsRequest\x1a#.controlplane.GetServerLogsResponse\x12X\n" +
+	"\rReadServerLog\x12\".controlplane.ReadServerLogRequest\x1a#.controlplane.ReadServerLogResponseB;Z9github.com/zhinea/sylix/internal/infra/proto/controlplaneb\x06proto3"
 
 var (
-	file_logs_logs_proto_rawDescOnce sync.Once
-	file_logs_logs_proto_rawDescData []byte
+	file_controlplane_logs_proto_rawDescOnce sync.Once
+	file_controlplane_logs_proto_rawDescData []byte
 )
 
-func file_logs_logs_proto_rawDescGZIP() []byte {
-	file_logs_logs_proto_rawDescOnce.Do(func() {
-		file_logs_logs_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_logs_logs_proto_rawDesc), len(file_logs_logs_proto_rawDesc)))
+func file_controlplane_logs_proto_rawDescGZIP() []byte {
+	file_controlplane_logs_proto_rawDescOnce.Do(func() {
+		file_controlplane_logs_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_controlplane_logs_proto_rawDesc), len(file_controlplane_logs_proto_rawDesc)))
 	})
-	return file_logs_logs_proto_rawDescData
+	return file_controlplane_logs_proto_rawDescData
 }
 
-var file_logs_logs_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_logs_logs_proto_goTypes = []any{
-	(*Empty)(nil),                 // 0: logs.Empty
-	(*LogFile)(nil),               // 1: logs.LogFile
-	(*GetSystemLogsResponse)(nil), // 2: logs.GetSystemLogsResponse
-	(*ReadSystemLogRequest)(nil),  // 3: logs.ReadSystemLogRequest
-	(*ReadSystemLogResponse)(nil), // 4: logs.ReadSystemLogResponse
-	(*GetServerLogsRequest)(nil),  // 5: logs.GetServerLogsRequest
-	(*GetServerLogsResponse)(nil), // 6: logs.GetServerLogsResponse
-	(*ReadServerLogRequest)(nil),  // 7: logs.ReadServerLogRequest
-	(*ReadServerLogResponse)(nil), // 8: logs.ReadServerLogResponse
+var file_controlplane_logs_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_controlplane_logs_proto_goTypes = []any{
+	(*LogFile)(nil),               // 0: controlplane.LogFile
+	(*GetSystemLogsResponse)(nil), // 1: controlplane.GetSystemLogsResponse
+	(*ReadSystemLogRequest)(nil),  // 2: controlplane.ReadSystemLogRequest
+	(*ReadSystemLogResponse)(nil), // 3: controlplane.ReadSystemLogResponse
+	(*GetServerLogsRequest)(nil),  // 4: controlplane.GetServerLogsRequest
+	(*GetServerLogsResponse)(nil), // 5: controlplane.GetServerLogsResponse
+	(*ReadServerLogRequest)(nil),  // 6: controlplane.ReadServerLogRequest
+	(*ReadServerLogResponse)(nil), // 7: controlplane.ReadServerLogResponse
+	(*common.Empty)(nil),          // 8: common.Empty
 }
-var file_logs_logs_proto_depIdxs = []int32{
-	1, // 0: logs.GetSystemLogsResponse.files:type_name -> logs.LogFile
-	1, // 1: logs.GetServerLogsResponse.files:type_name -> logs.LogFile
-	0, // 2: logs.LogsService.GetSystemLogs:input_type -> logs.Empty
-	3, // 3: logs.LogsService.ReadSystemLog:input_type -> logs.ReadSystemLogRequest
-	5, // 4: logs.LogsService.GetServerLogs:input_type -> logs.GetServerLogsRequest
-	7, // 5: logs.LogsService.ReadServerLog:input_type -> logs.ReadServerLogRequest
-	2, // 6: logs.LogsService.GetSystemLogs:output_type -> logs.GetSystemLogsResponse
-	4, // 7: logs.LogsService.ReadSystemLog:output_type -> logs.ReadSystemLogResponse
-	6, // 8: logs.LogsService.GetServerLogs:output_type -> logs.GetServerLogsResponse
-	8, // 9: logs.LogsService.ReadServerLog:output_type -> logs.ReadServerLogResponse
+var file_controlplane_logs_proto_depIdxs = []int32{
+	0, // 0: controlplane.GetSystemLogsResponse.files:type_name -> controlplane.LogFile
+	0, // 1: controlplane.GetServerLogsResponse.files:type_name -> controlplane.LogFile
+	8, // 2: controlplane.LogsService.GetSystemLogs:input_type -> common.Empty
+	2, // 3: controlplane.LogsService.ReadSystemLog:input_type -> controlplane.ReadSystemLogRequest
+	4, // 4: controlplane.LogsService.GetServerLogs:input_type -> controlplane.GetServerLogsRequest
+	6, // 5: controlplane.LogsService.ReadServerLog:input_type -> controlplane.ReadServerLogRequest
+	1, // 6: controlplane.LogsService.GetSystemLogs:output_type -> controlplane.GetSystemLogsResponse
+	3, // 7: controlplane.LogsService.ReadSystemLog:output_type -> controlplane.ReadSystemLogResponse
+	5, // 8: controlplane.LogsService.GetServerLogs:output_type -> controlplane.GetServerLogsResponse
+	7, // 9: controlplane.LogsService.ReadServerLog:output_type -> controlplane.ReadServerLogResponse
 	6, // [6:10] is the sub-list for method output_type
 	2, // [2:6] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -600,26 +564,26 @@ var file_logs_logs_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_logs_logs_proto_init() }
-func file_logs_logs_proto_init() {
-	if File_logs_logs_proto != nil {
+func init() { file_controlplane_logs_proto_init() }
+func file_controlplane_logs_proto_init() {
+	if File_controlplane_logs_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_logs_logs_proto_rawDesc), len(file_logs_logs_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_controlplane_logs_proto_rawDesc), len(file_controlplane_logs_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_logs_logs_proto_goTypes,
-		DependencyIndexes: file_logs_logs_proto_depIdxs,
-		MessageInfos:      file_logs_logs_proto_msgTypes,
+		GoTypes:           file_controlplane_logs_proto_goTypes,
+		DependencyIndexes: file_controlplane_logs_proto_depIdxs,
+		MessageInfos:      file_controlplane_logs_proto_msgTypes,
 	}.Build()
-	File_logs_logs_proto = out.File
-	file_logs_logs_proto_goTypes = nil
-	file_logs_logs_proto_depIdxs = nil
+	File_controlplane_logs_proto = out.File
+	file_controlplane_logs_proto_goTypes = nil
+	file_controlplane_logs_proto_depIdxs = nil
 }

@@ -2,12 +2,13 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.12.4
-// source: logs/logs.proto
+// source: controlplane/logs.proto
 
-package logs
+package controlplane
 
 import (
 	context "context"
+	common "github.com/zhinea/sylix/internal/infra/proto/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,17 +20,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	LogsService_GetSystemLogs_FullMethodName = "/logs.LogsService/GetSystemLogs"
-	LogsService_ReadSystemLog_FullMethodName = "/logs.LogsService/ReadSystemLog"
-	LogsService_GetServerLogs_FullMethodName = "/logs.LogsService/GetServerLogs"
-	LogsService_ReadServerLog_FullMethodName = "/logs.LogsService/ReadServerLog"
+	LogsService_GetSystemLogs_FullMethodName = "/controlplane.LogsService/GetSystemLogs"
+	LogsService_ReadSystemLog_FullMethodName = "/controlplane.LogsService/ReadSystemLog"
+	LogsService_GetServerLogs_FullMethodName = "/controlplane.LogsService/GetServerLogs"
+	LogsService_ReadServerLog_FullMethodName = "/controlplane.LogsService/ReadServerLog"
 )
 
 // LogsServiceClient is the client API for LogsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LogsServiceClient interface {
-	GetSystemLogs(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetSystemLogsResponse, error)
+	GetSystemLogs(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*GetSystemLogsResponse, error)
 	ReadSystemLog(ctx context.Context, in *ReadSystemLogRequest, opts ...grpc.CallOption) (*ReadSystemLogResponse, error)
 	GetServerLogs(ctx context.Context, in *GetServerLogsRequest, opts ...grpc.CallOption) (*GetServerLogsResponse, error)
 	ReadServerLog(ctx context.Context, in *ReadServerLogRequest, opts ...grpc.CallOption) (*ReadServerLogResponse, error)
@@ -43,7 +44,7 @@ func NewLogsServiceClient(cc grpc.ClientConnInterface) LogsServiceClient {
 	return &logsServiceClient{cc}
 }
 
-func (c *logsServiceClient) GetSystemLogs(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetSystemLogsResponse, error) {
+func (c *logsServiceClient) GetSystemLogs(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*GetSystemLogsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetSystemLogsResponse)
 	err := c.cc.Invoke(ctx, LogsService_GetSystemLogs_FullMethodName, in, out, cOpts...)
@@ -87,7 +88,7 @@ func (c *logsServiceClient) ReadServerLog(ctx context.Context, in *ReadServerLog
 // All implementations must embed UnimplementedLogsServiceServer
 // for forward compatibility.
 type LogsServiceServer interface {
-	GetSystemLogs(context.Context, *Empty) (*GetSystemLogsResponse, error)
+	GetSystemLogs(context.Context, *common.Empty) (*GetSystemLogsResponse, error)
 	ReadSystemLog(context.Context, *ReadSystemLogRequest) (*ReadSystemLogResponse, error)
 	GetServerLogs(context.Context, *GetServerLogsRequest) (*GetServerLogsResponse, error)
 	ReadServerLog(context.Context, *ReadServerLogRequest) (*ReadServerLogResponse, error)
@@ -101,7 +102,7 @@ type LogsServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedLogsServiceServer struct{}
 
-func (UnimplementedLogsServiceServer) GetSystemLogs(context.Context, *Empty) (*GetSystemLogsResponse, error) {
+func (UnimplementedLogsServiceServer) GetSystemLogs(context.Context, *common.Empty) (*GetSystemLogsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSystemLogs not implemented")
 }
 func (UnimplementedLogsServiceServer) ReadSystemLog(context.Context, *ReadSystemLogRequest) (*ReadSystemLogResponse, error) {
@@ -135,7 +136,7 @@ func RegisterLogsServiceServer(s grpc.ServiceRegistrar, srv LogsServiceServer) {
 }
 
 func _LogsService_GetSystemLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(common.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -147,7 +148,7 @@ func _LogsService_GetSystemLogs_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: LogsService_GetSystemLogs_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LogsServiceServer).GetSystemLogs(ctx, req.(*Empty))
+		return srv.(LogsServiceServer).GetSystemLogs(ctx, req.(*common.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -210,7 +211,7 @@ func _LogsService_ReadServerLog_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var LogsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "logs.LogsService",
+	ServiceName: "controlplane.LogsService",
 	HandlerType: (*LogsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -231,5 +232,5 @@ var LogsService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "logs/logs.proto",
+	Metadata: "controlplane/logs.proto",
 }

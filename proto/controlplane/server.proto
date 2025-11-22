@@ -1,17 +1,19 @@
 syntax = "proto3";
 
-package server;
+package controlplane;
 
-option go_package = "github.com/zhinea/sylix/internal/infra/proto/server";
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/controlplane";
 
 import "common/validation.proto";
+import "common/common.proto";
 
 service ServerService {
     rpc Create(Server) returns (ServerResponse);
     rpc Get(Id) returns (ServerResponse);
-    rpc All(Empty) returns (ServersResponse);
+    rpc All(common.Empty) returns (ServersResponse);
     rpc Update(Server) returns (ServerResponse);
     rpc Delete(Id) returns (MessageResponse);
+    rpc RetryConnection(Id) returns (ServerResponse);
     rpc InstallAgent(Id) returns (MessageResponse);
 }
 
@@ -40,8 +42,6 @@ enum AgentStatusServer {
     SUCCESS = 4;
     FAILED = 5;
 }
-
-message Empty {}
 
 message Id {
     string id = 1;

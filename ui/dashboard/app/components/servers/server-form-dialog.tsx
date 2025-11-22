@@ -1,4 +1,3 @@
-import { Loader2 } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 import { Button } from "~/components/ui/button";
 import {
@@ -20,6 +19,7 @@ interface ServerFormDialogProps {
   form: UseFormReturn<ServerFormValues>;
   onSubmit: (data: ServerFormValues) => void;
   isSubmitting: boolean;
+  mode?: "create" | "edit";
 }
 
 export function ServerFormDialog({
@@ -28,14 +28,17 @@ export function ServerFormDialog({
   form,
   onSubmit,
   isSubmitting,
+  mode = "create",
 }: ServerFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Server</DialogTitle>
+          <DialogTitle>{mode === "create" ? "Add Server" : "Edit Server"}</DialogTitle>
           <DialogDescription>
-            Enter the details of the server you want to manage.
+            {mode === "create" 
+              ? "Enter the details of the server you want to manage." 
+              : "Update the details of your server."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -118,9 +121,8 @@ export function ServerFormDialog({
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save changes
+            <Button type="submit" isLoading={isSubmitting}>
+              {mode === "create" ? "Add Server" : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>

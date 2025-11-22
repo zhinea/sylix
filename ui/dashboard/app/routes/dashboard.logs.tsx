@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { LogFile } from "~/proto/logs/logs";
+import { toast } from "sonner";
+import { LogFile } from "~/proto/controlplane/logs";
 import { logsService } from "~/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
@@ -32,8 +33,10 @@ export default function LogsPage() {
     try {
       const response = await logsService.GetSystemLogs({});
       setLogs(response.files);
+      toast.success("Logs refreshed");
     } catch (error) {
       console.error("Failed to fetch logs:", error);
+      toast.error("Failed to fetch logs");
     } finally {
       setLoading(false);
     }
@@ -53,6 +56,7 @@ export default function LogsPage() {
       setTotalPages(response.totalPages);
     } catch (error) {
       console.error("Failed to read log:", error);
+      toast.error("Failed to read log content");
     } finally {
       setLoadingContent(false);
     }
@@ -74,8 +78,8 @@ export default function LogsPage() {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button onClick={fetchLogs} disabled={loading}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          <Button onClick={fetchLogs} isLoading={loading}>
+            {!loading && <RefreshCw className="mr-2 h-4 w-4" />}
             Refresh
           </Button>
         </div>

@@ -2,15 +2,13 @@
 // versions:
 //   protoc-gen-ts_proto  v2.8.3
 //   protoc               v3.12.4
-// source: logs/logs.proto
+// source: controlplane/logs.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { Empty } from "../common/common";
 
-export const protobufPackage = "logs";
-
-export interface Empty {
-}
+export const protobufPackage = "controlplane";
 
 export interface LogFile {
   name: string;
@@ -56,49 +54,6 @@ export interface ReadServerLogResponse {
   currentPage: number;
   totalPages: number;
 }
-
-function createBaseEmpty(): Empty {
-  return {};
-}
-
-export const Empty: MessageFns<Empty> = {
-  encode(_: Empty, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): Empty {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseEmpty();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): Empty {
-    return {};
-  },
-
-  toJSON(_: Empty): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Empty>, I>>(base?: I): Empty {
-    return Empty.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<Empty>, I>>(_: I): Empty {
-    const message = createBaseEmpty();
-    return message;
-  },
-};
 
 function createBaseLogFile(): LogFile {
   return { name: "", size: 0, lastModified: "" };
@@ -789,7 +744,7 @@ export interface LogsService {
   ReadServerLog(request: ReadServerLogRequest): Promise<ReadServerLogResponse>;
 }
 
-export const LogsServiceServiceName = "logs.LogsService";
+export const LogsServiceServiceName = "controlplane.LogsService";
 export class LogsServiceClientImpl implements LogsService {
   private readonly rpc: Rpc;
   private readonly service: string;

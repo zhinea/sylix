@@ -8,8 +8,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/zhinea/sylix/internal/common/logger"
 	database "github.com/zhinea/sylix/internal/infra/db"
-	logsPb "github.com/zhinea/sylix/internal/infra/proto/logs"
-	serverPb "github.com/zhinea/sylix/internal/infra/proto/server"
+	pbControlPlane "github.com/zhinea/sylix/internal/infra/proto/controlplane"
 	"github.com/zhinea/sylix/internal/module/controlplane/app"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
 	grpcServices "github.com/zhinea/sylix/internal/module/controlplane/interface/grpc"
@@ -46,8 +45,8 @@ func main() {
 	logsUseCase := app.NewLogsUseCase()
 	logsService := grpcServices.NewLogsService(logsUseCase)
 
-	serverPb.RegisterServerServiceServer(grpcServer, serverService)
-	logsPb.RegisterLogsServiceServer(grpcServer, logsService)
+	pbControlPlane.RegisterServerServiceServer(grpcServer, serverService)
+	pbControlPlane.RegisterLogsServiceServer(grpcServer, logsService)
 
 	// Wrap gRPC server for gRPC-Web support
 	wrappedGrpc := grpcweb.WrapServer(grpcServer,

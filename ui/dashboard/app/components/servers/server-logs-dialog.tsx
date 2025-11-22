@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +14,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Button } from "~/components/ui/button";
-import { LogFile } from "~/proto/logs/logs";
+import { LogFile } from "~/proto/controlplane/logs";
 import { logsService } from "~/lib/api";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
@@ -67,6 +68,7 @@ export function ServerLogsDialog({
       }
     } catch (error) {
       console.error("Failed to fetch logs:", error);
+      toast.error("Failed to fetch logs");
     } finally {
       setLoading(false);
     }
@@ -87,6 +89,7 @@ export function ServerLogsDialog({
       setTotalPages(response.totalPages);
     } catch (error) {
       console.error("Failed to read log:", error);
+      toast.error("Failed to read log content");
     } finally {
       setLoadingContent(false);
     }

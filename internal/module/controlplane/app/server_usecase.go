@@ -51,6 +51,22 @@ func (uc *ServerUseCase) Update(ctx context.Context, server *entity.Server) (*en
 	return uc.repo.Update(ctx, server)
 }
 
+func (uc *ServerUseCase) RetryConnection(ctx context.Context, id string) (*entity.Server, error) {
+	server, err := uc.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := uc.CheckConnection(server); err == nil {
+		server.Status = entity.ServerStatusConnected
+	} else {
+		server.Status = entity.ServerStatusDisconnected
+		logger.Log.Warn("Failed to connect to server during retry", zap.Error(err), zap.String("ip", server.IpAddress))
+	}
+
+	return uc.repo.Update(ctx, server)
+}
+
 func (uc *ServerUseCase) Delete(ctx context.Context, id string) error {
 	return uc.repo.Delete(ctx, id)
 }

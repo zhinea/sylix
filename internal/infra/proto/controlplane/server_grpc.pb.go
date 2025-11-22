@@ -2,12 +2,13 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.12.4
-// source: server/server.proto
+// source: controlplane/server.proto
 
-package server
+package controlplane
 
 import (
 	context "context"
+	common "github.com/zhinea/sylix/internal/infra/proto/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,12 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ServerService_Create_FullMethodName       = "/server.ServerService/Create"
-	ServerService_Get_FullMethodName          = "/server.ServerService/Get"
-	ServerService_All_FullMethodName          = "/server.ServerService/All"
-	ServerService_Update_FullMethodName       = "/server.ServerService/Update"
-	ServerService_Delete_FullMethodName       = "/server.ServerService/Delete"
-	ServerService_InstallAgent_FullMethodName = "/server.ServerService/InstallAgent"
+	ServerService_Create_FullMethodName       = "/controlplane.ServerService/Create"
+	ServerService_Get_FullMethodName          = "/controlplane.ServerService/Get"
+	ServerService_All_FullMethodName          = "/controlplane.ServerService/All"
+	ServerService_Update_FullMethodName       = "/controlplane.ServerService/Update"
+	ServerService_Delete_FullMethodName       = "/controlplane.ServerService/Delete"
+	ServerService_InstallAgent_FullMethodName = "/controlplane.ServerService/InstallAgent"
 )
 
 // ServerServiceClient is the client API for ServerService service.
@@ -33,7 +34,7 @@ const (
 type ServerServiceClient interface {
 	Create(ctx context.Context, in *Server, opts ...grpc.CallOption) (*ServerResponse, error)
 	Get(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ServerResponse, error)
-	All(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ServersResponse, error)
+	All(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*ServersResponse, error)
 	Update(ctx context.Context, in *Server, opts ...grpc.CallOption) (*ServerResponse, error)
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
 	InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
@@ -67,7 +68,7 @@ func (c *serverServiceClient) Get(ctx context.Context, in *Id, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *serverServiceClient) All(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ServersResponse, error) {
+func (c *serverServiceClient) All(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*ServersResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ServersResponse)
 	err := c.cc.Invoke(ctx, ServerService_All_FullMethodName, in, out, cOpts...)
@@ -113,7 +114,7 @@ func (c *serverServiceClient) InstallAgent(ctx context.Context, in *Id, opts ...
 type ServerServiceServer interface {
 	Create(context.Context, *Server) (*ServerResponse, error)
 	Get(context.Context, *Id) (*ServerResponse, error)
-	All(context.Context, *Empty) (*ServersResponse, error)
+	All(context.Context, *common.Empty) (*ServersResponse, error)
 	Update(context.Context, *Server) (*ServerResponse, error)
 	Delete(context.Context, *Id) (*MessageResponse, error)
 	InstallAgent(context.Context, *Id) (*MessageResponse, error)
@@ -133,7 +134,7 @@ func (UnimplementedServerServiceServer) Create(context.Context, *Server) (*Serve
 func (UnimplementedServerServiceServer) Get(context.Context, *Id) (*ServerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedServerServiceServer) All(context.Context, *Empty) (*ServersResponse, error) {
+func (UnimplementedServerServiceServer) All(context.Context, *common.Empty) (*ServersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method All not implemented")
 }
 func (UnimplementedServerServiceServer) Update(context.Context, *Server) (*ServerResponse, error) {
@@ -203,7 +204,7 @@ func _ServerService_Get_Handler(srv interface{}, ctx context.Context, dec func(i
 }
 
 func _ServerService_All_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(common.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -215,7 +216,7 @@ func _ServerService_All_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: ServerService_All_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServiceServer).All(ctx, req.(*Empty))
+		return srv.(ServerServiceServer).All(ctx, req.(*common.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -278,7 +279,7 @@ func _ServerService_InstallAgent_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ServerService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "server.ServerService",
+	ServiceName: "controlplane.ServerService",
 	HandlerType: (*ServerServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -307,5 +308,5 @@ var ServerService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "server/server.proto",
+	Metadata: "controlplane/server.proto",
 }

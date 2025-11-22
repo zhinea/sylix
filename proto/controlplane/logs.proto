@@ -1,18 +1,18 @@
 syntax = "proto3";
 
-package logs;
+package controlplane;
 
-option go_package = "github.com/zhinea/sylix/internal/infra/proto/logs";
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/controlplane";
+
+import "common/common.proto";
 
 service LogsService {
-    rpc GetSystemLogs(Empty) returns (GetSystemLogsResponse);
+    rpc GetSystemLogs(common.Empty) returns (GetSystemLogsResponse);
     rpc ReadSystemLog(ReadSystemLogRequest) returns (ReadSystemLogResponse);
     
     rpc GetServerLogs(GetServerLogsRequest) returns (GetServerLogsResponse);
     rpc ReadServerLog(ReadServerLogRequest) returns (ReadServerLogResponse);
 }
-
-message Empty {}
 
 message LogFile {
     string name = 1;

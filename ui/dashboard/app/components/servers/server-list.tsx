@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, RefreshCw, Server as ServerIcon, Trash, FileText } from "lucide-react";
+import { MoreHorizontal, RefreshCw, Server as ServerIcon, Trash, FileText, Edit } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -18,24 +18,39 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { Server, StatusServer, AgentStatusServer } from "~/proto/server/server";
+import { Server, StatusServer, AgentStatusServer } from "~/proto/controlplane/server";
 import { ServerLogsDialog } from "./server-logs-dialog";
 
 interface ServerListProps {
   servers: Server[];
   onDelete: (server: Server) => void;
   onInstallAgent: (id: string) => void;
+  onRetryConnection: (id: string) => void;
+  onUpdate: (server: Server) => void;
 }
 
-export function ServerList({ servers, onDelete, onInstallAgent }: ServerListProps) {
+export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnection, onUpdate }: ServerListProps) {
   const [logsServerId, setLogsServerId] = useState<string | null>(null);
 
-  const getStatusBadge = (status: StatusServer) => {
-    switch (status) {
+  const getStatusBadge = (server: Server) => {
+    switch (server.status) {
       case StatusServer.CONNECTED:
         return <Badge variant="default" className="bg-green-500 hover:bg-green-600">Connected</Badge>;
       case StatusServer.DISCONNECTED:
-        return <Badge variant="destructive">Disconnected</Badge>;
+        return (
+          <div className="flex items-center gap-2">
+            <Badge variant="destructive">Disconnected</Badge>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-6 w-6" 
+              onClick={() => onRetryConnection(server.id)}
+              title="Retry Connection"
+            >
+              <RefreshCw className="h-3 w-3" />
+            </Button>
+          </div>
+        );
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
@@ -84,7 +99,7 @@ export function ServerList({ servers, onDelete, onInstallAgent }: ServerListProp
                 </TableCell>
                 <TableCell>{server.credential?.username}</TableCell>
                 <TableCell>
-                  {getStatusBadge(server.status)}
+                  {getStatusBadge(server)}
                 </TableCell>
                 <TableCell>
                   {getAgentStatusBadge(server.agentStatus)}
@@ -105,6 +120,9 @@ export function ServerList({ servers, onDelete, onInstallAgent }: ServerListProp
                         Copy IP Address
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => onUpdate(server)}>
+                        <Edit className="mr-2 h-4 w-4" /> Edit
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setLogsServerId(server.id)}>
                         <FileText className="mr-2 h-4 w-4" /> Logs
                       </DropdownMenuItem>

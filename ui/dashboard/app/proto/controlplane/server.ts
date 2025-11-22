@@ -2,13 +2,14 @@
 // versions:
 //   protoc-gen-ts_proto  v2.8.3
 //   protoc               v3.12.4
-// source: server/server.proto
+// source: controlplane/server.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { Empty } from "../common/common";
 import { ValidationError } from "../common/validation";
 
-export const protobufPackage = "server";
+export const protobufPackage = "controlplane";
 
 export enum StatusCode {
   UNSPECIFIED = 0,
@@ -170,9 +171,6 @@ export function agentStatusServerToJSON(object: AgentStatusServer): string {
   }
 }
 
-export interface Empty {
-}
-
 export interface Id {
   id: string;
 }
@@ -214,49 +212,6 @@ export interface MessageResponse {
   status: StatusCode;
   message: string;
 }
-
-function createBaseEmpty(): Empty {
-  return {};
-}
-
-export const Empty: MessageFns<Empty> = {
-  encode(_: Empty, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): Empty {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseEmpty();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): Empty {
-    return {};
-  },
-
-  toJSON(_: Empty): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Empty>, I>>(base?: I): Empty {
-    return Empty.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<Empty>, I>>(_: I): Empty {
-    const message = createBaseEmpty();
-    return message;
-  },
-};
 
 function createBaseId(): Id {
   return { id: "" };
@@ -929,10 +884,11 @@ export interface ServerService {
   All(request: Empty): Promise<ServersResponse>;
   Update(request: Server): Promise<ServerResponse>;
   Delete(request: Id): Promise<MessageResponse>;
+  RetryConnection(request: Id): Promise<ServerResponse>;
   InstallAgent(request: Id): Promise<MessageResponse>;
 }
 
-export const ServerServiceServiceName = "server.ServerService";
+export const ServerServiceServiceName = "controlplane.ServerService";
 export class ServerServiceClientImpl implements ServerService {
   private readonly rpc: Rpc;
   private readonly service: string;
@@ -944,6 +900,7 @@ export class ServerServiceClientImpl implements ServerService {
     this.All = this.All.bind(this);
     this.Update = this.Update.bind(this);
     this.Delete = this.Delete.bind(this);
+    this.RetryConnection = this.RetryConnection.bind(this);
     this.InstallAgent = this.InstallAgent.bind(this);
   }
   Create(request: Server): Promise<ServerResponse> {
@@ -974,6 +931,12 @@ export class ServerServiceClientImpl implements ServerService {
     const data = Id.encode(request).finish();
     const promise = this.rpc.request(this.service, "Delete", data);
     return promise.then((data) => MessageResponse.decode(new BinaryReader(data)));
+  }
+
+  RetryConnection(request: Id): Promise<ServerResponse> {
+    const data = Id.encode(request).finish();
+    const promise = this.rpc.request(this.service, "RetryConnection", data);
+    return promise.then((data) => ServerResponse.decode(new BinaryReader(data)));
   }
 
   InstallAgent(request: Id): Promise<MessageResponse> {
