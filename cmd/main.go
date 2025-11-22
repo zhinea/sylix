@@ -2,8 +2,10 @@ package main
 
 import (
 	"log"
-	"net"
+	"net/http"
 
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/rs/cors"
 	database "github.com/zhinea/sylix/internal/infra/db"
 	serverPb "github.com/zhinea/sylix/internal/infra/proto/server"
 	"github.com/zhinea/sylix/internal/module/controlplane/app"
@@ -23,12 +25,6 @@ func main() {
 
 	port := ":8082"
 
-	netListen, err := net.Listen("tcp", port)
-
-	if err != nil {
-		log.Fatalf("Failed to listen on port %s: %v", port, err)
-	}
-
 	grpcServer := grpc.NewServer()
 
 	// Initialize dependencies
@@ -38,8 +34,40 @@ func main() {
 
 	serverPb.RegisterServerServiceServer(grpcServer, serverService)
 
+	// Wrap gRPC server for gRPC-Web support
+	wrappedGrpc := grpcweb.WrapServer(grpcServer,
+		grpcweb.WithOriginFunc(func(origin string) bool {
+			return true // Allow all origins for development
+		}),
+	)
+
+	// Setup CORS
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+	})
+
+	// Create HTTP handler
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if wrappedGrpc.IsGrpcWebRequest(r) {
+			wrappedGrpc.ServeHTTP(w, r)
+			return
+		}
+		// Fallback to standard gRPC server (if using HTTP/2) or other handlers
+		// Note: serving standard gRPC over HTTP/1.1 port usually requires cmux or h2c
+		// For now, we prioritize gRPC-Web for the dashboard.
+		wrappedGrpc.ServeHTTP(w, r)
+	})
+
+	httpServer := &http.Server{
+		Addr:    port,
+		Handler: c.Handler(handler),
+	}
+
 	log.Printf("Server started at: %v", port)
-	if err := grpcServer.Serve(netListen); err != nil {
-		log.Fatalf("Failed to serve gRPC server over port %s: %v", port, err)
+	if err := httpServer.ListenAndServe(); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
 	}
 }

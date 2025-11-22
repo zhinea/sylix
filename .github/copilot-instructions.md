@@ -44,3 +44,8 @@ The main concept is that the `controlplane` acts as the master backend (installe
 - Write clear and concise comments for exported functions and types to enhance code readability and maintainability.
 - Reuse existing components and patterns rather than creating new ones for similar functionality.
 - Always format code with `go fmt` before committing.
+
+
+IMPORTANT: DO NOT CREATE REDUNDANT AND NON-OPTIMAL CODE.
+
+IMPORTANT: CREATE CODE THAT IS OPTIMAL, EFFICIENT, MAINTAINABLE, AND CLEAN.

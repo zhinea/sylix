@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "shadcn": {
+      "command": "zsh",
+      "args": [
+        "-lc",
+        "cd ui/dashboard && npx shadcn@latest mcp"
+      ]
+    }
+  }
+}
