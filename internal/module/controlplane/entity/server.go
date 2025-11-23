@@ -17,7 +17,7 @@ type Server struct {
 	Credential  ServerCredential `json:"credential" gorm:"embedded;embeddedPrefix:credential_"`
 	Status      int              `json:"status"`
 	AgentStatus int              `json:"agent_status"`
-	AgentLogs   string           `json:"agent_logs"`
+	AgentLogs   string           `json:"agent_logs" gorm:"-"`
 }
 
 const (

@@ -20,12 +20,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ServerService_Create_FullMethodName       = "/controlplane.ServerService/Create"
-	ServerService_Get_FullMethodName          = "/controlplane.ServerService/Get"
-	ServerService_All_FullMethodName          = "/controlplane.ServerService/All"
-	ServerService_Update_FullMethodName       = "/controlplane.ServerService/Update"
-	ServerService_Delete_FullMethodName       = "/controlplane.ServerService/Delete"
-	ServerService_InstallAgent_FullMethodName = "/controlplane.ServerService/InstallAgent"
+	ServerService_Create_FullMethodName          = "/controlplane.ServerService/Create"
+	ServerService_Get_FullMethodName             = "/controlplane.ServerService/Get"
+	ServerService_All_FullMethodName             = "/controlplane.ServerService/All"
+	ServerService_Update_FullMethodName          = "/controlplane.ServerService/Update"
+	ServerService_Delete_FullMethodName          = "/controlplane.ServerService/Delete"
+	ServerService_RetryConnection_FullMethodName = "/controlplane.ServerService/RetryConnection"
+	ServerService_InstallAgent_FullMethodName    = "/controlplane.ServerService/InstallAgent"
 )
 
 // ServerServiceClient is the client API for ServerService service.
@@ -37,6 +38,7 @@ type ServerServiceClient interface {
 	All(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*ServersResponse, error)
 	Update(ctx context.Context, in *Server, opts ...grpc.CallOption) (*ServerResponse, error)
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
+	RetryConnection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ServerResponse, error)
 	InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
 }
 
@@ -98,6 +100,16 @@ func (c *serverServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.C
 	return out, nil
 }
 
+func (c *serverServiceClient) RetryConnection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ServerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ServerResponse)
+	err := c.cc.Invoke(ctx, ServerService_RetryConnection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *serverServiceClient) InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MessageResponse)
@@ -117,6 +129,7 @@ type ServerServiceServer interface {
 	All(context.Context, *common.Empty) (*ServersResponse, error)
 	Update(context.Context, *Server) (*ServerResponse, error)
 	Delete(context.Context, *Id) (*MessageResponse, error)
+	RetryConnection(context.Context, *Id) (*ServerResponse, error)
 	InstallAgent(context.Context, *Id) (*MessageResponse, error)
 	mustEmbedUnimplementedServerServiceServer()
 }
@@ -142,6 +155,9 @@ func (UnimplementedServerServiceServer) Update(context.Context, *Server) (*Serve
 }
 func (UnimplementedServerServiceServer) Delete(context.Context, *Id) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedServerServiceServer) RetryConnection(context.Context, *Id) (*ServerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RetryConnection not implemented")
 }
 func (UnimplementedServerServiceServer) InstallAgent(context.Context, *Id) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InstallAgent not implemented")
@@ -257,6 +273,24 @@ func _ServerService_Delete_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServerService_RetryConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).RetryConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_RetryConnection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).RetryConnection(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ServerService_InstallAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Id)
 	if err := dec(in); err != nil {
@@ -301,6 +335,10 @@ var ServerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _ServerService_Delete_Handler,
+		},
+		{
+			MethodName: "RetryConnection",
+			Handler:    _ServerService_RetryConnection_Handler,
 		},
 		{
 			MethodName: "InstallAgent",

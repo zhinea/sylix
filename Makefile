@@ -3,6 +3,8 @@ run:
 	go run ./cmd/main.go
 
 dev:
+	make compile-proto
+	make compile-proto-frontend
 	go build -o bin/agent cmd/agent/main.go
 	gowatch -o ./bin/controlplane -p ./cmd/main.go
 

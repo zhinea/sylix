@@ -59,9 +59,9 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       
       if (response.status === StatusCode.CREATED || response.status === StatusCode.OK) {
           if (response.server?.status === StatusServer.CONNECTED) {
-              return { success: true, message: "Server credentials have been successfully connected", close: true };
+              return { success: true, message: "Server credentials have been successfully connected", close: true, server: response.server };
           } else {
-              return { success: true, warning: "Connection failed, credentials may be incorrect, or UFW is running", close: true };
+              return { success: true, warning: "Connection failed, credentials may be incorrect, or UFW is running", close: false, server: response.server };
           }
       }
       return { success: false, error: response.error || "Failed to create server" };
@@ -107,7 +107,11 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
       const response = await serverService.Update(server);
       if (response.status === StatusCode.OK) {
-        return { success: true, message: "Server updated successfully" };
+        if (response.server?.status === StatusServer.CONNECTED) {
+          return { success: true, message: "Server updated successfully", close: true, server: response.server };
+        } else {
+          return { success: true, warning: "Server updated but connection failed", close: false, server: response.server };
+        }
       }
       return { success: false, error: response.error || "Failed to update server" };
     }
@@ -138,6 +142,11 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
   const isDeleting = 
     navigation.state === "submitting" && 
     navigation.formData?.get("intent") === "delete";
+  const retryingServerId = 
+    navigation.state === "submitting" && 
+    navigation.formData?.get("intent") === "retry-connection" 
+      ? navigation.formData.get("id") as string 
+      : null;
   const actionData = useActionData<typeof clientAction>();
   const wasDeleting = useRef(false);
 
@@ -179,6 +188,13 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
                   setIsCreateOpen(false);
                   setServerToUpdate(null);
                   form.reset();
+              } else if (actionData.server) {
+                  if (isCreateOpen) {
+                      setIsCreateOpen(false);
+                      handleUpdate(actionData.server);
+                  } else if (serverToUpdate) {
+                      handleUpdate(actionData.server);
+                  }
               }
           } else if (actionData.error) {
               toast.error(actionData.error);
@@ -284,6 +300,7 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
           onInstallAgent={handleInstallAgent}
           onRetryConnection={handleRetryConnection}
           onUpdate={handleUpdate}
+          retryingServerId={retryingServerId}
         />
       )}
 
@@ -294,6 +311,7 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
         onSubmit={onSubmit}
         isSubmitting={isSubmitting}
         mode="create"
+        status={StatusServer.STATUS_SERVER_UNSPECIFIED}
       />
 
       <ServerFormDialog
@@ -308,6 +326,7 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
         onSubmit={onUpdateSubmit}
         isSubmitting={isSubmitting}
         mode="edit"
+        status={serverToUpdate?.status || StatusServer.STATUS_SERVER_UNSPECIFIED}
       />
 
       <DeleteServerAlert

@@ -27,9 +27,10 @@ interface ServerListProps {
   onInstallAgent: (id: string) => void;
   onRetryConnection: (id: string) => void;
   onUpdate: (server: Server) => void;
+  retryingServerId?: string | null;
 }
 
-export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnection, onUpdate }: ServerListProps) {
+export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnection, onUpdate, retryingServerId }: ServerListProps) {
   const [logsServerId, setLogsServerId] = useState<string | null>(null);
 
   const getStatusBadge = (server: Server) => {
@@ -43,11 +44,12 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-6 w-6" 
+              className="h-6 w-6 hover:shadow-md transition-all" 
               onClick={() => onRetryConnection(server.id)}
               title="Retry Connection"
+              isLoading={retryingServerId === server.id}
             >
-              <RefreshCw className="h-3 w-3" />
+              {!(retryingServerId === server.id) && <RefreshCw className="h-3 w-3" />}
             </Button>
           </div>
         );

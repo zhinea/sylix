@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -79,11 +78,6 @@ func (s *SSHClient) CopyFile(srcPath, dstPath string) error {
 	}
 	defer srcFile.Close()
 
-	stat, err := srcFile.Stat()
-	if err != nil {
-		return fmt.Errorf("failed to stat source file: %w", err)
-	}
-
 	session, err := s.client.NewSession()
 	if err != nil {
 		return fmt.Errorf("failed to create session: %w", err)
@@ -100,13 +94,11 @@ func (s *SSHClient) CopyFile(srcPath, dstPath string) error {
 
 	go func() {
 		defer w.Close()
-		fmt.Fprintf(w, "C%#o %d %s\n", stat.Mode().Perm(), stat.Size(), filepath.Base(dstPath))
 		io.Copy(w, srcFile)
-		fmt.Fprint(w, "\x00")
 	}()
 
-	if err := session.Run("scp -t " + dstPath); err != nil {
-		return fmt.Errorf("failed to run scp: %w, stderr: %s", err, stderr.String())
+	if err := session.Run("cat > " + dstPath); err != nil {
+		return fmt.Errorf("failed to copy file: %w, stderr: %s", err, stderr.String())
 	}
 
 	return nil

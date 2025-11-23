@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { serverService } from "~/lib/api";
+import { serverService, logsService } from "~/lib/api";
 import { AgentStatusServer } from "~/proto/controlplane/server";
 
 interface AgentLogsModalProps {
@@ -23,17 +23,27 @@ export function AgentLogsModal({ serverId, onClose }: AgentLogsModalProps) {
   useEffect(() => {
     if (!serverId) return;
 
-    const interval = setInterval(async () => {
+    const fetchData = async () => {
       try {
-        const response = await serverService.Get({ id: serverId });
-        if (response.server) {
-          setLogs(response.server.agentLogs);
-          setStatus(response.server.agentStatus);
+        const serverResponse = await serverService.Get({ id: serverId });
+        if (serverResponse.server) {
+          setStatus(serverResponse.server.agentStatus);
         }
+
+        const logsResponse = await logsService.ReadServerLog({
+          serverId,
+          filename: "setup_agent.log",
+          page: 1,
+          pageSize: 10000,
+        });
+        setLogs(logsResponse.lines.join("\n"));
       } catch (e) {
         console.error(e);
       }
-    }, 2000);
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 2000);
 
     return () => clearInterval(interval);
   }, [serverId]);

@@ -662,13 +662,14 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\x10FINALIZING_SETUP\x10\x03\x12\v\n" +
 	"\aSUCCESS\x10\x04\x12\n" +
 	"\n" +
-	"\x06FAILED\x10\x052\xf3\x02\n" +
+	"\x06FAILED\x10\x052\xb6\x03\n" +
 	"\rServerService\x12<\n" +
 	"\x06Create\x12\x14.controlplane.Server\x1a\x1c.controlplane.ServerResponse\x125\n" +
 	"\x03Get\x12\x10.controlplane.Id\x1a\x1c.controlplane.ServerResponse\x123\n" +
 	"\x03All\x12\r.common.Empty\x1a\x1d.controlplane.ServersResponse\x12<\n" +
 	"\x06Update\x12\x14.controlplane.Server\x1a\x1c.controlplane.ServerResponse\x129\n" +
-	"\x06Delete\x12\x10.controlplane.Id\x1a\x1d.controlplane.MessageResponse\x12?\n" +
+	"\x06Delete\x12\x10.controlplane.Id\x1a\x1d.controlplane.MessageResponse\x12A\n" +
+	"\x0fRetryConnection\x12\x10.controlplane.Id\x1a\x1c.controlplane.ServerResponse\x12?\n" +
 	"\fInstallAgent\x12\x10.controlplane.Id\x1a\x1d.controlplane.MessageResponseB;Z9github.com/zhinea/sylix/internal/infra/proto/controlplaneb\x06proto3"
 
 var (
@@ -714,15 +715,17 @@ var file_controlplane_server_proto_depIdxs = []int32{
 	10, // 12: controlplane.ServerService.All:input_type -> common.Empty
 	6,  // 13: controlplane.ServerService.Update:input_type -> controlplane.Server
 	3,  // 14: controlplane.ServerService.Delete:input_type -> controlplane.Id
-	3,  // 15: controlplane.ServerService.InstallAgent:input_type -> controlplane.Id
-	4,  // 16: controlplane.ServerService.Create:output_type -> controlplane.ServerResponse
-	4,  // 17: controlplane.ServerService.Get:output_type -> controlplane.ServerResponse
-	5,  // 18: controlplane.ServerService.All:output_type -> controlplane.ServersResponse
-	4,  // 19: controlplane.ServerService.Update:output_type -> controlplane.ServerResponse
-	8,  // 20: controlplane.ServerService.Delete:output_type -> controlplane.MessageResponse
-	8,  // 21: controlplane.ServerService.InstallAgent:output_type -> controlplane.MessageResponse
-	16, // [16:22] is the sub-list for method output_type
-	10, // [10:16] is the sub-list for method input_type
+	3,  // 15: controlplane.ServerService.RetryConnection:input_type -> controlplane.Id
+	3,  // 16: controlplane.ServerService.InstallAgent:input_type -> controlplane.Id
+	4,  // 17: controlplane.ServerService.Create:output_type -> controlplane.ServerResponse
+	4,  // 18: controlplane.ServerService.Get:output_type -> controlplane.ServerResponse
+	5,  // 19: controlplane.ServerService.All:output_type -> controlplane.ServersResponse
+	4,  // 20: controlplane.ServerService.Update:output_type -> controlplane.ServerResponse
+	8,  // 21: controlplane.ServerService.Delete:output_type -> controlplane.MessageResponse
+	4,  // 22: controlplane.ServerService.RetryConnection:output_type -> controlplane.ServerResponse
+	8,  // 23: controlplane.ServerService.InstallAgent:output_type -> controlplane.MessageResponse
+	17, // [17:24] is the sub-list for method output_type
+	10, // [10:17] is the sub-list for method input_type
 	10, // [10:10] is the sub-list for extension type_name
 	10, // [10:10] is the sub-list for extension extendee
 	0,  // [0:10] is the sub-list for field type_name
