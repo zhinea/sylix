@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, RefreshCw, Server as ServerIcon, Trash, FileText, Edit } from "lucide-react";
+import { MoreHorizontal, RefreshCw, Server as ServerIcon, Trash, FileText, Edit, Activity } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import {
 } from "~/components/ui/table";
 import { Server, StatusServer, AgentStatusServer } from "~/proto/controlplane/server";
 import { ServerLogsDialog } from "./server-logs-dialog";
+import { ServerStatsDialog } from "./server-stats-dialog";
 
 interface ServerListProps {
   servers: Server[];
@@ -32,6 +33,7 @@ interface ServerListProps {
 
 export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnection, onUpdate, retryingServerId }: ServerListProps) {
   const [logsServerId, setLogsServerId] = useState<string | null>(null);
+  const [statsServerId, setStatsServerId] = useState<string | null>(null);
 
   const getStatusBadge = (server: Server) => {
     switch (server.status) {
@@ -116,20 +118,17 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => navigator.clipboard.writeText(server.ipAddress)}
-                      >
-                        Copy IP Address
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => onUpdate(server)}>
-                        <Edit className="mr-2 h-4 w-4" /> Edit
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit Server
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setStatsServerId(server.id)}>
+                        <Activity className="mr-2 h-4 w-4" />
+                        Stats & Incidents
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setLogsServerId(server.id)}>
-                        <FileText className="mr-2 h-4 w-4" /> Logs
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onInstallAgent(server.id)}>
-                        <RefreshCw className="mr-2 h-4 w-4" /> Install Agent
+                        <FileText className="mr-2 h-4 w-4" />
+                        View Logs
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -146,10 +145,16 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
           </TableBody>
         </Table>
       </div>
-      <ServerLogsDialog
-        serverId={logsServerId}
-        open={!!logsServerId}
-        onOpenChange={(open) => !open && setLogsServerId(null)}
+      <ServerLogsDialog 
+        serverId={logsServerId} 
+        open={!!logsServerId} 
+        onOpenChange={(open) => !open && setLogsServerId(null)} 
+      />
+
+      <ServerStatsDialog 
+        serverId={statsServerId} 
+        open={!!statsServerId} 
+        onOpenChange={(open) => !open && setStatsServerId(null)} 
       />
     </>
   );

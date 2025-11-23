@@ -42,11 +42,17 @@ func main() {
 
 	// Initialize dependencies
 	serverRepo := repository.NewServerRepository(db)
-	serverUseCase := app.NewServerUseCase(serverRepo)
+	monitoringRepo := repository.NewMonitoringRepository(db)
+
+	serverUseCase := app.NewServerUseCase(serverRepo, monitoringRepo)
 	serverService := grpcServices.NewServerService(serverUseCase)
 
 	logsUseCase := app.NewLogsUseCase()
 	logsService := grpcServices.NewLogsService(logsUseCase)
+
+	// Monitoring
+	monitoringWorker := app.NewMonitoringWorker(serverRepo, monitoringRepo)
+	monitoringWorker.Start()
 
 	pbControlPlane.RegisterServerServiceServer(grpcServer, serverService)
 	pbControlPlane.RegisterLogsServiceServer(grpcServer, logsService)

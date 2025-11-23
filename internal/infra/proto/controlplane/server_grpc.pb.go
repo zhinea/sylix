@@ -27,6 +27,8 @@ const (
 	ServerService_Delete_FullMethodName          = "/controlplane.ServerService/Delete"
 	ServerService_RetryConnection_FullMethodName = "/controlplane.ServerService/RetryConnection"
 	ServerService_InstallAgent_FullMethodName    = "/controlplane.ServerService/InstallAgent"
+	ServerService_GetStats_FullMethodName        = "/controlplane.ServerService/GetStats"
+	ServerService_GetAccidents_FullMethodName    = "/controlplane.ServerService/GetAccidents"
 )
 
 // ServerServiceClient is the client API for ServerService service.
@@ -40,6 +42,8 @@ type ServerServiceClient interface {
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
 	RetryConnection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ServerResponse, error)
 	InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
+	GetStats(ctx context.Context, in *GetStatsRequest, opts ...grpc.CallOption) (*GetStatsResponse, error)
+	GetAccidents(ctx context.Context, in *GetAccidentsRequest, opts ...grpc.CallOption) (*GetAccidentsResponse, error)
 }
 
 type serverServiceClient struct {
@@ -120,6 +124,26 @@ func (c *serverServiceClient) InstallAgent(ctx context.Context, in *Id, opts ...
 	return out, nil
 }
 
+func (c *serverServiceClient) GetStats(ctx context.Context, in *GetStatsRequest, opts ...grpc.CallOption) (*GetStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetStatsResponse)
+	err := c.cc.Invoke(ctx, ServerService_GetStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serverServiceClient) GetAccidents(ctx context.Context, in *GetAccidentsRequest, opts ...grpc.CallOption) (*GetAccidentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAccidentsResponse)
+	err := c.cc.Invoke(ctx, ServerService_GetAccidents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ServerServiceServer is the server API for ServerService service.
 // All implementations must embed UnimplementedServerServiceServer
 // for forward compatibility.
@@ -131,6 +155,8 @@ type ServerServiceServer interface {
 	Delete(context.Context, *Id) (*MessageResponse, error)
 	RetryConnection(context.Context, *Id) (*ServerResponse, error)
 	InstallAgent(context.Context, *Id) (*MessageResponse, error)
+	GetStats(context.Context, *GetStatsRequest) (*GetStatsResponse, error)
+	GetAccidents(context.Context, *GetAccidentsRequest) (*GetAccidentsResponse, error)
 	mustEmbedUnimplementedServerServiceServer()
 }
 
@@ -161,6 +187,12 @@ func (UnimplementedServerServiceServer) RetryConnection(context.Context, *Id) (*
 }
 func (UnimplementedServerServiceServer) InstallAgent(context.Context, *Id) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InstallAgent not implemented")
+}
+func (UnimplementedServerServiceServer) GetStats(context.Context, *GetStatsRequest) (*GetStatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStats not implemented")
+}
+func (UnimplementedServerServiceServer) GetAccidents(context.Context, *GetAccidentsRequest) (*GetAccidentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAccidents not implemented")
 }
 func (UnimplementedServerServiceServer) mustEmbedUnimplementedServerServiceServer() {}
 func (UnimplementedServerServiceServer) testEmbeddedByValue()                       {}
@@ -309,6 +341,42 @@ func _ServerService_InstallAgent_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServerService_GetStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).GetStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_GetStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).GetStats(ctx, req.(*GetStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServerService_GetAccidents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAccidentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).GetAccidents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_GetAccidents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).GetAccidents(ctx, req.(*GetAccidentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ServerService_ServiceDesc is the grpc.ServiceDesc for ServerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -343,6 +411,14 @@ var ServerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InstallAgent",
 			Handler:    _ServerService_InstallAgent_Handler,
+		},
+		{
+			MethodName: "GetStats",
+			Handler:    _ServerService_GetStats_Handler,
+		},
+		{
+			MethodName: "GetAccidents",
+			Handler:    _ServerService_GetAccidents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -32,3 +32,10 @@ func (s *AgentService) Heartbeat(ctx context.Context, req *pbAgent.HeartbeatRequ
 		Acknowledged: true,
 	}, nil
 }
+
+func (s *AgentService) Ping(ctx context.Context, req *pbAgent.PingRequest) (*pbAgent.PingResponse, error) {
+	return &pbAgent.PingResponse{
+		Timestamp: time.Now().Unix(),
+		Status:    "OK",
+	}, nil
+}

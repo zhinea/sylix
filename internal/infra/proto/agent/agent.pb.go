@@ -213,6 +213,102 @@ func (x *HeartbeatResponse) GetAcknowledged() bool {
 	return false
 }
 
+type PingRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Timestamp     int64                  `protobuf:"varint,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PingRequest) Reset() {
+	*x = PingRequest{}
+	mi := &file_agent_agent_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PingRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PingRequest) ProtoMessage() {}
+
+func (x *PingRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PingRequest.ProtoReflect.Descriptor instead.
+func (*PingRequest) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *PingRequest) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+type PingResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Timestamp     int64                  `protobuf:"varint,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PingResponse) Reset() {
+	*x = PingResponse{}
+	mi := &file_agent_agent_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PingResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PingResponse) ProtoMessage() {}
+
+func (x *PingResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PingResponse.ProtoReflect.Descriptor instead.
+func (*PingResponse) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *PingResponse) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *PingResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
 var File_agent_agent_proto protoreflect.FileDescriptor
 
 const file_agent_agent_proto_rawDesc = "" +
@@ -227,10 +323,16 @@ const file_agent_agent_proto_rawDesc = "" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1c\n" +
 	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\"7\n" +
 	"\x11HeartbeatResponse\x12\"\n" +
-	"\facknowledged\x18\x01 \x01(\bR\facknowledged2\x87\x01\n" +
+	"\facknowledged\x18\x01 \x01(\bR\facknowledged\"+\n" +
+	"\vPingRequest\x12\x1c\n" +
+	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\"D\n" +
+	"\fPingResponse\x12\x1c\n" +
+	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status2\xb8\x01\n" +
 	"\x05Agent\x12>\n" +
 	"\tGetStatus\x12\x17.agent.GetStatusRequest\x1a\x18.agent.GetStatusResponse\x12>\n" +
-	"\tHeartbeat\x12\x17.agent.HeartbeatRequest\x1a\x18.agent.HeartbeatResponseB4Z2github.com/zhinea/sylix/internal/infra/proto/agentb\x06proto3"
+	"\tHeartbeat\x12\x17.agent.HeartbeatRequest\x1a\x18.agent.HeartbeatResponse\x12/\n" +
+	"\x04Ping\x12\x12.agent.PingRequest\x1a\x13.agent.PingResponseB4Z2github.com/zhinea/sylix/internal/infra/proto/agentb\x06proto3"
 
 var (
 	file_agent_agent_proto_rawDescOnce sync.Once
@@ -244,20 +346,24 @@ func file_agent_agent_proto_rawDescGZIP() []byte {
 	return file_agent_agent_proto_rawDescData
 }
 
-var file_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_agent_agent_proto_goTypes = []any{
 	(*GetStatusRequest)(nil),  // 0: agent.GetStatusRequest
 	(*GetStatusResponse)(nil), // 1: agent.GetStatusResponse
 	(*HeartbeatRequest)(nil),  // 2: agent.HeartbeatRequest
 	(*HeartbeatResponse)(nil), // 3: agent.HeartbeatResponse
+	(*PingRequest)(nil),       // 4: agent.PingRequest
+	(*PingResponse)(nil),      // 5: agent.PingResponse
 }
 var file_agent_agent_proto_depIdxs = []int32{
 	0, // 0: agent.Agent.GetStatus:input_type -> agent.GetStatusRequest
 	2, // 1: agent.Agent.Heartbeat:input_type -> agent.HeartbeatRequest
-	1, // 2: agent.Agent.GetStatus:output_type -> agent.GetStatusResponse
-	3, // 3: agent.Agent.Heartbeat:output_type -> agent.HeartbeatResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	4, // 2: agent.Agent.Ping:input_type -> agent.PingRequest
+	1, // 3: agent.Agent.GetStatus:output_type -> agent.GetStatusResponse
+	3, // 4: agent.Agent.Heartbeat:output_type -> agent.HeartbeatResponse
+	5, // 5: agent.Agent.Ping:output_type -> agent.PingResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -274,7 +380,7 @@ func file_agent_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_agent_proto_rawDesc), len(file_agent_agent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

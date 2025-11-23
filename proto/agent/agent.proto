@@ -7,6 +7,7 @@ option go_package = "github.com/zhinea/sylix/internal/infra/proto/agent";
 service Agent {
     rpc GetStatus (GetStatusRequest) returns (GetStatusResponse);
     rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
+    rpc Ping (PingRequest) returns (PingResponse);
 }
 
 message GetStatusRequest {}
@@ -24,4 +25,13 @@ message HeartbeatRequest {
 
 message HeartbeatResponse {
     bool acknowledged = 1;
+}
+
+message PingRequest {
+    int64 timestamp = 1;
+}
+
+message PingResponse {
+    int64 timestamp = 1;
+    string status = 2;
 }

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"time"
 
 	"github.com/zhinea/sylix/internal/module/controlplane/app"
 	"github.com/zhinea/sylix/internal/module/controlplane/entity"
@@ -106,19 +107,52 @@ func (s *ServerService) Update(ctx context.Context, pb *pbControlPlane.Server) (
 	}, nil
 }
 
-func (s *ServerService) RetryConnection(ctx context.Context, id *pbControlPlane.Id) (*pbControlPlane.ServerResponse, error) {
-	server, err := s.useCase.RetryConnection(ctx, id.Id)
+func (s *ServerService) GetStats(ctx context.Context, req *pbControlPlane.GetStatsRequest) (*pbControlPlane.GetStatsResponse, error) {
+	stats, err := s.useCase.GetStats(ctx, req.ServerId)
 	if err != nil {
-		errStr := err.Error()
-		return &pbControlPlane.ServerResponse{
-			Status: pbControlPlane.StatusCode_INTERNAL_ERROR,
-			Error:  &errStr,
-		}, nil
+		return nil, err
 	}
 
-	return &pbControlPlane.ServerResponse{
-		Status: pbControlPlane.StatusCode_OK,
-		Server: s.entityToProto(server),
+	var pbStats []*pbControlPlane.ServerStat
+	for _, stat := range stats {
+		pbStats = append(pbStats, &pbControlPlane.ServerStat{
+			Id:                  stat.Id,
+			ServerId:            stat.ServerID,
+			AverageResponseTime: stat.AverageResponseTime,
+			MinResponseTime:     stat.MinResponseTime,
+			MaxResponseTime:     stat.MaxResponseTime,
+			PingCount:           stat.PingCount,
+			SuccessRate:         stat.SuccessRate,
+			Timestamp:           stat.Timestamp.Format(time.RFC3339),
+		})
+	}
+
+	return &pbControlPlane.GetStatsResponse{
+		Stats: pbStats,
+	}, nil
+}
+
+func (s *ServerService) GetAccidents(ctx context.Context, req *pbControlPlane.GetAccidentsRequest) (*pbControlPlane.GetAccidentsResponse, error) {
+	accidents, err := s.useCase.GetAccidents(ctx, req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbAccidents []*pbControlPlane.ServerAccident
+	for _, accident := range accidents {
+		pbAccidents = append(pbAccidents, &pbControlPlane.ServerAccident{
+			Id:           accident.Id,
+			ServerId:     accident.ServerID,
+			ResponseTime: accident.ResponseTime,
+			Error:        accident.Error,
+			Details:      accident.Details,
+			Resolved:     accident.Resolved,
+			CreatedAt:    accident.CreatedAt.Format(time.RFC3339),
+		})
+	}
+
+	return &pbControlPlane.GetAccidentsResponse{
+		Accidents: pbAccidents,
 	}, nil
 }
 

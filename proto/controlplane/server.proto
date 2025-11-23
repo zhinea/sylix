@@ -15,6 +15,45 @@ service ServerService {
     rpc Delete(Id) returns (MessageResponse);
     rpc RetryConnection(Id) returns (ServerResponse);
     rpc InstallAgent(Id) returns (MessageResponse);
+    rpc GetStats(GetStatsRequest) returns (GetStatsResponse);
+    rpc GetAccidents(GetAccidentsRequest) returns (GetAccidentsResponse);
+}
+
+message GetStatsRequest {
+    string server_id = 1;
+}
+
+message ServerStat {
+    string id = 1;
+    string server_id = 2;
+    double average_response_time = 3;
+    int64 min_response_time = 4;
+    int64 max_response_time = 5;
+    int64 ping_count = 6;
+    double success_rate = 7;
+    string timestamp = 8;
+}
+
+message GetStatsResponse {
+    repeated ServerStat stats = 1;
+}
+
+message GetAccidentsRequest {
+    string server_id = 1;
+}
+
+message ServerAccident {
+    string id = 1;
+    string server_id = 2;
+    int64 response_time = 3;
+    string error = 4;
+    string details = 5;
+    bool resolved = 6;
+    string created_at = 7;
+}
+
+message GetAccidentsResponse {
+    repeated ServerAccident accidents = 1;
 }
 
 enum StatusCode {

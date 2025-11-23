@@ -18,12 +18,14 @@ import (
 )
 
 type ServerUseCase struct {
-	repo repository.ServerRepository
+	repo           repository.ServerRepository
+	monitoringRepo repository.MonitoringRepository
 }
 
-func NewServerUseCase(repo repository.ServerRepository) *ServerUseCase {
+func NewServerUseCase(repo repository.ServerRepository, monitoringRepo repository.MonitoringRepository) *ServerUseCase {
 	return &ServerUseCase{
-		repo: repo,
+		repo:           repo,
+		monitoringRepo: monitoringRepo,
 	}
 }
 
@@ -115,6 +117,14 @@ func (uc *ServerUseCase) InstallAgent(ctx context.Context, serverID string) erro
 	go uc.runAgentInstallation(context.Background(), server)
 
 	return nil
+}
+
+func (uc *ServerUseCase) GetStats(ctx context.Context, serverID string) ([]*entity.ServerStat, error) {
+	return uc.monitoringRepo.GetStatsByServerID(ctx, serverID, 100) // Limit to last 100 stats
+}
+
+func (uc *ServerUseCase) GetAccidents(ctx context.Context, serverID string) ([]*entity.ServerAccident, error) {
+	return uc.monitoringRepo.GetAccidentsByServerID(ctx, serverID, 50) // Limit to last 50 accidents
 }
 
 func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entity.Server) {
