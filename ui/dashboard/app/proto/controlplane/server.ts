@@ -279,9 +279,13 @@ export interface Server {
   credential: ServerCredential | undefined;
   isRoot: number;
   status: StatusServer;
-  agentStatus: AgentStatusServer;
-  agentLogs: string;
-  agentPort: number;
+  agent: ServerAgent | undefined;
+}
+
+export interface ServerAgent {
+  port: number;
+  status: AgentStatusServer;
+  logs: string;
 }
 
 export interface ServerCredential {
@@ -1842,9 +1846,7 @@ function createBaseServer(): Server {
     credential: undefined,
     isRoot: 0,
     status: 0,
-    agentStatus: 0,
-    agentLogs: "",
-    agentPort: 0,
+    agent: undefined,
   };
 }
 
@@ -1874,14 +1876,8 @@ export const Server: MessageFns<Server> = {
     if (message.status !== 0) {
       writer.uint32(64).int32(message.status);
     }
-    if (message.agentStatus !== 0) {
-      writer.uint32(72).int32(message.agentStatus);
-    }
-    if (message.agentLogs !== "") {
-      writer.uint32(82).string(message.agentLogs);
-    }
-    if (message.agentPort !== 0) {
-      writer.uint32(88).int32(message.agentPort);
+    if (message.agent !== undefined) {
+      ServerAgent.encode(message.agent, writer.uint32(74).fork()).join();
     }
     return writer;
   },
@@ -1958,27 +1954,11 @@ export const Server: MessageFns<Server> = {
           continue;
         }
         case 9: {
-          if (tag !== 72) {
+          if (tag !== 74) {
             break;
           }
 
-          message.agentStatus = reader.int32() as any;
-          continue;
-        }
-        case 10: {
-          if (tag !== 82) {
-            break;
-          }
-
-          message.agentLogs = reader.string();
-          continue;
-        }
-        case 11: {
-          if (tag !== 88) {
-            break;
-          }
-
-          message.agentPort = reader.int32();
+          message.agent = ServerAgent.decode(reader, reader.uint32());
           continue;
         }
       }
@@ -2000,9 +1980,7 @@ export const Server: MessageFns<Server> = {
       credential: isSet(object.credential) ? ServerCredential.fromJSON(object.credential) : undefined,
       isRoot: isSet(object.isRoot) ? globalThis.Number(object.isRoot) : 0,
       status: isSet(object.status) ? statusServerFromJSON(object.status) : 0,
-      agentStatus: isSet(object.agentStatus) ? agentStatusServerFromJSON(object.agentStatus) : 0,
-      agentLogs: isSet(object.agentLogs) ? globalThis.String(object.agentLogs) : "",
-      agentPort: isSet(object.agentPort) ? globalThis.Number(object.agentPort) : 0,
+      agent: isSet(object.agent) ? ServerAgent.fromJSON(object.agent) : undefined,
     };
   },
 
@@ -2032,14 +2010,8 @@ export const Server: MessageFns<Server> = {
     if (message.status !== 0) {
       obj.status = statusServerToJSON(message.status);
     }
-    if (message.agentStatus !== 0) {
-      obj.agentStatus = agentStatusServerToJSON(message.agentStatus);
-    }
-    if (message.agentLogs !== "") {
-      obj.agentLogs = message.agentLogs;
-    }
-    if (message.agentPort !== 0) {
-      obj.agentPort = Math.round(message.agentPort);
+    if (message.agent !== undefined) {
+      obj.agent = ServerAgent.toJSON(message.agent);
     }
     return obj;
   },
@@ -2059,9 +2031,101 @@ export const Server: MessageFns<Server> = {
       : undefined;
     message.isRoot = object.isRoot ?? 0;
     message.status = object.status ?? 0;
-    message.agentStatus = object.agentStatus ?? 0;
-    message.agentLogs = object.agentLogs ?? "";
-    message.agentPort = object.agentPort ?? 0;
+    message.agent = (object.agent !== undefined && object.agent !== null)
+      ? ServerAgent.fromPartial(object.agent)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseServerAgent(): ServerAgent {
+  return { port: 0, status: 0, logs: "" };
+}
+
+export const ServerAgent: MessageFns<ServerAgent> = {
+  encode(message: ServerAgent, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.port !== 0) {
+      writer.uint32(8).int32(message.port);
+    }
+    if (message.status !== 0) {
+      writer.uint32(16).int32(message.status);
+    }
+    if (message.logs !== "") {
+      writer.uint32(26).string(message.logs);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ServerAgent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerAgent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.port = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.status = reader.int32() as any;
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.logs = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerAgent {
+    return {
+      port: isSet(object.port) ? globalThis.Number(object.port) : 0,
+      status: isSet(object.status) ? agentStatusServerFromJSON(object.status) : 0,
+      logs: isSet(object.logs) ? globalThis.String(object.logs) : "",
+    };
+  },
+
+  toJSON(message: ServerAgent): unknown {
+    const obj: any = {};
+    if (message.port !== 0) {
+      obj.port = Math.round(message.port);
+    }
+    if (message.status !== 0) {
+      obj.status = agentStatusServerToJSON(message.status);
+    }
+    if (message.logs !== "") {
+      obj.logs = message.logs;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerAgent>, I>>(base?: I): ServerAgent {
+    return ServerAgent.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerAgent>, I>>(object: I): ServerAgent {
+    const message = createBaseServerAgent();
+    message.port = object.port ?? 0;
+    message.status = object.status ?? 0;
+    message.logs = object.logs ?? "";
     return message;
   },
 };

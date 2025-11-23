@@ -160,9 +160,13 @@ message Server {
     ServerCredential credential = 6;
     int32 isRoot = 7;
     StatusServer status = 8;
-    AgentStatusServer agentStatus = 9;
-    string agentLogs = 10;
-    int32 agentPort = 11;
+    ServerAgent agent = 9;
+}
+
+message ServerAgent {
+    int32 port = 1;
+    AgentStatusServer status = 2;
+    string logs = 3;
 }
 
 message ServerCredential {

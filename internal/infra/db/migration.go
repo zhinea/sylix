@@ -13,10 +13,25 @@ func AutoMigrate(db *gorm.DB) error {
 		}
 	}
 
-	return db.AutoMigrate(
+	if err := db.AutoMigrate(
 		&entity.Server{},
 		&entity.ServerPing{},
 		&entity.ServerStat{},
 		&entity.ServerAccident{},
-	)
+	); err != nil {
+		return err
+	}
+
+	// Migrate credential_ca_cert to agent_cert
+	if db.Migrator().HasColumn(&entity.Server{}, "credential_ca_cert") {
+		if err := db.Exec("UPDATE servers SET agent_cert = credential_ca_cert WHERE (agent_cert IS NULL OR agent_cert = '') AND credential_ca_cert IS NOT NULL").Error; err != nil {
+			return err
+		}
+		// Optional: Drop the old column
+		// if err := db.Migrator().DropColumn(&entity.Server{}, "credential_ca_cert"); err != nil {
+		// 	return err
+		// }
+	}
+
+	return nil
 }

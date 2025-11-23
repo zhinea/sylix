@@ -51,8 +51,11 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
         },
         isRoot: 0, // Default value
         status: StatusServer.STATUS_SERVER_UNSPECIFIED,
-        agentStatus: AgentStatusServer.AGENT_STATUS_SERVER_UNSPECIFIED,
-        agentLogs: "",
+        agent: {
+          port: 0,
+          status: AgentStatusServer.AGENT_STATUS_SERVER_UNSPECIFIED,
+          logs: "",
+        },
       };
 
       const response = await serverService.Create(server);
@@ -101,8 +104,11 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
         },
         isRoot: 0,
         status: StatusServer.STATUS_SERVER_UNSPECIFIED,
-        agentStatus: AgentStatusServer.AGENT_STATUS_SERVER_UNSPECIFIED,
-        agentLogs: "",
+        agent: {
+          port: 0,
+          status: AgentStatusServer.AGENT_STATUS_SERVER_UNSPECIFIED,
+          logs: "",
+        },
       };
 
       const response = await serverService.Update(server);

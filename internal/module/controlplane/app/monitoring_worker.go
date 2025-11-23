@@ -70,7 +70,7 @@ func (w *MonitoringWorker) pingAllServers() {
 }
 
 func (w *MonitoringWorker) pingServer(ctx context.Context, server *entity.Server) {
-	port := server.AgentPort
+	port := server.Agent.Port
 	if port == 0 {
 		port = 8083
 	}
@@ -82,9 +82,9 @@ func (w *MonitoringWorker) pingServer(ctx context.Context, server *entity.Server
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: true,
 	}
-	if server.Credential.CaCert != "" {
+	if server.Agent.Cert != "" {
 		cp := x509.NewCertPool()
-		if cp.AppendCertsFromPEM([]byte(server.Credential.CaCert)) {
+		if cp.AppendCertsFromPEM([]byte(server.Agent.Cert)) {
 			tlsConfig.RootCAs = cp
 		}
 	}
@@ -137,6 +137,8 @@ func (w *MonitoringWorker) recordPingFailure(ctx context.Context, server *entity
 		Status:       "ERROR",
 		Error:        errorMsg,
 	})
+
+	fmt.Println(server.Agent.Cert)
 
 	w.monitoringRepo.SaveAccident(ctx, &entity.ServerAccident{
 		ServerID:     server.Id,

@@ -12,6 +12,7 @@ import (
 	pbControlPlane "github.com/zhinea/sylix/internal/infra/proto/controlplane"
 	"github.com/zhinea/sylix/internal/module/controlplane/app"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
+	"github.com/zhinea/sylix/internal/module/controlplane/domain/services"
 	grpcServices "github.com/zhinea/sylix/internal/module/controlplane/interface/grpc"
 	"google.golang.org/grpc"
 )
@@ -44,7 +45,10 @@ func main() {
 	serverRepo := repository.NewServerRepository(db)
 	monitoringRepo := repository.NewMonitoringRepository(db)
 
-	serverUseCase := app.NewServerUseCase(serverRepo, monitoringRepo)
+	monitoringService := services.NewMonitoringService(monitoringRepo)
+	agentService := services.NewAgentService(serverRepo)
+
+	serverUseCase := app.NewServerUseCase(serverRepo, monitoringService, agentService)
 	serverService := grpcServices.NewServerService(serverUseCase)
 
 	logsUseCase := app.NewLogsUseCase()

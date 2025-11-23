@@ -107,7 +107,7 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
                 </TableCell>
                 <TableCell>{server.credential?.username}</TableCell>
                 <TableCell>{getStatusBadge(server)}</TableCell>
-                <TableCell>{getAgentStatusBadge(server.agentStatus)}</TableCell>
+                <TableCell>{getAgentStatusBadge(server.agent?.status ?? AgentStatusServer.AGENT_STATUS_SERVER_UNSPECIFIED)}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

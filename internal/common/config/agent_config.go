@@ -31,7 +31,7 @@ func LoadAgentConfig(path string) (*AgentConfig, error) {
 	config.Server.Port = 8083
 	config.Server.Host = "0.0.0.0"
 	config.Log.Level = "info"
-	config.Log.Filename = "sylix-agent.log"
+	config.Log.Filename = "/etc/sylix-agent/agent.log"
 	config.Log.MaxSize = 10
 	config.Log.MaxBackups = 3
 	config.Log.MaxAge = 28

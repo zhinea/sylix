@@ -324,10 +324,12 @@ func (s *ServerService) entityToProto(server *entity.Server) *pbControlPlane.Ser
 			Password: server.Credential.Password,
 			SshKey:   server.Credential.SSHKey,
 		},
-		Status:      pbControlPlane.StatusServer(server.Status),
-		AgentStatus: pbControlPlane.AgentStatusServer(server.AgentStatus),
-		AgentLogs:   server.AgentLogs,
-		AgentPort:   int32(server.AgentPort),
+		Status: pbControlPlane.StatusServer(server.Status),
+		Agent: &pbControlPlane.ServerAgent{
+			Port:   int32(server.Agent.Port),
+			Status: pbControlPlane.AgentStatusServer(server.Agent.Status),
+			Logs:   server.Agent.Logs,
+		},
 	}
 }
 
@@ -336,16 +338,20 @@ func (s *ServerService) protoToEntity(pb *pbControlPlane.Server) *entity.Server 
 		Name:      pb.Name,
 		IpAddress: pb.IpAddress,
 		Port:      int(pb.Port),
-		AgentPort: int(pb.AgentPort),
 		Protocol:  pb.Protocol,
 		Credential: entity.ServerCredential{
 			Username: pb.Credential.Username,
 			Password: pb.Credential.Password,
 			SSHKey:   pb.Credential.SshKey,
 		},
-		Status:      int(pb.Status),
-		AgentStatus: int(pb.AgentStatus),
-		AgentLogs:   pb.AgentLogs,
+		Status: int(pb.Status),
+	}
+	if pb.Agent != nil {
+		server.Agent = entity.ServerAgent{
+			Port:   int(pb.Agent.Port),
+			Status: int(pb.Agent.Status),
+			Logs:   pb.Agent.Logs,
+		}
 	}
 	server.Id = pb.Id
 	return server

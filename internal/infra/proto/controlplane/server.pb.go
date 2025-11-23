@@ -1185,9 +1185,7 @@ type Server struct {
 	Credential    *ServerCredential      `protobuf:"bytes,6,opt,name=credential,proto3" json:"credential,omitempty"`
 	IsRoot        int32                  `protobuf:"varint,7,opt,name=isRoot,proto3" json:"isRoot,omitempty"`
 	Status        StatusServer           `protobuf:"varint,8,opt,name=status,proto3,enum=controlplane.StatusServer" json:"status,omitempty"`
-	AgentStatus   AgentStatusServer      `protobuf:"varint,9,opt,name=agentStatus,proto3,enum=controlplane.AgentStatusServer" json:"agentStatus,omitempty"`
-	AgentLogs     string                 `protobuf:"bytes,10,opt,name=agentLogs,proto3" json:"agentLogs,omitempty"`
-	AgentPort     int32                  `protobuf:"varint,11,opt,name=agentPort,proto3" json:"agentPort,omitempty"`
+	Agent         *ServerAgent           `protobuf:"bytes,9,opt,name=agent,proto3" json:"agent,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1278,25 +1276,71 @@ func (x *Server) GetStatus() StatusServer {
 	return StatusServer_STATUS_SERVER_UNSPECIFIED
 }
 
-func (x *Server) GetAgentStatus() AgentStatusServer {
+func (x *Server) GetAgent() *ServerAgent {
 	if x != nil {
-		return x.AgentStatus
+		return x.Agent
+	}
+	return nil
+}
+
+type ServerAgent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Port          int32                  `protobuf:"varint,1,opt,name=port,proto3" json:"port,omitempty"`
+	Status        AgentStatusServer      `protobuf:"varint,2,opt,name=status,proto3,enum=controlplane.AgentStatusServer" json:"status,omitempty"`
+	Logs          string                 `protobuf:"bytes,3,opt,name=logs,proto3" json:"logs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServerAgent) Reset() {
+	*x = ServerAgent{}
+	mi := &file_controlplane_server_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerAgent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerAgent) ProtoMessage() {}
+
+func (x *ServerAgent) ProtoReflect() protoreflect.Message {
+	mi := &file_controlplane_server_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerAgent.ProtoReflect.Descriptor instead.
+func (*ServerAgent) Descriptor() ([]byte, []int) {
+	return file_controlplane_server_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ServerAgent) GetPort() int32 {
+	if x != nil {
+		return x.Port
+	}
+	return 0
+}
+
+func (x *ServerAgent) GetStatus() AgentStatusServer {
+	if x != nil {
+		return x.Status
 	}
 	return AgentStatusServer_AGENT_STATUS_SERVER_UNSPECIFIED
 }
 
-func (x *Server) GetAgentLogs() string {
+func (x *ServerAgent) GetLogs() string {
 	if x != nil {
-		return x.AgentLogs
+		return x.Logs
 	}
 	return ""
-}
-
-func (x *Server) GetAgentPort() int32 {
-	if x != nil {
-		return x.AgentPort
-	}
-	return 0
 }
 
 type ServerCredential struct {
@@ -1310,7 +1354,7 @@ type ServerCredential struct {
 
 func (x *ServerCredential) Reset() {
 	*x = ServerCredential{}
-	mi := &file_controlplane_server_proto_msgTypes[17]
+	mi := &file_controlplane_server_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1322,7 +1366,7 @@ func (x *ServerCredential) String() string {
 func (*ServerCredential) ProtoMessage() {}
 
 func (x *ServerCredential) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[17]
+	mi := &file_controlplane_server_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1335,7 +1379,7 @@ func (x *ServerCredential) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerCredential.ProtoReflect.Descriptor instead.
 func (*ServerCredential) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{17}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ServerCredential) GetUsername() string {
@@ -1369,7 +1413,7 @@ type MessageResponse struct {
 
 func (x *MessageResponse) Reset() {
 	*x = MessageResponse{}
-	mi := &file_controlplane_server_proto_msgTypes[18]
+	mi := &file_controlplane_server_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1381,7 +1425,7 @@ func (x *MessageResponse) String() string {
 func (*MessageResponse) ProtoMessage() {}
 
 func (x *MessageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[18]
+	mi := &file_controlplane_server_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1394,7 +1438,7 @@ func (x *MessageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MessageResponse.ProtoReflect.Descriptor instead.
 func (*MessageResponse) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{18}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *MessageResponse) GetStatus() StatusCode {
@@ -1420,7 +1464,7 @@ type BatchDeleteAccidentsRequest struct {
 
 func (x *BatchDeleteAccidentsRequest) Reset() {
 	*x = BatchDeleteAccidentsRequest{}
-	mi := &file_controlplane_server_proto_msgTypes[19]
+	mi := &file_controlplane_server_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1432,7 +1476,7 @@ func (x *BatchDeleteAccidentsRequest) String() string {
 func (*BatchDeleteAccidentsRequest) ProtoMessage() {}
 
 func (x *BatchDeleteAccidentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[19]
+	mi := &file_controlplane_server_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1445,7 +1489,7 @@ func (x *BatchDeleteAccidentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BatchDeleteAccidentsRequest.ProtoReflect.Descriptor instead.
 func (*BatchDeleteAccidentsRequest) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{19}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *BatchDeleteAccidentsRequest) GetIds() []string {
@@ -1535,7 +1579,7 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\aservers\x18\x02 \x03(\v2\x14.controlplane.ServerR\aservers\x12/\n" +
 	"\x06errors\x18\x03 \x03(\v2\x17.common.ValidationErrorR\x06errors\x12\x19\n" +
 	"\x05error\x18\x04 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error\"\x85\x03\n" +
+	"\x06_error\"\xb7\x02\n" +
 	"\x06Server\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
@@ -1546,11 +1590,12 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"credential\x18\x06 \x01(\v2\x1e.controlplane.ServerCredentialR\n" +
 	"credential\x12\x16\n" +
 	"\x06isRoot\x18\a \x01(\x05R\x06isRoot\x122\n" +
-	"\x06status\x18\b \x01(\x0e2\x1a.controlplane.StatusServerR\x06status\x12A\n" +
-	"\vagentStatus\x18\t \x01(\x0e2\x1f.controlplane.AgentStatusServerR\vagentStatus\x12\x1c\n" +
-	"\tagentLogs\x18\n" +
-	" \x01(\tR\tagentLogs\x12\x1c\n" +
-	"\tagentPort\x18\v \x01(\x05R\tagentPort\"\x84\x01\n" +
+	"\x06status\x18\b \x01(\x0e2\x1a.controlplane.StatusServerR\x06status\x12/\n" +
+	"\x05agent\x18\t \x01(\v2\x19.controlplane.ServerAgentR\x05agent\"n\n" +
+	"\vServerAgent\x12\x12\n" +
+	"\x04port\x18\x01 \x01(\x05R\x04port\x127\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x1f.controlplane.AgentStatusServerR\x06status\x12\x12\n" +
+	"\x04logs\x18\x03 \x01(\tR\x04logs\"\x84\x01\n" +
 	"\x10ServerCredential\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1f\n" +
 	"\bpassword\x18\x02 \x01(\tH\x00R\bpassword\x88\x01\x01\x12\x1b\n" +
@@ -1615,7 +1660,7 @@ func file_controlplane_server_proto_rawDescGZIP() []byte {
 }
 
 var file_controlplane_server_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_controlplane_server_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_controlplane_server_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_controlplane_server_proto_goTypes = []any{
 	(StatusCode)(0),                     // 0: controlplane.StatusCode
 	(StatusServer)(0),                   // 1: controlplane.StatusServer
@@ -1637,11 +1682,12 @@ var file_controlplane_server_proto_goTypes = []any{
 	(*ServerResponse)(nil),              // 17: controlplane.ServerResponse
 	(*ServersResponse)(nil),             // 18: controlplane.ServersResponse
 	(*Server)(nil),                      // 19: controlplane.Server
-	(*ServerCredential)(nil),            // 20: controlplane.ServerCredential
-	(*MessageResponse)(nil),             // 21: controlplane.MessageResponse
-	(*BatchDeleteAccidentsRequest)(nil), // 22: controlplane.BatchDeleteAccidentsRequest
-	(*common.ValidationError)(nil),      // 23: common.ValidationError
-	(*common.Empty)(nil),                // 24: common.Empty
+	(*ServerAgent)(nil),                 // 20: controlplane.ServerAgent
+	(*ServerCredential)(nil),            // 21: controlplane.ServerCredential
+	(*MessageResponse)(nil),             // 22: controlplane.MessageResponse
+	(*BatchDeleteAccidentsRequest)(nil), // 23: controlplane.BatchDeleteAccidentsRequest
+	(*common.ValidationError)(nil),      // 24: common.ValidationError
+	(*common.Empty)(nil),                // 25: common.Empty
 }
 var file_controlplane_server_proto_depIdxs = []int32{
 	5,  // 0: controlplane.GetRealtimeStatsResponse.pings:type_name -> controlplane.ServerPing
@@ -1649,51 +1695,52 @@ var file_controlplane_server_proto_depIdxs = []int32{
 	14, // 2: controlplane.GetAccidentsResponse.accidents:type_name -> controlplane.ServerAccident
 	0,  // 3: controlplane.ServerResponse.status:type_name -> controlplane.StatusCode
 	19, // 4: controlplane.ServerResponse.server:type_name -> controlplane.Server
-	23, // 5: controlplane.ServerResponse.errors:type_name -> common.ValidationError
+	24, // 5: controlplane.ServerResponse.errors:type_name -> common.ValidationError
 	0,  // 6: controlplane.ServersResponse.status:type_name -> controlplane.StatusCode
 	19, // 7: controlplane.ServersResponse.servers:type_name -> controlplane.Server
-	23, // 8: controlplane.ServersResponse.errors:type_name -> common.ValidationError
-	20, // 9: controlplane.Server.credential:type_name -> controlplane.ServerCredential
+	24, // 8: controlplane.ServersResponse.errors:type_name -> common.ValidationError
+	21, // 9: controlplane.Server.credential:type_name -> controlplane.ServerCredential
 	1,  // 10: controlplane.Server.status:type_name -> controlplane.StatusServer
-	2,  // 11: controlplane.Server.agentStatus:type_name -> controlplane.AgentStatusServer
-	0,  // 12: controlplane.MessageResponse.status:type_name -> controlplane.StatusCode
-	19, // 13: controlplane.ServerService.Create:input_type -> controlplane.Server
-	16, // 14: controlplane.ServerService.Get:input_type -> controlplane.Id
-	24, // 15: controlplane.ServerService.All:input_type -> common.Empty
-	19, // 16: controlplane.ServerService.Update:input_type -> controlplane.Server
-	16, // 17: controlplane.ServerService.Delete:input_type -> controlplane.Id
-	16, // 18: controlplane.ServerService.RetryConnection:input_type -> controlplane.Id
-	16, // 19: controlplane.ServerService.InstallAgent:input_type -> controlplane.Id
-	10, // 20: controlplane.ServerService.GetStats:input_type -> controlplane.GetStatsRequest
-	13, // 21: controlplane.ServerService.GetAccidents:input_type -> controlplane.GetAccidentsRequest
-	16, // 22: controlplane.ServerService.DeleteAccident:input_type -> controlplane.Id
-	22, // 23: controlplane.ServerService.BatchDeleteAccidents:input_type -> controlplane.BatchDeleteAccidentsRequest
-	4,  // 24: controlplane.ServerService.GetRealtimeStats:input_type -> controlplane.GetRealtimeStatsRequest
-	7,  // 25: controlplane.ServerService.ConfigureAgent:input_type -> controlplane.ConfigureAgentRequest
-	8,  // 26: controlplane.ServerService.UpdateAgentPort:input_type -> controlplane.UpdateAgentPortRequest
-	9,  // 27: controlplane.ServerService.UpdateServerTimeZone:input_type -> controlplane.UpdateServerTimeZoneRequest
-	16, // 28: controlplane.ServerService.GetAgentConfig:input_type -> controlplane.Id
-	17, // 29: controlplane.ServerService.Create:output_type -> controlplane.ServerResponse
-	17, // 30: controlplane.ServerService.Get:output_type -> controlplane.ServerResponse
-	18, // 31: controlplane.ServerService.All:output_type -> controlplane.ServersResponse
-	17, // 32: controlplane.ServerService.Update:output_type -> controlplane.ServerResponse
-	21, // 33: controlplane.ServerService.Delete:output_type -> controlplane.MessageResponse
-	17, // 34: controlplane.ServerService.RetryConnection:output_type -> controlplane.ServerResponse
-	21, // 35: controlplane.ServerService.InstallAgent:output_type -> controlplane.MessageResponse
-	12, // 36: controlplane.ServerService.GetStats:output_type -> controlplane.GetStatsResponse
-	15, // 37: controlplane.ServerService.GetAccidents:output_type -> controlplane.GetAccidentsResponse
-	21, // 38: controlplane.ServerService.DeleteAccident:output_type -> controlplane.MessageResponse
-	21, // 39: controlplane.ServerService.BatchDeleteAccidents:output_type -> controlplane.MessageResponse
-	6,  // 40: controlplane.ServerService.GetRealtimeStats:output_type -> controlplane.GetRealtimeStatsResponse
-	21, // 41: controlplane.ServerService.ConfigureAgent:output_type -> controlplane.MessageResponse
-	21, // 42: controlplane.ServerService.UpdateAgentPort:output_type -> controlplane.MessageResponse
-	21, // 43: controlplane.ServerService.UpdateServerTimeZone:output_type -> controlplane.MessageResponse
-	3,  // 44: controlplane.ServerService.GetAgentConfig:output_type -> controlplane.GetAgentConfigResponse
-	29, // [29:45] is the sub-list for method output_type
-	13, // [13:29] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	20, // 11: controlplane.Server.agent:type_name -> controlplane.ServerAgent
+	2,  // 12: controlplane.ServerAgent.status:type_name -> controlplane.AgentStatusServer
+	0,  // 13: controlplane.MessageResponse.status:type_name -> controlplane.StatusCode
+	19, // 14: controlplane.ServerService.Create:input_type -> controlplane.Server
+	16, // 15: controlplane.ServerService.Get:input_type -> controlplane.Id
+	25, // 16: controlplane.ServerService.All:input_type -> common.Empty
+	19, // 17: controlplane.ServerService.Update:input_type -> controlplane.Server
+	16, // 18: controlplane.ServerService.Delete:input_type -> controlplane.Id
+	16, // 19: controlplane.ServerService.RetryConnection:input_type -> controlplane.Id
+	16, // 20: controlplane.ServerService.InstallAgent:input_type -> controlplane.Id
+	10, // 21: controlplane.ServerService.GetStats:input_type -> controlplane.GetStatsRequest
+	13, // 22: controlplane.ServerService.GetAccidents:input_type -> controlplane.GetAccidentsRequest
+	16, // 23: controlplane.ServerService.DeleteAccident:input_type -> controlplane.Id
+	23, // 24: controlplane.ServerService.BatchDeleteAccidents:input_type -> controlplane.BatchDeleteAccidentsRequest
+	4,  // 25: controlplane.ServerService.GetRealtimeStats:input_type -> controlplane.GetRealtimeStatsRequest
+	7,  // 26: controlplane.ServerService.ConfigureAgent:input_type -> controlplane.ConfigureAgentRequest
+	8,  // 27: controlplane.ServerService.UpdateAgentPort:input_type -> controlplane.UpdateAgentPortRequest
+	9,  // 28: controlplane.ServerService.UpdateServerTimeZone:input_type -> controlplane.UpdateServerTimeZoneRequest
+	16, // 29: controlplane.ServerService.GetAgentConfig:input_type -> controlplane.Id
+	17, // 30: controlplane.ServerService.Create:output_type -> controlplane.ServerResponse
+	17, // 31: controlplane.ServerService.Get:output_type -> controlplane.ServerResponse
+	18, // 32: controlplane.ServerService.All:output_type -> controlplane.ServersResponse
+	17, // 33: controlplane.ServerService.Update:output_type -> controlplane.ServerResponse
+	22, // 34: controlplane.ServerService.Delete:output_type -> controlplane.MessageResponse
+	17, // 35: controlplane.ServerService.RetryConnection:output_type -> controlplane.ServerResponse
+	22, // 36: controlplane.ServerService.InstallAgent:output_type -> controlplane.MessageResponse
+	12, // 37: controlplane.ServerService.GetStats:output_type -> controlplane.GetStatsResponse
+	15, // 38: controlplane.ServerService.GetAccidents:output_type -> controlplane.GetAccidentsResponse
+	22, // 39: controlplane.ServerService.DeleteAccident:output_type -> controlplane.MessageResponse
+	22, // 40: controlplane.ServerService.BatchDeleteAccidents:output_type -> controlplane.MessageResponse
+	6,  // 41: controlplane.ServerService.GetRealtimeStats:output_type -> controlplane.GetRealtimeStatsResponse
+	22, // 42: controlplane.ServerService.ConfigureAgent:output_type -> controlplane.MessageResponse
+	22, // 43: controlplane.ServerService.UpdateAgentPort:output_type -> controlplane.MessageResponse
+	22, // 44: controlplane.ServerService.UpdateServerTimeZone:output_type -> controlplane.MessageResponse
+	3,  // 45: controlplane.ServerService.GetAgentConfig:output_type -> controlplane.GetAgentConfigResponse
+	30, // [30:46] is the sub-list for method output_type
+	14, // [14:30] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_controlplane_server_proto_init() }
@@ -1703,14 +1750,14 @@ func file_controlplane_server_proto_init() {
 	}
 	file_controlplane_server_proto_msgTypes[14].OneofWrappers = []any{}
 	file_controlplane_server_proto_msgTypes[15].OneofWrappers = []any{}
-	file_controlplane_server_proto_msgTypes[17].OneofWrappers = []any{}
+	file_controlplane_server_proto_msgTypes[18].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_controlplane_server_proto_rawDesc), len(file_controlplane_server_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   20,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

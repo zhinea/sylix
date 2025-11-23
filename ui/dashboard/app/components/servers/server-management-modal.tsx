@@ -90,7 +90,7 @@ export function ServerManagementModal({ server, open, onOpenChange }: ServerMana
           <TabsContent value="configuration" className="flex-1 overflow-auto p-4 space-y-6">
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Agent Port</h3>
-              <AgentPortForm serverId={server.id} initialPort={server.agentPort} />
+              <AgentPortForm serverId={server.id} initialPort={server.agent?.port ?? 8083} />
             </div>
             
             <div className="space-y-4">
