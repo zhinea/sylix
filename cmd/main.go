@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 	"github.com/zhinea/sylix/internal/common/logger"
 	database "github.com/zhinea/sylix/internal/infra/db"
@@ -16,6 +17,8 @@ import (
 )
 
 func main() {
+	_ = godotenv.Load() // Load .env file if it exists
+
 	logger.Init(logger.Config{
 		Filename:   "logs/app/file.log",
 		MaxSize:    10, // MB

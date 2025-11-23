@@ -8,6 +8,7 @@ require (
 	github.com/go-playground/validator/v10 v10.28.0
 	github.com/google/uuid v1.6.0
 	github.com/improbable-eng/grpc-web v0.15.0
+	github.com/joho/godotenv v1.5.1
 	github.com/rs/cors v1.11.1
 	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.44.0

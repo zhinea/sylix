@@ -2,3 +2,4 @@ sylix.db
 bin
 .bin
 .output
+.env

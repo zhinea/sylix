@@ -133,7 +133,10 @@ func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entit
 	uc.appendAgentLog(ctx, server.Id, "Downloading agent binary...")
 	remoteBinaryPath := "/usr/local/bin/sylix-agent"
 
-	version := common.Version
+	version := os.Getenv("SYLIX_VERSION")
+	if version == "" {
+		version = common.Version
+	}
 	if version == "0.0.0-dev" {
 		// Fallback for development if version is not injected
 		version = "0.1.1"
