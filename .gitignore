@@ -4,3 +4,4 @@ bin
 .output
 .env
 logs
+.bin
