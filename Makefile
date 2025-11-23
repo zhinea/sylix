@@ -8,7 +8,7 @@ dev:
 	make compile-proto
 	make compile-proto-frontend
 	go build -ldflags "$(LDFLAGS)" -o bin/agent cmd/agent/main.go
-	gowatch -o ./bin/controlplane -p ./cmd/main.go -ldflags "$(LDFLAGS)"
+	gowatch -o ./bin/controlplane -p ./cmd/main.go
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o bin/controlplane cmd/main.go

@@ -129,6 +129,15 @@ func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entit
 	}
 	defer client.Close()
 
+	// 0. Stop existing service if running
+	uc.appendAgentLog(ctx, server.Id, "Stopping existing service (if any)...")
+	stopCmd := "systemctl stop sylix-agent || true"
+	if out, err := client.RunCommand(stopCmd); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Warning: Failed to stop service: %v", err))
+	} else if out != "" {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Stop service output: %s", out))
+	}
+
 	// 1. Download Agent Binary
 	uc.appendAgentLog(ctx, server.Id, "Downloading agent binary...")
 	remoteBinaryPath := "/usr/local/bin/sylix-agent"
@@ -143,12 +152,15 @@ func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entit
 	}
 
 	downloadURL := fmt.Sprintf("https://github.com/zhinea/sylix/releases/download/v%s/agent", version)
-	downloadCmd := fmt.Sprintf("curl -L -f -o %s %s || wget -O %s %s", remoteBinaryPath, downloadURL, remoteBinaryPath, downloadURL)
+	// Try curl first, then wget. Split commands to get better error reporting.
+	downloadCmd := fmt.Sprintf("if command -v curl >/dev/null 2>&1; then curl -L -f -o %s %s; elif command -v wget >/dev/null 2>&1; then wget -O %s %s; else echo 'Error: neither curl nor wget found'; exit 1; fi", remoteBinaryPath, downloadURL, remoteBinaryPath, downloadURL)
 
-	if _, err := client.RunCommand(downloadCmd); err != nil {
+	if out, err := client.RunCommand(downloadCmd); err != nil {
 		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to download agent binary from %s: %v", downloadURL, err))
 		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
+	} else {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Download output: %s", out))
 	}
 
 	if _, err := client.RunCommand("chmod +x " + remoteBinaryPath); err != nil {
