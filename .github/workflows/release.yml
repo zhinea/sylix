@@ -26,13 +26,13 @@ jobs:
 
       - name: Build Controlplane
         run: |
-          GOOS=linux GOARCH=amd64 go build -v -o bin/controlplane cmd/main.go
+          GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/zhinea/sylix/internal/common.Version=0.1.${{ github.run_number }}" -v -o bin/controlplane cmd/main.go
         env:
           CGO_ENABLED: 1 # Required for SQLite
 
       - name: Build Agent
         run: |
-          GOOS=linux GOARCH=amd64 go build -v -o bin/agent cmd/agent/main.go
+          GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/zhinea/sylix/internal/common.Version=0.1.${{ github.run_number }}" -v -o bin/agent cmd/agent/main.go
         env:
           CGO_ENABLED: 0 # Static binary for better portability
 

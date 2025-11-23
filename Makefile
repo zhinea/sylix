@@ -1,16 +1,18 @@
+VERSION ?= 0.0.0-dev
+LDFLAGS := -X github.com/zhinea/sylix/internal/common.Version=$(VERSION)
 
 run:
-	go run ./cmd/main.go
+	go run -ldflags "$(LDFLAGS)" ./cmd/main.go
 
 dev:
 	make compile-proto
 	make compile-proto-frontend
-	go build -o bin/agent cmd/agent/main.go
-	gowatch -o ./bin/controlplane -p ./cmd/main.go
+	go build -ldflags "$(LDFLAGS)" -o bin/agent cmd/agent/main.go
+	gowatch -o ./bin/controlplane -p ./cmd/main.go -ldflags "$(LDFLAGS)"
 
 build:
-	go build -o bin/controlplane cmd/main.go
-	go build -o bin/agent cmd/agent/main.go
+	go build -ldflags "$(LDFLAGS)" -o bin/controlplane cmd/main.go
+	go build -ldflags "$(LDFLAGS)" -o bin/agent cmd/agent/main.go
 
 compile-proto:
 	rm -rf ./internal/infra/proto/*

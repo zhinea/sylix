@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/zhinea/sylix/internal/common"
 	"github.com/zhinea/sylix/internal/common/logger"
 	"github.com/zhinea/sylix/internal/common/util"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
@@ -128,19 +129,21 @@ func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entit
 	}
 	defer client.Close()
 
-	// 1. Copy Agent Binary
-	uc.appendAgentLog(ctx, server.Id, "Copying agent binary...")
-	localBinaryPath := "bin/agent"
+	// 1. Download Agent Binary
+	uc.appendAgentLog(ctx, server.Id, "Downloading agent binary...")
 	remoteBinaryPath := "/usr/local/bin/sylix-agent"
 
-	if _, err := os.Stat(localBinaryPath); os.IsNotExist(err) {
-		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Agent binary not found at %s", localBinaryPath))
-		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
-		return
+	version := common.Version
+	if version == "0.0.0-dev" {
+		// Fallback for development if version is not injected
+		version = "0.1.1"
 	}
 
-	if err := client.CopyFile(localBinaryPath, remoteBinaryPath); err != nil {
-		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy agent binary: %v", err))
+	downloadURL := fmt.Sprintf("https://github.com/zhinea/sylix/releases/download/v%s/agent", version)
+	downloadCmd := fmt.Sprintf("curl -L -f -o %s %s || wget -O %s %s", remoteBinaryPath, downloadURL, remoteBinaryPath, downloadURL)
+
+	if _, err := client.RunCommand(downloadCmd); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to download agent binary from %s: %v", downloadURL, err))
 		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
