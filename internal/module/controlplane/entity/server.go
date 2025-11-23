@@ -6,6 +6,7 @@ type ServerCredential struct {
 	Username string  `json:"username"`
 	Password *string `json:"password,omitempty"`
 	SSHKey   *string `json:"ssh_key,omitempty"`
+	CaCert   string  `json:"-"`
 }
 
 type Server struct {
@@ -13,6 +14,7 @@ type Server struct {
 	Name        string           `json:"name"`
 	IpAddress   string           `json:"ip_address"`
 	Port        int              `json:"port"`
+	AgentPort   int              `json:"agent_port"`
 	Protocol    string           `json:"protocol"`
 	Credential  ServerCredential `json:"credential" gorm:"embedded;embeddedPrefix:credential_"`
 	Status      int              `json:"status"`

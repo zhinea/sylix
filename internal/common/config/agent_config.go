@@ -11,6 +11,10 @@ type AgentConfig struct {
 		Port int    `yaml:"port"`
 		Host string `yaml:"host"`
 	} `yaml:"server"`
+	Security struct {
+		CertFile string `yaml:"cert_file"`
+		KeyFile  string `yaml:"key_file"`
+	} `yaml:"security"`
 	Log struct {
 		Level      string `yaml:"level"`
 		Filename   string `yaml:"filename"`

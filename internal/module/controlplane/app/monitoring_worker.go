@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"crypto/x509"
 	"fmt"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/zhinea/sylix/internal/module/controlplane/entity"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -68,9 +70,30 @@ func (w *MonitoringWorker) pingAllServers() {
 }
 
 func (w *MonitoringWorker) pingServer(ctx context.Context, server *entity.Server) {
-	target := fmt.Sprintf("%s:8083", server.IpAddress)
+	port := server.AgentPort
+	if port == 0 {
+		port = 8083
+	}
+	target := fmt.Sprintf("%s:%d", server.IpAddress, port)
 
-	conn, err := grpc.Dial(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	var opts []grpc.DialOption
+	if server.Credential.CaCert != "" {
+		cp := x509.NewCertPool()
+		if !cp.AppendCertsFromPEM([]byte(server.Credential.CaCert)) {
+			w.recordPingFailure(ctx, server, "failed to append CA cert")
+			return
+		}
+		// We use InsecureSkipVerify: true here ONLY for the hostname check if we want to allow IP-based certs easily without strict hostname matching issues,
+		// BUT since we generated the cert with the IP as SAN, we should be fine.
+		// However, grpc-go's TLS credentials expect the server name to match.
+		// If we don't pass a server name override, it uses the target address.
+		creds := credentials.NewClientTLSFromCert(cp, "")
+		opts = append(opts, grpc.WithTransportCredentials(creds))
+	} else {
+		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}
+
+	conn, err := grpc.Dial(target, opts...)
 	if err != nil {
 		w.recordPingFailure(ctx, server, err.Error())
 		return

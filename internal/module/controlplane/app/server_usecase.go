@@ -228,6 +228,12 @@ func (uc *ServerUseCase) UpdateAgentPort(ctx context.Context, serverID string, p
 		return fmt.Errorf("failed to restart agent: %w", err)
 	}
 
+	// Update agent port in DB
+	server.AgentPort = port
+	if _, err := uc.repo.Update(ctx, server); err != nil {
+		return fmt.Errorf("failed to update server agent port in db: %w", err)
+	}
+
 	return nil
 }
 
@@ -316,6 +322,67 @@ func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entit
 		return
 	}
 
+	// 1.5 Generate and Install Certificates
+	uc.appendAgentLog(ctx, server.Id, "Generating certificates...")
+	caCert, caKey, err := util.GenerateCA()
+	if err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to generate CA: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+
+	serverCert, serverKey, err := util.GenerateCert(caCert, caKey, server.IpAddress)
+	if err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to generate server cert: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+
+	// Save CA to server entity
+	server.Credential.CaCert = string(caCert)
+	if _, err := uc.repo.Update(ctx, server); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to save CA to DB: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+
+	// Create certs directory
+	certsDir := "/etc/sylix-agent/certs"
+	if _, err := client.RunCommand("mkdir -p " + certsDir); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to create certs dir: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+
+	// Upload certs
+	tmpCertFile := fmt.Sprintf("server_cert_%s.pem", server.Id)
+	if err := os.WriteFile(tmpCertFile, serverCert, 0644); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to write temp cert file: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+	defer os.Remove(tmpCertFile)
+
+	if err := client.CopyFile(tmpCertFile, filepath.Join(certsDir, "server.crt")); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy cert file: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+
+	tmpKeyFile := fmt.Sprintf("server_key_%s.pem", server.Id)
+	if err := os.WriteFile(tmpKeyFile, serverKey, 0644); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to write temp key file: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+	defer os.Remove(tmpKeyFile)
+
+	if err := client.CopyFile(tmpKeyFile, filepath.Join(certsDir, "server.key")); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy key file: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+
 	// 2. Create Config File
 	uc.appendAgentLog(ctx, server.Id, "Creating configuration file...")
 	configDir := "/etc/sylix-agent"
@@ -328,6 +395,9 @@ func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entit
 	defaultConfig := `server:
   port: 8083
   host: "0.0.0.0"
+security:
+  cert_file: "/etc/sylix-agent/certs/server.crt"
+  key_file: "/etc/sylix-agent/certs/server.key"
 log:
   level: "info"
   filename: "sylix-agent.log"

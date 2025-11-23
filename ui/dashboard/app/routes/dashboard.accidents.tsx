@@ -29,6 +29,7 @@ import { Badge } from "~/components/ui/badge";
 import { serverService } from "~/lib/api";
 import { ServerAccident } from "~/proto/controlplane/server";
 import { cn } from "~/lib/utils";
+import { IncidentDetailsModal } from "~/components/servers/incident-details-modal";
 
 export async function clientLoader() {
   try {
@@ -44,6 +45,7 @@ export default function ServerAccidentsPage() {
   const { servers } = useLoaderData<typeof clientLoader>();
   const [accidents, setAccidents] = useState<ServerAccident[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [selectedAccident, setSelectedAccident] = useState<ServerAccident | null>(null);
   
   // Filters
   const [selectedServerId, setSelectedServerId] = useState<string>("all");
@@ -155,7 +157,11 @@ export default function ServerAccidentsPage() {
               accidents.map((accident) => {
                 const server = servers.find(s => s.id === accident.serverId);
                 return (
-                  <TableRow key={accident.id}>
+                  <TableRow 
+                    key={accident.id} 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => setSelectedAccident(accident)}
+                  >
                     <TableCell>{new Date(accident.createdAt).toLocaleString()}</TableCell>
                     <TableCell className="font-medium">
                       {server ? server.name : accident.serverId}
@@ -205,6 +211,13 @@ export default function ServerAccidentsPage() {
           Next
         </Button>
       </div>
+
+      <IncidentDetailsModal
+        accident={selectedAccident}
+        open={!!selectedAccident}
+        onOpenChange={(open) => !open && setSelectedAccident(null)}
+        serverName={selectedAccident ? servers.find(s => s.id === selectedAccident.serverId)?.name : undefined}
+      />
     </div>
   );
 }

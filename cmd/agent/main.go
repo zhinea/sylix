@@ -11,6 +11,7 @@ import (
 	grpcServices "github.com/zhinea/sylix/internal/module/agent/interface/grpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -42,6 +43,13 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
+	if cfg.Security.CertFile != "" && cfg.Security.KeyFile != "" {
+		creds, err := credentials.NewServerTLSFromFile(cfg.Security.CertFile, cfg.Security.KeyFile)
+		if err != nil {
+			logger.Log.Fatal("Failed to load TLS keys", zap.Error(err))
+		}
+		grpcServer = grpc.NewServer(grpc.Creds(creds))
+	}
 
 	agentService := grpcServices.NewAgentService()
 	agentPb.RegisterAgentServer(grpcServer, agentService)
