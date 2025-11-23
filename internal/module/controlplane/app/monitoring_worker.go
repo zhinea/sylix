@@ -86,6 +86,8 @@ func (w *MonitoringWorker) pingServer(ctx context.Context, server *entity.Server
 		cp := x509.NewCertPool()
 		if cp.AppendCertsFromPEM([]byte(server.Agent.Cert)) {
 			tlsConfig.RootCAs = cp
+			tlsConfig.ServerName = server.IpAddress
+			tlsConfig.InsecureSkipVerify = false
 		}
 	}
 	creds := credentials.NewTLS(tlsConfig)

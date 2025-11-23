@@ -125,3 +125,42 @@ func GenerateCert(caCertPEM, caKeyPEM []byte, ip string) (certPEM, keyPEM []byte
 
 	return certPEM, keyPEM, nil
 }
+
+// GenerateSelfSignedCert generates a self-signed certificate and private key for a specific host.
+func GenerateSelfSignedCert(host string) (certPEM, keyPEM []byte, err error) {
+	priv, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to generate private key: %w", err)
+	}
+
+	template := x509.Certificate{
+		SerialNumber: big.NewInt(time.Now().UnixNano()),
+		Subject: pkix.Name{
+			Organization: []string{"Sylix"},
+			CommonName:   host,
+		},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().AddDate(10, 0, 0), // 10 years
+
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		IsCA:                  true, // Self-signed needs to be CA to be in RootCAs? Or just trusted.
+	}
+
+	if ip := net.ParseIP(host); ip != nil {
+		template.IPAddresses = []net.IP{ip}
+	} else {
+		template.DNSNames = []string{host}
+	}
+
+	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &priv.PublicKey, priv)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create certificate: %w", err)
+	}
+
+	certPEM = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
+	keyPEM = pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)})
+
+	return certPEM, keyPEM, nil
+}

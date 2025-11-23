@@ -13,6 +13,7 @@ type ServerAgent struct {
 	Status int    `json:"status"`
 	Logs   string `json:"logs" gorm:"-"`
 	Cert   string `json:"-"`
+	Key    string `json:"-"`
 }
 
 type Server struct {

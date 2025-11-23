@@ -58,6 +58,8 @@ func (s *AgentService) GetAgentConfig(ctx context.Context, server *entity.Server
 		cp := x509.NewCertPool()
 		if cp.AppendCertsFromPEM([]byte(server.Agent.Cert)) {
 			tlsConfig.RootCAs = cp
+			tlsConfig.ServerName = server.IpAddress
+			tlsConfig.InsecureSkipVerify = false
 		}
 	}
 	creds := credentials.NewTLS(tlsConfig)
@@ -244,24 +246,18 @@ func (s *AgentService) runAgentInstallation(ctx context.Context, server *entity.
 
 	// 1.5 Generate and Install Certificates
 	s.appendAgentLog(ctx, server.Id, "Generating certificates...")
-	caCert, caKey, err := util.GenerateCA()
-	if err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to generate CA: %v", err))
-		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
-		return
-	}
-
-	serverCert, serverKey, err := util.GenerateCert(caCert, caKey, server.IpAddress)
+	serverCert, serverKey, err := util.GenerateSelfSignedCert(server.IpAddress)
 	if err != nil {
 		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to generate server cert: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 
-	// Save CA to server entity
-	server.Agent.Cert = string(caCert)
+	// Save Cert and Key to server entity
+	server.Agent.Cert = string(serverCert)
+	server.Agent.Key = string(serverKey)
 	if _, err := s.repo.Update(ctx, server); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to save CA to DB: %v", err))
+		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to save Certs to DB: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
@@ -312,8 +308,8 @@ func (s *AgentService) runAgentInstallation(ctx context.Context, server *entity.
 		return
 	}
 
-	defaultConfig := `server:
-  port: 8083
+	defaultConfig := fmt.Sprintf(`server:
+  port: %d
   host: "0.0.0.0"
 security:
   cert_file: "/etc/sylix-agent/certs/server.crt"
@@ -325,7 +321,8 @@ log:
   max_backups: 3
   max_age: 28
   compress: true
-`
+`, server.Agent.Port)
+
 	tmpConfigFile := fmt.Sprintf("agent_config_setup_%s.yaml", server.Id)
 	if err := os.WriteFile(tmpConfigFile, []byte(defaultConfig), 0644); err != nil {
 		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to create temp config file: %v", err))

@@ -42,6 +42,8 @@ func (uc *ServerUseCase) Create(ctx context.Context, server *entity.Server) (*en
 		logger.Log.Warn("Failed to connect to server during creation", zap.Error(err), zap.String("ip", server.IpAddress))
 	}
 
+	server.Agent.Port = 8083
+
 	return uc.repo.Create(ctx, server)
 }
 
@@ -67,6 +69,7 @@ func (uc *ServerUseCase) Update(ctx context.Context, server *entity.Server) (*en
 
 	// Preserve Cert
 	server.Agent.Cert = existing.Agent.Cert
+	server.Agent.Key = existing.Agent.Key
 
 	// Preserve Password and SSHKey if not provided (nil)
 	if server.Credential.Password == nil {
