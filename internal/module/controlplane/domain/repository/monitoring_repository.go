@@ -13,7 +13,8 @@ type MonitoringRepository interface {
 	SaveAccident(ctx context.Context, accident *entity.ServerAccident) error
 
 	GetPingsByServerID(ctx context.Context, serverID string, since time.Time) ([]*entity.ServerPing, error)
+	GetRecentPings(ctx context.Context, serverID string, limit int) ([]*entity.ServerPing, error)
 	GetStatsByServerID(ctx context.Context, serverID string, limit int) ([]*entity.ServerStat, error)
-	GetAccidentsByServerID(ctx context.Context, serverID string, limit int) ([]*entity.ServerAccident, error)
+	GetAccidents(ctx context.Context, serverID string, startDate, endDate *time.Time, resolved *bool, offset, limit int) ([]*entity.ServerAccident, int64, error)
 	DeleteOldPings(ctx context.Context, before time.Time) error
 }

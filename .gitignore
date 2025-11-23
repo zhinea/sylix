@@ -6,3 +6,5 @@ bin
 logs
 .bin
 sylix.db-journal
+main
+agent

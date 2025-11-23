@@ -17,6 +17,43 @@ service ServerService {
     rpc InstallAgent(Id) returns (MessageResponse);
     rpc GetStats(GetStatsRequest) returns (GetStatsResponse);
     rpc GetAccidents(GetAccidentsRequest) returns (GetAccidentsResponse);
+    rpc GetRealtimeStats(GetRealtimeStatsRequest) returns (GetRealtimeStatsResponse);
+    rpc ConfigureAgent(ConfigureAgentRequest) returns (MessageResponse);
+    rpc UpdateAgentPort(UpdateAgentPortRequest) returns (MessageResponse);
+    rpc UpdateServerTimeZone(UpdateServerTimeZoneRequest) returns (MessageResponse);
+}
+
+message GetRealtimeStatsRequest {
+    string server_id = 1;
+    int32 limit = 2;
+}
+
+message ServerPing {
+    string id = 1;
+    string server_id = 2;
+    int64 response_time = 3;
+    string status = 4;
+    string error = 5;
+    string created_at = 6;
+}
+
+message GetRealtimeStatsResponse {
+    repeated ServerPing pings = 1;
+}
+
+message ConfigureAgentRequest {
+    string server_id = 1;
+    string config = 2;
+}
+
+message UpdateAgentPortRequest {
+    string server_id = 1;
+    int32 port = 2;
+}
+
+message UpdateServerTimeZoneRequest {
+    string server_id = 1;
+    string timezone = 2;
 }
 
 message GetStatsRequest {
@@ -40,6 +77,11 @@ message GetStatsResponse {
 
 message GetAccidentsRequest {
     string server_id = 1;
+    string start_date = 2;
+    string end_date = 3;
+    bool resolved = 4;
+    int32 page = 5;
+    int32 page_size = 6;
 }
 
 message ServerAccident {
@@ -54,6 +96,7 @@ message ServerAccident {
 
 message GetAccidentsResponse {
     repeated ServerAccident accidents = 1;
+    int64 total_count = 2;
 }
 
 enum StatusCode {

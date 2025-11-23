@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, RefreshCw, Server as ServerIcon, Trash, FileText, Edit, Activity } from "lucide-react";
+import { MoreHorizontal, RefreshCw, Server as ServerIcon, Trash, FileText, Edit } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -20,7 +20,7 @@ import {
 } from "~/components/ui/table";
 import { Server, StatusServer, AgentStatusServer } from "~/proto/controlplane/server";
 import { ServerLogsDialog } from "./server-logs-dialog";
-import { ServerStatsDialog } from "./server-stats-dialog";
+import { ServerManagementModal } from "./server-management-modal";
 
 interface ServerListProps {
   servers: Server[];
@@ -33,7 +33,7 @@ interface ServerListProps {
 
 export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnection, onUpdate, retryingServerId }: ServerListProps) {
   const [logsServerId, setLogsServerId] = useState<string | null>(null);
-  const [statsServerId, setStatsServerId] = useState<string | null>(null);
+  const [selectedServer, setSelectedServer] = useState<Server | null>(null);
 
   const getStatusBadge = (server: Server) => {
     switch (server.status) {
@@ -91,7 +91,11 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
           </TableHeader>
           <TableBody>
             {servers.map((server: Server) => (
-              <TableRow key={server.id}>
+              <TableRow 
+                key={server.id} 
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => setSelectedServer(server)}
+              >
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
                     <ServerIcon className="h-4 w-4 text-muted-foreground" />
@@ -102,40 +106,38 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
                   {server.ipAddress}:{server.port}
                 </TableCell>
                 <TableCell>{server.credential?.username}</TableCell>
-                <TableCell>
-                  {getStatusBadge(server)}
-                </TableCell>
-                <TableCell>
-                  {getAgentStatusBadge(server.agentStatus)}
-                </TableCell>
+                <TableCell>{getStatusBadge(server)}</TableCell>
+                <TableCell>{getAgentStatusBadge(server.agentStatus)}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                         <span className="sr-only">Open menu</span>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => onUpdate(server)}>
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onUpdate(server); }}>
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Server
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatsServerId(server.id)}>
-                        <Activity className="mr-2 h-4 w-4" />
-                        Stats & Incidents
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setLogsServerId(server.id)}>
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setLogsServerId(server.id); }}>
                         <FileText className="mr-2 h-4 w-4" />
                         View Logs
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={() => onDelete(server)}
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onInstallAgent(server.id); }}>
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                        Install Agent
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        className="text-red-600"
+                        onClick={(e) => { e.stopPropagation(); onDelete(server); }}
                       >
-                        <Trash className="mr-2 h-4 w-4" /> Delete
+                        <Trash className="mr-2 h-4 w-4" />
+                        Delete Server
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -145,16 +147,17 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
           </TableBody>
         </Table>
       </div>
+
       <ServerLogsDialog 
         serverId={logsServerId} 
         open={!!logsServerId} 
         onOpenChange={(open) => !open && setLogsServerId(null)} 
       />
 
-      <ServerStatsDialog 
-        serverId={statsServerId} 
-        open={!!statsServerId} 
-        onOpenChange={(open) => !open && setStatsServerId(null)} 
+      <ServerManagementModal
+        server={selectedServer}
+        open={!!selectedServer}
+        onOpenChange={(open) => !open && setSelectedServer(null)}
       />
     </>
   );

@@ -133,7 +133,29 @@ func (s *ServerService) GetStats(ctx context.Context, req *pbControlPlane.GetSta
 }
 
 func (s *ServerService) GetAccidents(ctx context.Context, req *pbControlPlane.GetAccidentsRequest) (*pbControlPlane.GetAccidentsResponse, error) {
-	accidents, err := s.useCase.GetAccidents(ctx, req.ServerId)
+	var startDate, endDate *time.Time
+	if req.StartDate != "" {
+		t, err := time.Parse(time.RFC3339, req.StartDate)
+		if err == nil {
+			startDate = &t
+		}
+	}
+	if req.EndDate != "" {
+		t, err := time.Parse(time.RFC3339, req.EndDate)
+		if err == nil {
+			endDate = &t
+		}
+	}
+
+	// Handle resolved filter if needed (not in proto yet, assuming all for now or adding logic)
+	// The proto has `bool resolved = 4;` but bool defaults to false, so we need a way to know if it was set.
+	// For now, let's assume we fetch all if not specified, or we can add a flag.
+	// Since proto3 doesn't have optional scalars easily without `optional` keyword, let's assume we pass a pointer if we want to filter.
+	// But here we receive a value. Let's ignore resolved filter for a moment or assume the user always sends it.
+	// Better approach: Use a separate field `filter_resolved` boolean to indicate if we should filter by `resolved`.
+	// For this implementation, I'll pass nil for resolved to fetch all.
+
+	accidents, total, err := s.useCase.GetAccidents(ctx, req.ServerId, startDate, endDate, nil, int(req.Page), int(req.PageSize))
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +174,70 @@ func (s *ServerService) GetAccidents(ctx context.Context, req *pbControlPlane.Ge
 	}
 
 	return &pbControlPlane.GetAccidentsResponse{
-		Accidents: pbAccidents,
+		Accidents:  pbAccidents,
+		TotalCount: total,
+	}, nil
+}
+
+func (s *ServerService) GetRealtimeStats(ctx context.Context, req *pbControlPlane.GetRealtimeStatsRequest) (*pbControlPlane.GetRealtimeStatsResponse, error) {
+	pings, err := s.useCase.GetRealtimeStats(ctx, req.ServerId, int(req.Limit))
+	if err != nil {
+		return nil, err
+	}
+
+	var pbPings []*pbControlPlane.ServerPing
+	for _, ping := range pings {
+		pbPings = append(pbPings, &pbControlPlane.ServerPing{
+			Id:           ping.Id,
+			ServerId:     ping.ServerID,
+			ResponseTime: ping.ResponseTime,
+			Status:       ping.Status,
+			Error:        ping.Error,
+			CreatedAt:    ping.CreatedAt.Format(time.RFC3339),
+		})
+	}
+
+	return &pbControlPlane.GetRealtimeStatsResponse{
+		Pings: pbPings,
+	}, nil
+}
+
+func (s *ServerService) ConfigureAgent(ctx context.Context, req *pbControlPlane.ConfigureAgentRequest) (*pbControlPlane.MessageResponse, error) {
+	if err := s.useCase.ConfigureAgent(ctx, req.ServerId, req.Config); err != nil {
+		return &pbControlPlane.MessageResponse{
+			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+			Message: err.Error(),
+		}, nil
+	}
+	return &pbControlPlane.MessageResponse{
+		Status:  pbControlPlane.StatusCode_OK,
+		Message: "Agent configured successfully",
+	}, nil
+}
+
+func (s *ServerService) UpdateAgentPort(ctx context.Context, req *pbControlPlane.UpdateAgentPortRequest) (*pbControlPlane.MessageResponse, error) {
+	if err := s.useCase.UpdateAgentPort(ctx, req.ServerId, int(req.Port)); err != nil {
+		return &pbControlPlane.MessageResponse{
+			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+			Message: err.Error(),
+		}, nil
+	}
+	return &pbControlPlane.MessageResponse{
+		Status:  pbControlPlane.StatusCode_OK,
+		Message: "Agent port updated successfully",
+	}, nil
+}
+
+func (s *ServerService) UpdateServerTimeZone(ctx context.Context, req *pbControlPlane.UpdateServerTimeZoneRequest) (*pbControlPlane.MessageResponse, error) {
+	if err := s.useCase.UpdateServerTimeZone(ctx, req.ServerId, req.Timezone); err != nil {
+		return &pbControlPlane.MessageResponse{
+			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+			Message: err.Error(),
+		}, nil
+	}
+	return &pbControlPlane.MessageResponse{
+		Status:  pbControlPlane.StatusCode_OK,
+		Message: "Server timezone updated successfully",
 	}, nil
 }
 

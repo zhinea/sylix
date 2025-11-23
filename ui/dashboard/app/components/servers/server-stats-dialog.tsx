@@ -46,7 +46,14 @@ export function ServerStatsDialog({
     try {
       const [statsRes, accidentsRes] = await Promise.all([
         serverService.GetStats({ serverId: id }),
-        serverService.GetAccidents({ serverId: id }),
+        serverService.GetAccidents({ 
+          serverId: id,
+          startDate: "",
+          endDate: "",
+          resolved: false,
+          page: 1,
+          pageSize: 50
+        }),
       ]);
       setStats(statsRes.stats);
       setAccidents(accidentsRes.accidents);

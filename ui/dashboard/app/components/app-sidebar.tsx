@@ -44,6 +44,16 @@ const data = {
       isActive: true,
     },
     {
+      title: "Statistics",
+      url: "/stats",
+      icon: PieChart,
+    },
+    {
+      title: "Incidents",
+      url: "/accidents",
+      icon: LifeBuoy,
+    },
+    {
       title: "Logs",
       url: "/logs",
       icon: FileText,

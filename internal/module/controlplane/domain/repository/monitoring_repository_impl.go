@@ -36,16 +36,43 @@ func (r *MonitoringRepositoryImpl) GetPingsByServerID(ctx context.Context, serve
 	return pings, err
 }
 
+func (r *MonitoringRepositoryImpl) GetRecentPings(ctx context.Context, serverID string, limit int) ([]*entity.ServerPing, error) {
+	var pings []*entity.ServerPing
+	err := r.db.WithContext(ctx).Where("server_id = ?", serverID).Order("created_at desc").Limit(limit).Find(&pings).Error
+	return pings, err
+}
+
 func (r *MonitoringRepositoryImpl) GetStatsByServerID(ctx context.Context, serverID string, limit int) ([]*entity.ServerStat, error) {
 	var stats []*entity.ServerStat
 	err := r.db.WithContext(ctx).Where("server_id = ?", serverID).Order("created_at desc").Limit(limit).Find(&stats).Error
 	return stats, err
 }
 
-func (r *MonitoringRepositoryImpl) GetAccidentsByServerID(ctx context.Context, serverID string, limit int) ([]*entity.ServerAccident, error) {
+func (r *MonitoringRepositoryImpl) GetAccidents(ctx context.Context, serverID string, startDate, endDate *time.Time, resolved *bool, offset, limit int) ([]*entity.ServerAccident, int64, error) {
 	var accidents []*entity.ServerAccident
-	err := r.db.WithContext(ctx).Where("server_id = ?", serverID).Order("created_at desc").Limit(limit).Find(&accidents).Error
-	return accidents, err
+	var total int64
+
+	query := r.db.WithContext(ctx).Model(&entity.ServerAccident{})
+
+	if serverID != "" {
+		query = query.Where("server_id = ?", serverID)
+	}
+	if startDate != nil {
+		query = query.Where("created_at >= ?", startDate)
+	}
+	if endDate != nil {
+		query = query.Where("created_at <= ?", endDate)
+	}
+	if resolved != nil {
+		query = query.Where("resolved = ?", resolved)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	err := query.Order("created_at desc").Offset(offset).Limit(limit).Find(&accidents).Error
+	return accidents, total, err
 }
 
 func (r *MonitoringRepositoryImpl) DeleteOldPings(ctx context.Context, before time.Time) error {

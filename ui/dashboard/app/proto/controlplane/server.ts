@@ -171,6 +171,39 @@ export function agentStatusServerToJSON(object: AgentStatusServer): string {
   }
 }
 
+export interface GetRealtimeStatsRequest {
+  serverId: string;
+  limit: number;
+}
+
+export interface ServerPing {
+  id: string;
+  serverId: string;
+  responseTime: number;
+  status: string;
+  error: string;
+  createdAt: string;
+}
+
+export interface GetRealtimeStatsResponse {
+  pings: ServerPing[];
+}
+
+export interface ConfigureAgentRequest {
+  serverId: string;
+  config: string;
+}
+
+export interface UpdateAgentPortRequest {
+  serverId: string;
+  port: number;
+}
+
+export interface UpdateServerTimeZoneRequest {
+  serverId: string;
+  timezone: string;
+}
+
 export interface GetStatsRequest {
   serverId: string;
 }
@@ -192,6 +225,11 @@ export interface GetStatsResponse {
 
 export interface GetAccidentsRequest {
   serverId: string;
+  startDate: string;
+  endDate: string;
+  resolved: boolean;
+  page: number;
+  pageSize: number;
 }
 
 export interface ServerAccident {
@@ -206,6 +244,7 @@ export interface ServerAccident {
 
 export interface GetAccidentsResponse {
   accidents: ServerAccident[];
+  totalCount: number;
 }
 
 export interface Id {
@@ -249,6 +288,510 @@ export interface MessageResponse {
   status: StatusCode;
   message: string;
 }
+
+function createBaseGetRealtimeStatsRequest(): GetRealtimeStatsRequest {
+  return { serverId: "", limit: 0 };
+}
+
+export const GetRealtimeStatsRequest: MessageFns<GetRealtimeStatsRequest> = {
+  encode(message: GetRealtimeStatsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.serverId !== "") {
+      writer.uint32(10).string(message.serverId);
+    }
+    if (message.limit !== 0) {
+      writer.uint32(16).int32(message.limit);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetRealtimeStatsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetRealtimeStatsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.serverId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetRealtimeStatsRequest {
+    return {
+      serverId: isSet(object.serverId) ? globalThis.String(object.serverId) : "",
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+    };
+  },
+
+  toJSON(message: GetRealtimeStatsRequest): unknown {
+    const obj: any = {};
+    if (message.serverId !== "") {
+      obj.serverId = message.serverId;
+    }
+    if (message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetRealtimeStatsRequest>, I>>(base?: I): GetRealtimeStatsRequest {
+    return GetRealtimeStatsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetRealtimeStatsRequest>, I>>(object: I): GetRealtimeStatsRequest {
+    const message = createBaseGetRealtimeStatsRequest();
+    message.serverId = object.serverId ?? "";
+    message.limit = object.limit ?? 0;
+    return message;
+  },
+};
+
+function createBaseServerPing(): ServerPing {
+  return { id: "", serverId: "", responseTime: 0, status: "", error: "", createdAt: "" };
+}
+
+export const ServerPing: MessageFns<ServerPing> = {
+  encode(message: ServerPing, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.serverId !== "") {
+      writer.uint32(18).string(message.serverId);
+    }
+    if (message.responseTime !== 0) {
+      writer.uint32(24).int64(message.responseTime);
+    }
+    if (message.status !== "") {
+      writer.uint32(34).string(message.status);
+    }
+    if (message.error !== "") {
+      writer.uint32(42).string(message.error);
+    }
+    if (message.createdAt !== "") {
+      writer.uint32(50).string(message.createdAt);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ServerPing {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerPing();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.serverId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.responseTime = longToNumber(reader.int64());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.status = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.error = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.createdAt = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerPing {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      serverId: isSet(object.serverId) ? globalThis.String(object.serverId) : "",
+      responseTime: isSet(object.responseTime) ? globalThis.Number(object.responseTime) : 0,
+      status: isSet(object.status) ? globalThis.String(object.status) : "",
+      error: isSet(object.error) ? globalThis.String(object.error) : "",
+      createdAt: isSet(object.createdAt) ? globalThis.String(object.createdAt) : "",
+    };
+  },
+
+  toJSON(message: ServerPing): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.serverId !== "") {
+      obj.serverId = message.serverId;
+    }
+    if (message.responseTime !== 0) {
+      obj.responseTime = Math.round(message.responseTime);
+    }
+    if (message.status !== "") {
+      obj.status = message.status;
+    }
+    if (message.error !== "") {
+      obj.error = message.error;
+    }
+    if (message.createdAt !== "") {
+      obj.createdAt = message.createdAt;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerPing>, I>>(base?: I): ServerPing {
+    return ServerPing.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerPing>, I>>(object: I): ServerPing {
+    const message = createBaseServerPing();
+    message.id = object.id ?? "";
+    message.serverId = object.serverId ?? "";
+    message.responseTime = object.responseTime ?? 0;
+    message.status = object.status ?? "";
+    message.error = object.error ?? "";
+    message.createdAt = object.createdAt ?? "";
+    return message;
+  },
+};
+
+function createBaseGetRealtimeStatsResponse(): GetRealtimeStatsResponse {
+  return { pings: [] };
+}
+
+export const GetRealtimeStatsResponse: MessageFns<GetRealtimeStatsResponse> = {
+  encode(message: GetRealtimeStatsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.pings) {
+      ServerPing.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetRealtimeStatsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetRealtimeStatsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pings.push(ServerPing.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetRealtimeStatsResponse {
+    return {
+      pings: globalThis.Array.isArray(object?.pings) ? object.pings.map((e: any) => ServerPing.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: GetRealtimeStatsResponse): unknown {
+    const obj: any = {};
+    if (message.pings?.length) {
+      obj.pings = message.pings.map((e) => ServerPing.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetRealtimeStatsResponse>, I>>(base?: I): GetRealtimeStatsResponse {
+    return GetRealtimeStatsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetRealtimeStatsResponse>, I>>(object: I): GetRealtimeStatsResponse {
+    const message = createBaseGetRealtimeStatsResponse();
+    message.pings = object.pings?.map((e) => ServerPing.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseConfigureAgentRequest(): ConfigureAgentRequest {
+  return { serverId: "", config: "" };
+}
+
+export const ConfigureAgentRequest: MessageFns<ConfigureAgentRequest> = {
+  encode(message: ConfigureAgentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.serverId !== "") {
+      writer.uint32(10).string(message.serverId);
+    }
+    if (message.config !== "") {
+      writer.uint32(18).string(message.config);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ConfigureAgentRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseConfigureAgentRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.serverId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.config = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ConfigureAgentRequest {
+    return {
+      serverId: isSet(object.serverId) ? globalThis.String(object.serverId) : "",
+      config: isSet(object.config) ? globalThis.String(object.config) : "",
+    };
+  },
+
+  toJSON(message: ConfigureAgentRequest): unknown {
+    const obj: any = {};
+    if (message.serverId !== "") {
+      obj.serverId = message.serverId;
+    }
+    if (message.config !== "") {
+      obj.config = message.config;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ConfigureAgentRequest>, I>>(base?: I): ConfigureAgentRequest {
+    return ConfigureAgentRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ConfigureAgentRequest>, I>>(object: I): ConfigureAgentRequest {
+    const message = createBaseConfigureAgentRequest();
+    message.serverId = object.serverId ?? "";
+    message.config = object.config ?? "";
+    return message;
+  },
+};
+
+function createBaseUpdateAgentPortRequest(): UpdateAgentPortRequest {
+  return { serverId: "", port: 0 };
+}
+
+export const UpdateAgentPortRequest: MessageFns<UpdateAgentPortRequest> = {
+  encode(message: UpdateAgentPortRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.serverId !== "") {
+      writer.uint32(10).string(message.serverId);
+    }
+    if (message.port !== 0) {
+      writer.uint32(16).int32(message.port);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAgentPortRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAgentPortRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.serverId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.port = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAgentPortRequest {
+    return {
+      serverId: isSet(object.serverId) ? globalThis.String(object.serverId) : "",
+      port: isSet(object.port) ? globalThis.Number(object.port) : 0,
+    };
+  },
+
+  toJSON(message: UpdateAgentPortRequest): unknown {
+    const obj: any = {};
+    if (message.serverId !== "") {
+      obj.serverId = message.serverId;
+    }
+    if (message.port !== 0) {
+      obj.port = Math.round(message.port);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateAgentPortRequest>, I>>(base?: I): UpdateAgentPortRequest {
+    return UpdateAgentPortRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateAgentPortRequest>, I>>(object: I): UpdateAgentPortRequest {
+    const message = createBaseUpdateAgentPortRequest();
+    message.serverId = object.serverId ?? "";
+    message.port = object.port ?? 0;
+    return message;
+  },
+};
+
+function createBaseUpdateServerTimeZoneRequest(): UpdateServerTimeZoneRequest {
+  return { serverId: "", timezone: "" };
+}
+
+export const UpdateServerTimeZoneRequest: MessageFns<UpdateServerTimeZoneRequest> = {
+  encode(message: UpdateServerTimeZoneRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.serverId !== "") {
+      writer.uint32(10).string(message.serverId);
+    }
+    if (message.timezone !== "") {
+      writer.uint32(18).string(message.timezone);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateServerTimeZoneRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateServerTimeZoneRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.serverId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.timezone = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateServerTimeZoneRequest {
+    return {
+      serverId: isSet(object.serverId) ? globalThis.String(object.serverId) : "",
+      timezone: isSet(object.timezone) ? globalThis.String(object.timezone) : "",
+    };
+  },
+
+  toJSON(message: UpdateServerTimeZoneRequest): unknown {
+    const obj: any = {};
+    if (message.serverId !== "") {
+      obj.serverId = message.serverId;
+    }
+    if (message.timezone !== "") {
+      obj.timezone = message.timezone;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateServerTimeZoneRequest>, I>>(base?: I): UpdateServerTimeZoneRequest {
+    return UpdateServerTimeZoneRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateServerTimeZoneRequest>, I>>(object: I): UpdateServerTimeZoneRequest {
+    const message = createBaseUpdateServerTimeZoneRequest();
+    message.serverId = object.serverId ?? "";
+    message.timezone = object.timezone ?? "";
+    return message;
+  },
+};
 
 function createBaseGetStatsRequest(): GetStatsRequest {
   return { serverId: "" };
@@ -550,13 +1093,28 @@ export const GetStatsResponse: MessageFns<GetStatsResponse> = {
 };
 
 function createBaseGetAccidentsRequest(): GetAccidentsRequest {
-  return { serverId: "" };
+  return { serverId: "", startDate: "", endDate: "", resolved: false, page: 0, pageSize: 0 };
 }
 
 export const GetAccidentsRequest: MessageFns<GetAccidentsRequest> = {
   encode(message: GetAccidentsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.serverId !== "") {
       writer.uint32(10).string(message.serverId);
+    }
+    if (message.startDate !== "") {
+      writer.uint32(18).string(message.startDate);
+    }
+    if (message.endDate !== "") {
+      writer.uint32(26).string(message.endDate);
+    }
+    if (message.resolved !== false) {
+      writer.uint32(32).bool(message.resolved);
+    }
+    if (message.page !== 0) {
+      writer.uint32(40).int32(message.page);
+    }
+    if (message.pageSize !== 0) {
+      writer.uint32(48).int32(message.pageSize);
     }
     return writer;
   },
@@ -576,6 +1134,46 @@ export const GetAccidentsRequest: MessageFns<GetAccidentsRequest> = {
           message.serverId = reader.string();
           continue;
         }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.startDate = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.endDate = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.resolved = reader.bool();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.page = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.pageSize = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -586,13 +1184,35 @@ export const GetAccidentsRequest: MessageFns<GetAccidentsRequest> = {
   },
 
   fromJSON(object: any): GetAccidentsRequest {
-    return { serverId: isSet(object.serverId) ? globalThis.String(object.serverId) : "" };
+    return {
+      serverId: isSet(object.serverId) ? globalThis.String(object.serverId) : "",
+      startDate: isSet(object.startDate) ? globalThis.String(object.startDate) : "",
+      endDate: isSet(object.endDate) ? globalThis.String(object.endDate) : "",
+      resolved: isSet(object.resolved) ? globalThis.Boolean(object.resolved) : false,
+      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      pageSize: isSet(object.pageSize) ? globalThis.Number(object.pageSize) : 0,
+    };
   },
 
   toJSON(message: GetAccidentsRequest): unknown {
     const obj: any = {};
     if (message.serverId !== "") {
       obj.serverId = message.serverId;
+    }
+    if (message.startDate !== "") {
+      obj.startDate = message.startDate;
+    }
+    if (message.endDate !== "") {
+      obj.endDate = message.endDate;
+    }
+    if (message.resolved !== false) {
+      obj.resolved = message.resolved;
+    }
+    if (message.page !== 0) {
+      obj.page = Math.round(message.page);
+    }
+    if (message.pageSize !== 0) {
+      obj.pageSize = Math.round(message.pageSize);
     }
     return obj;
   },
@@ -603,6 +1223,11 @@ export const GetAccidentsRequest: MessageFns<GetAccidentsRequest> = {
   fromPartial<I extends Exact<DeepPartial<GetAccidentsRequest>, I>>(object: I): GetAccidentsRequest {
     const message = createBaseGetAccidentsRequest();
     message.serverId = object.serverId ?? "";
+    message.startDate = object.startDate ?? "";
+    message.endDate = object.endDate ?? "";
+    message.resolved = object.resolved ?? false;
+    message.page = object.page ?? 0;
+    message.pageSize = object.pageSize ?? 0;
     return message;
   },
 };
@@ -764,13 +1389,16 @@ export const ServerAccident: MessageFns<ServerAccident> = {
 };
 
 function createBaseGetAccidentsResponse(): GetAccidentsResponse {
-  return { accidents: [] };
+  return { accidents: [], totalCount: 0 };
 }
 
 export const GetAccidentsResponse: MessageFns<GetAccidentsResponse> = {
   encode(message: GetAccidentsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.accidents) {
       ServerAccident.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.totalCount !== 0) {
+      writer.uint32(16).int64(message.totalCount);
     }
     return writer;
   },
@@ -790,6 +1418,14 @@ export const GetAccidentsResponse: MessageFns<GetAccidentsResponse> = {
           message.accidents.push(ServerAccident.decode(reader, reader.uint32()));
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.totalCount = longToNumber(reader.int64());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -804,6 +1440,7 @@ export const GetAccidentsResponse: MessageFns<GetAccidentsResponse> = {
       accidents: globalThis.Array.isArray(object?.accidents)
         ? object.accidents.map((e: any) => ServerAccident.fromJSON(e))
         : [],
+      totalCount: isSet(object.totalCount) ? globalThis.Number(object.totalCount) : 0,
     };
   },
 
@@ -811,6 +1448,9 @@ export const GetAccidentsResponse: MessageFns<GetAccidentsResponse> = {
     const obj: any = {};
     if (message.accidents?.length) {
       obj.accidents = message.accidents.map((e) => ServerAccident.toJSON(e));
+    }
+    if (message.totalCount !== 0) {
+      obj.totalCount = Math.round(message.totalCount);
     }
     return obj;
   },
@@ -821,6 +1461,7 @@ export const GetAccidentsResponse: MessageFns<GetAccidentsResponse> = {
   fromPartial<I extends Exact<DeepPartial<GetAccidentsResponse>, I>>(object: I): GetAccidentsResponse {
     const message = createBaseGetAccidentsResponse();
     message.accidents = object.accidents?.map((e) => ServerAccident.fromPartial(e)) || [];
+    message.totalCount = object.totalCount ?? 0;
     return message;
   },
 };
@@ -1500,6 +2141,10 @@ export interface ServerService {
   InstallAgent(request: Id): Promise<MessageResponse>;
   GetStats(request: GetStatsRequest): Promise<GetStatsResponse>;
   GetAccidents(request: GetAccidentsRequest): Promise<GetAccidentsResponse>;
+  GetRealtimeStats(request: GetRealtimeStatsRequest): Promise<GetRealtimeStatsResponse>;
+  ConfigureAgent(request: ConfigureAgentRequest): Promise<MessageResponse>;
+  UpdateAgentPort(request: UpdateAgentPortRequest): Promise<MessageResponse>;
+  UpdateServerTimeZone(request: UpdateServerTimeZoneRequest): Promise<MessageResponse>;
 }
 
 export const ServerServiceServiceName = "controlplane.ServerService";
@@ -1518,6 +2163,10 @@ export class ServerServiceClientImpl implements ServerService {
     this.InstallAgent = this.InstallAgent.bind(this);
     this.GetStats = this.GetStats.bind(this);
     this.GetAccidents = this.GetAccidents.bind(this);
+    this.GetRealtimeStats = this.GetRealtimeStats.bind(this);
+    this.ConfigureAgent = this.ConfigureAgent.bind(this);
+    this.UpdateAgentPort = this.UpdateAgentPort.bind(this);
+    this.UpdateServerTimeZone = this.UpdateServerTimeZone.bind(this);
   }
   Create(request: Server): Promise<ServerResponse> {
     const data = Server.encode(request).finish();
@@ -1571,6 +2220,30 @@ export class ServerServiceClientImpl implements ServerService {
     const data = GetAccidentsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "GetAccidents", data);
     return promise.then((data) => GetAccidentsResponse.decode(new BinaryReader(data)));
+  }
+
+  GetRealtimeStats(request: GetRealtimeStatsRequest): Promise<GetRealtimeStatsResponse> {
+    const data = GetRealtimeStatsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "GetRealtimeStats", data);
+    return promise.then((data) => GetRealtimeStatsResponse.decode(new BinaryReader(data)));
+  }
+
+  ConfigureAgent(request: ConfigureAgentRequest): Promise<MessageResponse> {
+    const data = ConfigureAgentRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "ConfigureAgent", data);
+    return promise.then((data) => MessageResponse.decode(new BinaryReader(data)));
+  }
+
+  UpdateAgentPort(request: UpdateAgentPortRequest): Promise<MessageResponse> {
+    const data = UpdateAgentPortRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "UpdateAgentPort", data);
+    return promise.then((data) => MessageResponse.decode(new BinaryReader(data)));
+  }
+
+  UpdateServerTimeZone(request: UpdateServerTimeZoneRequest): Promise<MessageResponse> {
+    const data = UpdateServerTimeZoneRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "UpdateServerTimeZone", data);
+    return promise.then((data) => MessageResponse.decode(new BinaryReader(data)));
   }
 }
 

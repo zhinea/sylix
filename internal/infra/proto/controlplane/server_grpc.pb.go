@@ -20,15 +20,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ServerService_Create_FullMethodName          = "/controlplane.ServerService/Create"
-	ServerService_Get_FullMethodName             = "/controlplane.ServerService/Get"
-	ServerService_All_FullMethodName             = "/controlplane.ServerService/All"
-	ServerService_Update_FullMethodName          = "/controlplane.ServerService/Update"
-	ServerService_Delete_FullMethodName          = "/controlplane.ServerService/Delete"
-	ServerService_RetryConnection_FullMethodName = "/controlplane.ServerService/RetryConnection"
-	ServerService_InstallAgent_FullMethodName    = "/controlplane.ServerService/InstallAgent"
-	ServerService_GetStats_FullMethodName        = "/controlplane.ServerService/GetStats"
-	ServerService_GetAccidents_FullMethodName    = "/controlplane.ServerService/GetAccidents"
+	ServerService_Create_FullMethodName               = "/controlplane.ServerService/Create"
+	ServerService_Get_FullMethodName                  = "/controlplane.ServerService/Get"
+	ServerService_All_FullMethodName                  = "/controlplane.ServerService/All"
+	ServerService_Update_FullMethodName               = "/controlplane.ServerService/Update"
+	ServerService_Delete_FullMethodName               = "/controlplane.ServerService/Delete"
+	ServerService_RetryConnection_FullMethodName      = "/controlplane.ServerService/RetryConnection"
+	ServerService_InstallAgent_FullMethodName         = "/controlplane.ServerService/InstallAgent"
+	ServerService_GetStats_FullMethodName             = "/controlplane.ServerService/GetStats"
+	ServerService_GetAccidents_FullMethodName         = "/controlplane.ServerService/GetAccidents"
+	ServerService_GetRealtimeStats_FullMethodName     = "/controlplane.ServerService/GetRealtimeStats"
+	ServerService_ConfigureAgent_FullMethodName       = "/controlplane.ServerService/ConfigureAgent"
+	ServerService_UpdateAgentPort_FullMethodName      = "/controlplane.ServerService/UpdateAgentPort"
+	ServerService_UpdateServerTimeZone_FullMethodName = "/controlplane.ServerService/UpdateServerTimeZone"
 )
 
 // ServerServiceClient is the client API for ServerService service.
@@ -44,6 +48,10 @@ type ServerServiceClient interface {
 	InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
 	GetStats(ctx context.Context, in *GetStatsRequest, opts ...grpc.CallOption) (*GetStatsResponse, error)
 	GetAccidents(ctx context.Context, in *GetAccidentsRequest, opts ...grpc.CallOption) (*GetAccidentsResponse, error)
+	GetRealtimeStats(ctx context.Context, in *GetRealtimeStatsRequest, opts ...grpc.CallOption) (*GetRealtimeStatsResponse, error)
+	ConfigureAgent(ctx context.Context, in *ConfigureAgentRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	UpdateAgentPort(ctx context.Context, in *UpdateAgentPortRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	UpdateServerTimeZone(ctx context.Context, in *UpdateServerTimeZoneRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 }
 
 type serverServiceClient struct {
@@ -144,6 +152,46 @@ func (c *serverServiceClient) GetAccidents(ctx context.Context, in *GetAccidents
 	return out, nil
 }
 
+func (c *serverServiceClient) GetRealtimeStats(ctx context.Context, in *GetRealtimeStatsRequest, opts ...grpc.CallOption) (*GetRealtimeStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRealtimeStatsResponse)
+	err := c.cc.Invoke(ctx, ServerService_GetRealtimeStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serverServiceClient) ConfigureAgent(ctx context.Context, in *ConfigureAgentRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, ServerService_ConfigureAgent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serverServiceClient) UpdateAgentPort(ctx context.Context, in *UpdateAgentPortRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, ServerService_UpdateAgentPort_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serverServiceClient) UpdateServerTimeZone(ctx context.Context, in *UpdateServerTimeZoneRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, ServerService_UpdateServerTimeZone_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ServerServiceServer is the server API for ServerService service.
 // All implementations must embed UnimplementedServerServiceServer
 // for forward compatibility.
@@ -157,6 +205,10 @@ type ServerServiceServer interface {
 	InstallAgent(context.Context, *Id) (*MessageResponse, error)
 	GetStats(context.Context, *GetStatsRequest) (*GetStatsResponse, error)
 	GetAccidents(context.Context, *GetAccidentsRequest) (*GetAccidentsResponse, error)
+	GetRealtimeStats(context.Context, *GetRealtimeStatsRequest) (*GetRealtimeStatsResponse, error)
+	ConfigureAgent(context.Context, *ConfigureAgentRequest) (*MessageResponse, error)
+	UpdateAgentPort(context.Context, *UpdateAgentPortRequest) (*MessageResponse, error)
+	UpdateServerTimeZone(context.Context, *UpdateServerTimeZoneRequest) (*MessageResponse, error)
 	mustEmbedUnimplementedServerServiceServer()
 }
 
@@ -193,6 +245,18 @@ func (UnimplementedServerServiceServer) GetStats(context.Context, *GetStatsReque
 }
 func (UnimplementedServerServiceServer) GetAccidents(context.Context, *GetAccidentsRequest) (*GetAccidentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccidents not implemented")
+}
+func (UnimplementedServerServiceServer) GetRealtimeStats(context.Context, *GetRealtimeStatsRequest) (*GetRealtimeStatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRealtimeStats not implemented")
+}
+func (UnimplementedServerServiceServer) ConfigureAgent(context.Context, *ConfigureAgentRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigureAgent not implemented")
+}
+func (UnimplementedServerServiceServer) UpdateAgentPort(context.Context, *UpdateAgentPortRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAgentPort not implemented")
+}
+func (UnimplementedServerServiceServer) UpdateServerTimeZone(context.Context, *UpdateServerTimeZoneRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateServerTimeZone not implemented")
 }
 func (UnimplementedServerServiceServer) mustEmbedUnimplementedServerServiceServer() {}
 func (UnimplementedServerServiceServer) testEmbeddedByValue()                       {}
@@ -377,6 +441,78 @@ func _ServerService_GetAccidents_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServerService_GetRealtimeStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRealtimeStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).GetRealtimeStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_GetRealtimeStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).GetRealtimeStats(ctx, req.(*GetRealtimeStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServerService_ConfigureAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfigureAgentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).ConfigureAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_ConfigureAgent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).ConfigureAgent(ctx, req.(*ConfigureAgentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServerService_UpdateAgentPort_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAgentPortRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).UpdateAgentPort(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_UpdateAgentPort_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).UpdateAgentPort(ctx, req.(*UpdateAgentPortRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServerService_UpdateServerTimeZone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateServerTimeZoneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).UpdateServerTimeZone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_UpdateServerTimeZone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).UpdateServerTimeZone(ctx, req.(*UpdateServerTimeZoneRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ServerService_ServiceDesc is the grpc.ServiceDesc for ServerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -419,6 +555,22 @@ var ServerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAccidents",
 			Handler:    _ServerService_GetAccidents_Handler,
+		},
+		{
+			MethodName: "GetRealtimeStats",
+			Handler:    _ServerService_GetRealtimeStats_Handler,
+		},
+		{
+			MethodName: "ConfigureAgent",
+			Handler:    _ServerService_ConfigureAgent_Handler,
+		},
+		{
+			MethodName: "UpdateAgentPort",
+			Handler:    _ServerService_UpdateAgentPort_Handler,
+		},
+		{
+			MethodName: "UpdateServerTimeZone",
+			Handler:    _ServerService_UpdateServerTimeZone_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -16,6 +16,28 @@ type Config struct {
 	MaxBackups int
 	MaxAge     int // days
 	Compress   bool
+	Level      string
+}
+
+func getZapLevel(level string) zapcore.Level {
+	switch level {
+	case "debug":
+		return zap.DebugLevel
+	case "info":
+		return zap.InfoLevel
+	case "warn":
+		return zap.WarnLevel
+	case "error":
+		return zap.ErrorLevel
+	case "dpanic":
+		return zap.DPanicLevel
+	case "panic":
+		return zap.PanicLevel
+	case "fatal":
+		return zap.FatalLevel
+	default:
+		return zap.InfoLevel
+	}
 }
 
 func Init(cfg Config) {
@@ -30,7 +52,7 @@ func Init(cfg Config) {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), w),
-		zap.InfoLevel,
+		getZapLevel(cfg.Level),
 	)
 
 	Log = zap.New(core)
@@ -48,7 +70,7 @@ func NewLogger(cfg Config) *zap.Logger {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), w),
-		zap.InfoLevel,
+		getZapLevel(cfg.Level),
 	)
 
 	return zap.New(core)

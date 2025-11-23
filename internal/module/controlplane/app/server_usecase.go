@@ -9,12 +9,14 @@ import (
 	"time"
 
 	"github.com/zhinea/sylix/internal/common"
+	"github.com/zhinea/sylix/internal/common/config"
 	"github.com/zhinea/sylix/internal/common/logger"
 	"github.com/zhinea/sylix/internal/common/util"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
 	"github.com/zhinea/sylix/internal/module/controlplane/entity"
 	"go.uber.org/zap"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type ServerUseCase struct {
@@ -123,8 +125,143 @@ func (uc *ServerUseCase) GetStats(ctx context.Context, serverID string) ([]*enti
 	return uc.monitoringRepo.GetStatsByServerID(ctx, serverID, 100) // Limit to last 100 stats
 }
 
-func (uc *ServerUseCase) GetAccidents(ctx context.Context, serverID string) ([]*entity.ServerAccident, error) {
-	return uc.monitoringRepo.GetAccidentsByServerID(ctx, serverID, 50) // Limit to last 50 accidents
+func (uc *ServerUseCase) GetRealtimeStats(ctx context.Context, serverID string, limit int) ([]*entity.ServerPing, error) {
+	if limit <= 0 {
+		limit = 50
+	}
+	return uc.monitoringRepo.GetRecentPings(ctx, serverID, limit)
+}
+
+func (uc *ServerUseCase) GetAccidents(ctx context.Context, serverID string, startDate, endDate *time.Time, resolved *bool, page, pageSize int) ([]*entity.ServerAccident, int64, error) {
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 10
+	}
+	offset := (page - 1) * pageSize
+	return uc.monitoringRepo.GetAccidents(ctx, serverID, startDate, endDate, resolved, offset, pageSize)
+}
+
+func (uc *ServerUseCase) ConfigureAgent(ctx context.Context, serverID string, configStr string) error {
+	server, err := uc.repo.GetByID(ctx, serverID)
+	if err != nil {
+		return err
+	}
+
+	client, err := util.NewSSHClient(server.IpAddress, server.Port, server.Credential.Username, server.Credential.Password, server.Credential.SSHKey)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	// Write config to a temporary local file
+	tmpFile := fmt.Sprintf("agent_config_%s.yaml", serverID)
+	if err := os.WriteFile(tmpFile, []byte(configStr), 0644); err != nil {
+		return fmt.Errorf("failed to write temp config file: %w", err)
+	}
+	defer os.Remove(tmpFile)
+
+	// Copy to remote server
+	remotePath := "/etc/sylix-agent/config.yaml"
+	if err := client.CopyFile(tmpFile, remotePath); err != nil {
+		return fmt.Errorf("failed to copy config file to server: %w", err)
+	}
+
+	// Restart agent
+	if _, err := client.RunCommand("systemctl restart sylix-agent"); err != nil {
+		return fmt.Errorf("failed to restart agent: %w", err)
+	}
+
+	return nil
+}
+
+func (uc *ServerUseCase) UpdateAgentPort(ctx context.Context, serverID string, port int) error {
+	server, err := uc.repo.GetByID(ctx, serverID)
+	if err != nil {
+		return err
+	}
+
+	client, err := util.NewSSHClient(server.IpAddress, server.Port, server.Credential.Username, server.Credential.Password, server.Credential.SSHKey)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	// Read remote config
+	remotePath := "/etc/sylix-agent/config.yaml"
+	out, err := client.RunCommand("cat " + remotePath)
+	if err != nil {
+		return fmt.Errorf("failed to read remote config: %w", err)
+	}
+
+	// Parse config
+	var cfg config.AgentConfig
+	if err := yaml.Unmarshal([]byte(out), &cfg); err != nil {
+		return fmt.Errorf("failed to parse remote config: %w", err)
+	}
+
+	// Update port
+	cfg.Server.Port = port
+
+	// Marshal config
+	data, err := yaml.Marshal(&cfg)
+	if err != nil {
+		return fmt.Errorf("failed to marshal config: %w", err)
+	}
+
+	// Write back using ConfigureAgent logic (but we can't call it directly easily without re-fetching server/client or refactoring)
+	// So we'll just duplicate the write logic for now or extract a helper.
+	// Let's duplicate for simplicity in this context.
+
+	tmpFile := fmt.Sprintf("agent_config_update_%s.yaml", serverID)
+	if err := os.WriteFile(tmpFile, data, 0644); err != nil {
+		return fmt.Errorf("failed to write temp config file: %w", err)
+	}
+	defer os.Remove(tmpFile)
+
+	if err := client.CopyFile(tmpFile, remotePath); err != nil {
+		return fmt.Errorf("failed to copy config file to server: %w", err)
+	}
+
+	if _, err := client.RunCommand("systemctl restart sylix-agent"); err != nil {
+		return fmt.Errorf("failed to restart agent: %w", err)
+	}
+
+	return nil
+}
+
+func (uc *ServerUseCase) UpdateServerTimeZone(ctx context.Context, serverID string, timezone string) error {
+	server, err := uc.repo.GetByID(ctx, serverID)
+	if err != nil {
+		return err
+	}
+
+	client, err := util.NewSSHClient(server.IpAddress, server.Port, server.Credential.Username, server.Credential.Password, server.Credential.SSHKey)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	// Install chrony if not present
+	installCmd := "if ! command -v chronyd >/dev/null 2>&1; then apt-get update && apt-get install -y chrony || yum install -y chrony; fi"
+	if _, err := client.RunCommand(installCmd); err != nil {
+		return fmt.Errorf("failed to install chrony: %w", err)
+	}
+
+	// Set timezone
+	tzCmd := fmt.Sprintf("timedatectl set-timezone %s", timezone)
+	if _, err := client.RunCommand(tzCmd); err != nil {
+		return fmt.Errorf("failed to set timezone: %w", err)
+	}
+
+	// Enable NTP
+	ntpCmd := "timedatectl set-ntp true"
+	if _, err := client.RunCommand(ntpCmd); err != nil {
+		return fmt.Errorf("failed to enable NTP: %w", err)
+	}
+
+	return nil
 }
 
 func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entity.Server) {
@@ -179,14 +316,49 @@ func (uc *ServerUseCase) runAgentInstallation(ctx context.Context, server *entit
 		return
 	}
 
-	// 2. Create Systemd Service
+	// 2. Create Config File
+	uc.appendAgentLog(ctx, server.Id, "Creating configuration file...")
+	configDir := "/etc/sylix-agent"
+	if _, err := client.RunCommand("mkdir -p " + configDir); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to create config dir: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+
+	defaultConfig := `server:
+  port: 8083
+  host: "0.0.0.0"
+log:
+  level: "info"
+  filename: "sylix-agent.log"
+  max_size: 10
+  max_backups: 3
+  max_age: 28
+  compress: true
+`
+	tmpConfigFile := fmt.Sprintf("agent_config_setup_%s.yaml", server.Id)
+	if err := os.WriteFile(tmpConfigFile, []byte(defaultConfig), 0644); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to create temp config file: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+	defer os.Remove(tmpConfigFile)
+
+	remoteConfigPath := filepath.Join(configDir, "config.yaml")
+	if err := client.CopyFile(tmpConfigFile, remoteConfigPath); err != nil {
+		uc.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy config file: %v", err))
+		uc.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
+		return
+	}
+
+	// 3. Create Systemd Service
 	uc.appendAgentLog(ctx, server.Id, "Creating systemd service...")
 	serviceContent := `[Unit]
 Description=Sylix Agent
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/sylix-agent
+ExecStart=/usr/local/bin/sylix-agent -config /etc/sylix-agent/config.yaml
 Restart=always
 User=root
 
