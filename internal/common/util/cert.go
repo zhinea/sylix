@@ -90,12 +90,17 @@ func GenerateCert(caCertPEM, caKeyPEM []byte, ip string) (certPEM, keyPEM []byte
 			PostalCode:    []string{""},
 			CommonName:    ip,
 		},
-		IPAddresses:  []net.IP{net.ParseIP(ip)},
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().AddDate(1, 0, 0), // 1 year
 		SubjectKeyId: []byte{1, 2, 3, 4, 6},
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:     x509.KeyUsageDigitalSignature,
+	}
+
+	if parsedIP := net.ParseIP(ip); parsedIP != nil {
+		cert.IPAddresses = []net.IP{parsedIP}
+	} else {
+		cert.DNSNames = []string{ip}
 	}
 
 	certPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)

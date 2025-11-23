@@ -281,6 +281,34 @@ func (s *ServerService) GetAgentConfig(ctx context.Context, id *pbControlPlane.I
 	}, nil
 }
 
+func (s *ServerService) DeleteAccident(ctx context.Context, req *pbControlPlane.Id) (*pbControlPlane.MessageResponse, error) {
+	err := s.useCase.DeleteAccident(ctx, req.Id)
+	if err != nil {
+		return &pbControlPlane.MessageResponse{
+			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+			Message: err.Error(),
+		}, nil
+	}
+	return &pbControlPlane.MessageResponse{
+		Status:  pbControlPlane.StatusCode_OK,
+		Message: "Accident deleted successfully",
+	}, nil
+}
+
+func (s *ServerService) BatchDeleteAccidents(ctx context.Context, req *pbControlPlane.BatchDeleteAccidentsRequest) (*pbControlPlane.MessageResponse, error) {
+	err := s.useCase.BatchDeleteAccidents(ctx, req.Ids)
+	if err != nil {
+		return &pbControlPlane.MessageResponse{
+			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+			Message: err.Error(),
+		}, nil
+	}
+	return &pbControlPlane.MessageResponse{
+		Status:  pbControlPlane.StatusCode_OK,
+		Message: "Accidents deleted successfully",
+	}, nil
+}
+
 // Helper functions for conversion
 var errStr = "Internal Server Error" // Placeholder for error string pointer
 

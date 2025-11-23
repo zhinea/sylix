@@ -1411,6 +1411,50 @@ func (x *MessageResponse) GetMessage() string {
 	return ""
 }
 
+type BatchDeleteAccidentsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ids           []string               `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchDeleteAccidentsRequest) Reset() {
+	*x = BatchDeleteAccidentsRequest{}
+	mi := &file_controlplane_server_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchDeleteAccidentsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchDeleteAccidentsRequest) ProtoMessage() {}
+
+func (x *BatchDeleteAccidentsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_controlplane_server_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchDeleteAccidentsRequest.ProtoReflect.Descriptor instead.
+func (*BatchDeleteAccidentsRequest) Descriptor() ([]byte, []int) {
+	return file_controlplane_server_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *BatchDeleteAccidentsRequest) GetIds() []string {
+	if x != nil {
+		return x.Ids
+	}
+	return nil
+}
+
 var File_controlplane_server_proto protoreflect.FileDescriptor
 
 const file_controlplane_server_proto_rawDesc = "" +
@@ -1515,7 +1559,9 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\a_sshKey\"]\n" +
 	"\x0fMessageResponse\x120\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x18.controlplane.StatusCodeR\x06status\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage*\x83\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"/\n" +
+	"\x1bBatchDeleteAccidentsRequest\x12\x10\n" +
+	"\x03ids\x18\x01 \x03(\tR\x03ids*\x83\x01\n" +
 	"\n" +
 	"StatusCode\x12\x0f\n" +
 	"\vUNSPECIFIED\x10\x00\x12\a\n" +
@@ -1537,7 +1583,7 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\x10FINALIZING_SETUP\x10\x03\x12\v\n" +
 	"\aSUCCESS\x10\x04\x12\n" +
 	"\n" +
-	"\x06FAILED\x10\x052\x95\b\n" +
+	"\x06FAILED\x10\x052\xba\t\n" +
 	"\rServerService\x12<\n" +
 	"\x06Create\x12\x14.controlplane.Server\x1a\x1c.controlplane.ServerResponse\x125\n" +
 	"\x03Get\x12\x10.controlplane.Id\x1a\x1c.controlplane.ServerResponse\x123\n" +
@@ -1547,7 +1593,9 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\x0fRetryConnection\x12\x10.controlplane.Id\x1a\x1c.controlplane.ServerResponse\x12?\n" +
 	"\fInstallAgent\x12\x10.controlplane.Id\x1a\x1d.controlplane.MessageResponse\x12I\n" +
 	"\bGetStats\x12\x1d.controlplane.GetStatsRequest\x1a\x1e.controlplane.GetStatsResponse\x12U\n" +
-	"\fGetAccidents\x12!.controlplane.GetAccidentsRequest\x1a\".controlplane.GetAccidentsResponse\x12a\n" +
+	"\fGetAccidents\x12!.controlplane.GetAccidentsRequest\x1a\".controlplane.GetAccidentsResponse\x12A\n" +
+	"\x0eDeleteAccident\x12\x10.controlplane.Id\x1a\x1d.controlplane.MessageResponse\x12`\n" +
+	"\x14BatchDeleteAccidents\x12).controlplane.BatchDeleteAccidentsRequest\x1a\x1d.controlplane.MessageResponse\x12a\n" +
 	"\x10GetRealtimeStats\x12%.controlplane.GetRealtimeStatsRequest\x1a&.controlplane.GetRealtimeStatsResponse\x12T\n" +
 	"\x0eConfigureAgent\x12#.controlplane.ConfigureAgentRequest\x1a\x1d.controlplane.MessageResponse\x12V\n" +
 	"\x0fUpdateAgentPort\x12$.controlplane.UpdateAgentPortRequest\x1a\x1d.controlplane.MessageResponse\x12`\n" +
@@ -1567,7 +1615,7 @@ func file_controlplane_server_proto_rawDescGZIP() []byte {
 }
 
 var file_controlplane_server_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_controlplane_server_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_controlplane_server_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_controlplane_server_proto_goTypes = []any{
 	(StatusCode)(0),                     // 0: controlplane.StatusCode
 	(StatusServer)(0),                   // 1: controlplane.StatusServer
@@ -1591,8 +1639,9 @@ var file_controlplane_server_proto_goTypes = []any{
 	(*Server)(nil),                      // 19: controlplane.Server
 	(*ServerCredential)(nil),            // 20: controlplane.ServerCredential
 	(*MessageResponse)(nil),             // 21: controlplane.MessageResponse
-	(*common.ValidationError)(nil),      // 22: common.ValidationError
-	(*common.Empty)(nil),                // 23: common.Empty
+	(*BatchDeleteAccidentsRequest)(nil), // 22: controlplane.BatchDeleteAccidentsRequest
+	(*common.ValidationError)(nil),      // 23: common.ValidationError
+	(*common.Empty)(nil),                // 24: common.Empty
 }
 var file_controlplane_server_proto_depIdxs = []int32{
 	5,  // 0: controlplane.GetRealtimeStatsResponse.pings:type_name -> controlplane.ServerPing
@@ -1600,44 +1649,48 @@ var file_controlplane_server_proto_depIdxs = []int32{
 	14, // 2: controlplane.GetAccidentsResponse.accidents:type_name -> controlplane.ServerAccident
 	0,  // 3: controlplane.ServerResponse.status:type_name -> controlplane.StatusCode
 	19, // 4: controlplane.ServerResponse.server:type_name -> controlplane.Server
-	22, // 5: controlplane.ServerResponse.errors:type_name -> common.ValidationError
+	23, // 5: controlplane.ServerResponse.errors:type_name -> common.ValidationError
 	0,  // 6: controlplane.ServersResponse.status:type_name -> controlplane.StatusCode
 	19, // 7: controlplane.ServersResponse.servers:type_name -> controlplane.Server
-	22, // 8: controlplane.ServersResponse.errors:type_name -> common.ValidationError
+	23, // 8: controlplane.ServersResponse.errors:type_name -> common.ValidationError
 	20, // 9: controlplane.Server.credential:type_name -> controlplane.ServerCredential
 	1,  // 10: controlplane.Server.status:type_name -> controlplane.StatusServer
 	2,  // 11: controlplane.Server.agentStatus:type_name -> controlplane.AgentStatusServer
 	0,  // 12: controlplane.MessageResponse.status:type_name -> controlplane.StatusCode
 	19, // 13: controlplane.ServerService.Create:input_type -> controlplane.Server
 	16, // 14: controlplane.ServerService.Get:input_type -> controlplane.Id
-	23, // 15: controlplane.ServerService.All:input_type -> common.Empty
+	24, // 15: controlplane.ServerService.All:input_type -> common.Empty
 	19, // 16: controlplane.ServerService.Update:input_type -> controlplane.Server
 	16, // 17: controlplane.ServerService.Delete:input_type -> controlplane.Id
 	16, // 18: controlplane.ServerService.RetryConnection:input_type -> controlplane.Id
 	16, // 19: controlplane.ServerService.InstallAgent:input_type -> controlplane.Id
 	10, // 20: controlplane.ServerService.GetStats:input_type -> controlplane.GetStatsRequest
 	13, // 21: controlplane.ServerService.GetAccidents:input_type -> controlplane.GetAccidentsRequest
-	4,  // 22: controlplane.ServerService.GetRealtimeStats:input_type -> controlplane.GetRealtimeStatsRequest
-	7,  // 23: controlplane.ServerService.ConfigureAgent:input_type -> controlplane.ConfigureAgentRequest
-	8,  // 24: controlplane.ServerService.UpdateAgentPort:input_type -> controlplane.UpdateAgentPortRequest
-	9,  // 25: controlplane.ServerService.UpdateServerTimeZone:input_type -> controlplane.UpdateServerTimeZoneRequest
-	16, // 26: controlplane.ServerService.GetAgentConfig:input_type -> controlplane.Id
-	17, // 27: controlplane.ServerService.Create:output_type -> controlplane.ServerResponse
-	17, // 28: controlplane.ServerService.Get:output_type -> controlplane.ServerResponse
-	18, // 29: controlplane.ServerService.All:output_type -> controlplane.ServersResponse
-	17, // 30: controlplane.ServerService.Update:output_type -> controlplane.ServerResponse
-	21, // 31: controlplane.ServerService.Delete:output_type -> controlplane.MessageResponse
-	17, // 32: controlplane.ServerService.RetryConnection:output_type -> controlplane.ServerResponse
-	21, // 33: controlplane.ServerService.InstallAgent:output_type -> controlplane.MessageResponse
-	12, // 34: controlplane.ServerService.GetStats:output_type -> controlplane.GetStatsResponse
-	15, // 35: controlplane.ServerService.GetAccidents:output_type -> controlplane.GetAccidentsResponse
-	6,  // 36: controlplane.ServerService.GetRealtimeStats:output_type -> controlplane.GetRealtimeStatsResponse
-	21, // 37: controlplane.ServerService.ConfigureAgent:output_type -> controlplane.MessageResponse
-	21, // 38: controlplane.ServerService.UpdateAgentPort:output_type -> controlplane.MessageResponse
-	21, // 39: controlplane.ServerService.UpdateServerTimeZone:output_type -> controlplane.MessageResponse
-	3,  // 40: controlplane.ServerService.GetAgentConfig:output_type -> controlplane.GetAgentConfigResponse
-	27, // [27:41] is the sub-list for method output_type
-	13, // [13:27] is the sub-list for method input_type
+	16, // 22: controlplane.ServerService.DeleteAccident:input_type -> controlplane.Id
+	22, // 23: controlplane.ServerService.BatchDeleteAccidents:input_type -> controlplane.BatchDeleteAccidentsRequest
+	4,  // 24: controlplane.ServerService.GetRealtimeStats:input_type -> controlplane.GetRealtimeStatsRequest
+	7,  // 25: controlplane.ServerService.ConfigureAgent:input_type -> controlplane.ConfigureAgentRequest
+	8,  // 26: controlplane.ServerService.UpdateAgentPort:input_type -> controlplane.UpdateAgentPortRequest
+	9,  // 27: controlplane.ServerService.UpdateServerTimeZone:input_type -> controlplane.UpdateServerTimeZoneRequest
+	16, // 28: controlplane.ServerService.GetAgentConfig:input_type -> controlplane.Id
+	17, // 29: controlplane.ServerService.Create:output_type -> controlplane.ServerResponse
+	17, // 30: controlplane.ServerService.Get:output_type -> controlplane.ServerResponse
+	18, // 31: controlplane.ServerService.All:output_type -> controlplane.ServersResponse
+	17, // 32: controlplane.ServerService.Update:output_type -> controlplane.ServerResponse
+	21, // 33: controlplane.ServerService.Delete:output_type -> controlplane.MessageResponse
+	17, // 34: controlplane.ServerService.RetryConnection:output_type -> controlplane.ServerResponse
+	21, // 35: controlplane.ServerService.InstallAgent:output_type -> controlplane.MessageResponse
+	12, // 36: controlplane.ServerService.GetStats:output_type -> controlplane.GetStatsResponse
+	15, // 37: controlplane.ServerService.GetAccidents:output_type -> controlplane.GetAccidentsResponse
+	21, // 38: controlplane.ServerService.DeleteAccident:output_type -> controlplane.MessageResponse
+	21, // 39: controlplane.ServerService.BatchDeleteAccidents:output_type -> controlplane.MessageResponse
+	6,  // 40: controlplane.ServerService.GetRealtimeStats:output_type -> controlplane.GetRealtimeStatsResponse
+	21, // 41: controlplane.ServerService.ConfigureAgent:output_type -> controlplane.MessageResponse
+	21, // 42: controlplane.ServerService.UpdateAgentPort:output_type -> controlplane.MessageResponse
+	21, // 43: controlplane.ServerService.UpdateServerTimeZone:output_type -> controlplane.MessageResponse
+	3,  // 44: controlplane.ServerService.GetAgentConfig:output_type -> controlplane.GetAgentConfigResponse
+	29, // [29:45] is the sub-list for method output_type
+	13, // [13:29] is the sub-list for method input_type
 	13, // [13:13] is the sub-list for extension type_name
 	13, // [13:13] is the sub-list for extension extendee
 	0,  // [0:13] is the sub-list for field type_name
@@ -1657,7 +1710,7 @@ func file_controlplane_server_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_controlplane_server_proto_rawDesc), len(file_controlplane_server_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   19,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"os"
@@ -122,7 +123,11 @@ func (uc *ServerUseCase) GetAgentConfig(ctx context.Context, id string) (string,
 		if !cp.AppendCertsFromPEM([]byte(server.Credential.CaCert)) {
 			return "", "", fmt.Errorf("failed to append CA cert")
 		}
-		creds := credentials.NewClientTLSFromCert(cp, "")
+		config := &tls.Config{
+			RootCAs:            cp,
+			InsecureSkipVerify: true,
+		}
+		creds := credentials.NewTLS(config)
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	} else {
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -539,4 +544,12 @@ func (uc *ServerUseCase) appendAgentLog(ctx context.Context, serverID string, lo
 	if _, err := l.Write([]byte(msg)); err != nil {
 		logger.Log.Error("Failed to write agent log", zap.Error(err))
 	}
+}
+
+func (uc *ServerUseCase) DeleteAccident(ctx context.Context, id string) error {
+	return uc.monitoringRepo.DeleteAccident(ctx, id)
+}
+
+func (uc *ServerUseCase) BatchDeleteAccidents(ctx context.Context, ids []string) error {
+	return uc.monitoringRepo.BatchDeleteAccidents(ctx, ids)
 }

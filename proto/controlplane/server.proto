@@ -17,6 +17,8 @@ service ServerService {
     rpc InstallAgent(Id) returns (MessageResponse);
     rpc GetStats(GetStatsRequest) returns (GetStatsResponse);
     rpc GetAccidents(GetAccidentsRequest) returns (GetAccidentsResponse);
+    rpc DeleteAccident(Id) returns (MessageResponse);
+    rpc BatchDeleteAccidents(BatchDeleteAccidentsRequest) returns (MessageResponse);
     rpc GetRealtimeStats(GetRealtimeStatsRequest) returns (GetRealtimeStatsResponse);
     rpc ConfigureAgent(ConfigureAgentRequest) returns (MessageResponse);
     rpc UpdateAgentPort(UpdateAgentPortRequest) returns (MessageResponse);
@@ -172,4 +174,8 @@ message ServerCredential {
 message MessageResponse {
     StatusCode status = 1;
     string message = 2;
+}
+
+message BatchDeleteAccidentsRequest {
+    repeated string ids = 1;
 }

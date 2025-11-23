@@ -295,6 +295,10 @@ export interface MessageResponse {
   message: string;
 }
 
+export interface BatchDeleteAccidentsRequest {
+  ids: string[];
+}
+
 function createBaseGetAgentConfigResponse(): GetAgentConfigResponse {
   return { config: "", timezone: "" };
 }
@@ -2230,6 +2234,64 @@ export const MessageResponse: MessageFns<MessageResponse> = {
   },
 };
 
+function createBaseBatchDeleteAccidentsRequest(): BatchDeleteAccidentsRequest {
+  return { ids: [] };
+}
+
+export const BatchDeleteAccidentsRequest: MessageFns<BatchDeleteAccidentsRequest> = {
+  encode(message: BatchDeleteAccidentsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.ids) {
+      writer.uint32(10).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): BatchDeleteAccidentsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBatchDeleteAccidentsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.ids.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BatchDeleteAccidentsRequest {
+    return { ids: globalThis.Array.isArray(object?.ids) ? object.ids.map((e: any) => globalThis.String(e)) : [] };
+  },
+
+  toJSON(message: BatchDeleteAccidentsRequest): unknown {
+    const obj: any = {};
+    if (message.ids?.length) {
+      obj.ids = message.ids;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<BatchDeleteAccidentsRequest>, I>>(base?: I): BatchDeleteAccidentsRequest {
+    return BatchDeleteAccidentsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<BatchDeleteAccidentsRequest>, I>>(object: I): BatchDeleteAccidentsRequest {
+    const message = createBaseBatchDeleteAccidentsRequest();
+    message.ids = object.ids?.map((e) => e) || [];
+    return message;
+  },
+};
+
 export interface ServerService {
   Create(request: Server): Promise<ServerResponse>;
   Get(request: Id): Promise<ServerResponse>;
@@ -2240,6 +2302,8 @@ export interface ServerService {
   InstallAgent(request: Id): Promise<MessageResponse>;
   GetStats(request: GetStatsRequest): Promise<GetStatsResponse>;
   GetAccidents(request: GetAccidentsRequest): Promise<GetAccidentsResponse>;
+  DeleteAccident(request: Id): Promise<MessageResponse>;
+  BatchDeleteAccidents(request: BatchDeleteAccidentsRequest): Promise<MessageResponse>;
   GetRealtimeStats(request: GetRealtimeStatsRequest): Promise<GetRealtimeStatsResponse>;
   ConfigureAgent(request: ConfigureAgentRequest): Promise<MessageResponse>;
   UpdateAgentPort(request: UpdateAgentPortRequest): Promise<MessageResponse>;
@@ -2263,6 +2327,8 @@ export class ServerServiceClientImpl implements ServerService {
     this.InstallAgent = this.InstallAgent.bind(this);
     this.GetStats = this.GetStats.bind(this);
     this.GetAccidents = this.GetAccidents.bind(this);
+    this.DeleteAccident = this.DeleteAccident.bind(this);
+    this.BatchDeleteAccidents = this.BatchDeleteAccidents.bind(this);
     this.GetRealtimeStats = this.GetRealtimeStats.bind(this);
     this.ConfigureAgent = this.ConfigureAgent.bind(this);
     this.UpdateAgentPort = this.UpdateAgentPort.bind(this);
@@ -2321,6 +2387,18 @@ export class ServerServiceClientImpl implements ServerService {
     const data = GetAccidentsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "GetAccidents", data);
     return promise.then((data) => GetAccidentsResponse.decode(new BinaryReader(data)));
+  }
+
+  DeleteAccident(request: Id): Promise<MessageResponse> {
+    const data = Id.encode(request).finish();
+    const promise = this.rpc.request(this.service, "DeleteAccident", data);
+    return promise.then((data) => MessageResponse.decode(new BinaryReader(data)));
+  }
+
+  BatchDeleteAccidents(request: BatchDeleteAccidentsRequest): Promise<MessageResponse> {
+    const data = BatchDeleteAccidentsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "BatchDeleteAccidents", data);
+    return promise.then((data) => MessageResponse.decode(new BinaryReader(data)));
   }
 
   GetRealtimeStats(request: GetRealtimeStatsRequest): Promise<GetRealtimeStatsResponse> {

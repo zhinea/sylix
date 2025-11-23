@@ -29,6 +29,8 @@ const (
 	ServerService_InstallAgent_FullMethodName         = "/controlplane.ServerService/InstallAgent"
 	ServerService_GetStats_FullMethodName             = "/controlplane.ServerService/GetStats"
 	ServerService_GetAccidents_FullMethodName         = "/controlplane.ServerService/GetAccidents"
+	ServerService_DeleteAccident_FullMethodName       = "/controlplane.ServerService/DeleteAccident"
+	ServerService_BatchDeleteAccidents_FullMethodName = "/controlplane.ServerService/BatchDeleteAccidents"
 	ServerService_GetRealtimeStats_FullMethodName     = "/controlplane.ServerService/GetRealtimeStats"
 	ServerService_ConfigureAgent_FullMethodName       = "/controlplane.ServerService/ConfigureAgent"
 	ServerService_UpdateAgentPort_FullMethodName      = "/controlplane.ServerService/UpdateAgentPort"
@@ -49,6 +51,8 @@ type ServerServiceClient interface {
 	InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
 	GetStats(ctx context.Context, in *GetStatsRequest, opts ...grpc.CallOption) (*GetStatsResponse, error)
 	GetAccidents(ctx context.Context, in *GetAccidentsRequest, opts ...grpc.CallOption) (*GetAccidentsResponse, error)
+	DeleteAccident(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
+	BatchDeleteAccidents(ctx context.Context, in *BatchDeleteAccidentsRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	GetRealtimeStats(ctx context.Context, in *GetRealtimeStatsRequest, opts ...grpc.CallOption) (*GetRealtimeStatsResponse, error)
 	ConfigureAgent(ctx context.Context, in *ConfigureAgentRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	UpdateAgentPort(ctx context.Context, in *UpdateAgentPortRequest, opts ...grpc.CallOption) (*MessageResponse, error)
@@ -154,6 +158,26 @@ func (c *serverServiceClient) GetAccidents(ctx context.Context, in *GetAccidents
 	return out, nil
 }
 
+func (c *serverServiceClient) DeleteAccident(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, ServerService_DeleteAccident_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serverServiceClient) BatchDeleteAccidents(ctx context.Context, in *BatchDeleteAccidentsRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, ServerService_BatchDeleteAccidents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *serverServiceClient) GetRealtimeStats(ctx context.Context, in *GetRealtimeStatsRequest, opts ...grpc.CallOption) (*GetRealtimeStatsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetRealtimeStatsResponse)
@@ -217,6 +241,8 @@ type ServerServiceServer interface {
 	InstallAgent(context.Context, *Id) (*MessageResponse, error)
 	GetStats(context.Context, *GetStatsRequest) (*GetStatsResponse, error)
 	GetAccidents(context.Context, *GetAccidentsRequest) (*GetAccidentsResponse, error)
+	DeleteAccident(context.Context, *Id) (*MessageResponse, error)
+	BatchDeleteAccidents(context.Context, *BatchDeleteAccidentsRequest) (*MessageResponse, error)
 	GetRealtimeStats(context.Context, *GetRealtimeStatsRequest) (*GetRealtimeStatsResponse, error)
 	ConfigureAgent(context.Context, *ConfigureAgentRequest) (*MessageResponse, error)
 	UpdateAgentPort(context.Context, *UpdateAgentPortRequest) (*MessageResponse, error)
@@ -258,6 +284,12 @@ func (UnimplementedServerServiceServer) GetStats(context.Context, *GetStatsReque
 }
 func (UnimplementedServerServiceServer) GetAccidents(context.Context, *GetAccidentsRequest) (*GetAccidentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccidents not implemented")
+}
+func (UnimplementedServerServiceServer) DeleteAccident(context.Context, *Id) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccident not implemented")
+}
+func (UnimplementedServerServiceServer) BatchDeleteAccidents(context.Context, *BatchDeleteAccidentsRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BatchDeleteAccidents not implemented")
 }
 func (UnimplementedServerServiceServer) GetRealtimeStats(context.Context, *GetRealtimeStatsRequest) (*GetRealtimeStatsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRealtimeStats not implemented")
@@ -457,6 +489,42 @@ func _ServerService_GetAccidents_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServerService_DeleteAccident_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).DeleteAccident(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_DeleteAccident_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).DeleteAccident(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServerService_BatchDeleteAccidents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchDeleteAccidentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).BatchDeleteAccidents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_BatchDeleteAccidents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).BatchDeleteAccidents(ctx, req.(*BatchDeleteAccidentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ServerService_GetRealtimeStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetRealtimeStatsRequest)
 	if err := dec(in); err != nil {
@@ -589,6 +657,14 @@ var ServerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAccidents",
 			Handler:    _ServerService_GetAccidents_Handler,
+		},
+		{
+			MethodName: "DeleteAccident",
+			Handler:    _ServerService_DeleteAccident_Handler,
+		},
+		{
+			MethodName: "BatchDeleteAccidents",
+			Handler:    _ServerService_BatchDeleteAccidents_Handler,
 		},
 		{
 			MethodName: "GetRealtimeStats",

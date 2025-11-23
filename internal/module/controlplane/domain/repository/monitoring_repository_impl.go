@@ -78,3 +78,11 @@ func (r *MonitoringRepositoryImpl) GetAccidents(ctx context.Context, serverID st
 func (r *MonitoringRepositoryImpl) DeleteOldPings(ctx context.Context, before time.Time) error {
 	return r.db.WithContext(ctx).Where("created_at < ?", before).Delete(&entity.ServerPing{}).Error
 }
+
+func (r *MonitoringRepositoryImpl) DeleteAccident(ctx context.Context, id string) error {
+	return r.db.WithContext(ctx).Delete(&entity.ServerAccident{}, "id = ?", id).Error
+}
+
+func (r *MonitoringRepositoryImpl) BatchDeleteAccidents(ctx context.Context, ids []string) error {
+	return r.db.WithContext(ctx).Delete(&entity.ServerAccident{}, "id IN ?", ids).Error
+}
