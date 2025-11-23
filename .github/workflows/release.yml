@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Create bin directory
+        run: mkdir -p bin
+
+      - name: Build Controlplane
+        run: |
+          GOOS=linux GOARCH=amd64 go build -v -o bin/controlplane cmd/main.go
+        env:
+          CGO_ENABLED: 1 # Required for SQLite
+
+      - name: Build Agent
+        run: |
+          GOOS=linux GOARCH=amd64 go build -v -o bin/agent cmd/agent/main.go
+        env:
+          CGO_ENABLED: 0 # Static binary for better portability
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.${{ github.run_number }}
+          name: Release v0.1.${{ github.run_number }}
+          draft: false
+          prerelease: false
+          files: |
+            bin/controlplane
+            bin/agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
