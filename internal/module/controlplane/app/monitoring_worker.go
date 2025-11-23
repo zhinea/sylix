@@ -140,8 +140,6 @@ func (w *MonitoringWorker) recordPingFailure(ctx context.Context, server *entity
 		Error:        errorMsg,
 	})
 
-	fmt.Println(server.Agent.Cert)
-
 	w.monitoringRepo.SaveAccident(ctx, &entity.ServerAccident{
 		ServerID:     server.Id,
 		ResponseTime: 0,

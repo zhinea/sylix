@@ -54,7 +54,7 @@ export function ServerManagementModal({ server, open, onOpenChange }: ServerMana
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[80rem] h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Manage Server: {server.name}</DialogTitle>
           <DialogDescription>

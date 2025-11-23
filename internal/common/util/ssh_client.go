@@ -71,6 +71,23 @@ func (s *SSHClient) RunCommand(cmd string) (string, error) {
 	return stdout.String(), nil
 }
 
+func (s *SSHClient) RunCommandStream(cmd string, stdoutWriter, stderrWriter io.Writer) error {
+	session, err := s.client.NewSession()
+	if err != nil {
+		return fmt.Errorf("failed to create session: %w", err)
+	}
+	defer session.Close()
+
+	session.Stdout = stdoutWriter
+	session.Stderr = stderrWriter
+
+	if err := session.Run(cmd); err != nil {
+		return fmt.Errorf("failed to run command: %s, err: %w", cmd, err)
+	}
+
+	return nil
+}
+
 func (s *SSHClient) CopyFile(srcPath, dstPath string) error {
 	srcFile, err := os.Open(srcPath)
 	if err != nil {

@@ -26,11 +26,11 @@ func (uc *LogsUseCase) GetServerLogs(ctx context.Context, serverID string) ([]os
 	return entries, nil
 }
 
-func (uc *LogsUseCase) ReadServerLog(ctx context.Context, serverID, filename string, page, pageSize int) ([]string, int, int, error) {
+func (uc *LogsUseCase) ReadServerLog(ctx context.Context, serverID, filename string, page, pageSize int) ([]string, int, int, int, error) {
 	logPath := fmt.Sprintf("logs/servers/%s/%s", serverID, filename)
 	// Security check: ensure filename doesn't contain ".."
 	if filepath.Base(filename) != filename {
-		return nil, 0, 0, fmt.Errorf("invalid filename")
+		return nil, 0, 0, 0, fmt.Errorf("invalid filename")
 	}
 
 	return uc.readLogFile(logPath, page, pageSize)
@@ -53,31 +53,31 @@ func (uc *LogsUseCase) GetSystemLogs(ctx context.Context) ([]string, error) {
 	return logs, err
 }
 
-func (uc *LogsUseCase) ReadSystemLog(ctx context.Context, filename string, page, pageSize int) ([]string, int, int, error) {
+func (uc *LogsUseCase) ReadSystemLog(ctx context.Context, filename string, page, pageSize int) ([]string, int, int, int, error) {
 	cleanPath := filepath.Clean(filename)
 
 	if !filepath.HasPrefix(cleanPath, "logs"+string(os.PathSeparator)) && cleanPath != "logs" {
-		return nil, 0, 0, fmt.Errorf("invalid log path: must start with logs/")
+		return nil, 0, 0, 0, fmt.Errorf("invalid log path: must start with logs/")
 	}
 
 	if filepath.IsAbs(cleanPath) {
-		return nil, 0, 0, fmt.Errorf("absolute paths not allowed")
+		return nil, 0, 0, 0, fmt.Errorf("absolute paths not allowed")
 	}
 
 	// Verify it is inside logs directory
 	absLogs, _ := filepath.Abs("logs")
 	absPath, _ := filepath.Abs(cleanPath)
 	if !filepath.HasPrefix(absPath, absLogs) {
-		return nil, 0, 0, fmt.Errorf("access denied")
+		return nil, 0, 0, 0, fmt.Errorf("access denied")
 	}
 
 	return uc.readLogFile(cleanPath, page, pageSize)
 }
 
-func (uc *LogsUseCase) readLogFile(path string, page, pageSize int) ([]string, int, int, error) {
+func (uc *LogsUseCase) readLogFile(path string, page, pageSize int) ([]string, int, int, int, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, 0, 0, err
+		return nil, 0, 0, 0, err
 	}
 	defer file.Close()
 
@@ -109,5 +109,5 @@ func (uc *LogsUseCase) readLogFile(path string, page, pageSize int) ([]string, i
 		end = totalLines
 	}
 
-	return lines[start:end], totalLines, totalPages, nil
+	return lines[start:end], totalLines, totalPages, page, nil
 }

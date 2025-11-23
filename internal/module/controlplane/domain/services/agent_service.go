@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -193,28 +194,49 @@ func (s *AgentService) UpdateTimeZone(ctx context.Context, server *entity.Server
 }
 
 func (s *AgentService) runAgentInstallation(ctx context.Context, server *entity.Server) {
+	// Setup logger
+	logDir := fmt.Sprintf("logs/servers/%s", server.Id)
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		logger.Log.Error("Failed to create log dir", zap.Error(err))
+		return
+	}
+
+	logFile := filepath.Join(logDir, "setup_agent.log")
+	l := &lumberjack.Logger{
+		Filename:   logFile,
+		MaxSize:    25, // MB
+		MaxBackups: 3,
+		MaxAge:     28,
+		Compress:   true,
+	}
+	defer l.Close()
+
+	// Helper to write with timestamp
+	logMsg := func(msg string) {
+		timestamp := time.Now().Format(time.RFC3339)
+		fmt.Fprintf(l, "[%s] %s\n", timestamp, msg)
+	}
+
 	s.updateAgentStatus(ctx, server.Id, entity.AgentStatusInstalling)
-	s.appendAgentLog(ctx, server.Id, "Starting installation...")
+	logMsg("Starting installation...")
 
 	client, err := util.NewSSHClient(server.IpAddress, server.Port, server.Credential.Username, server.Credential.Password, server.Credential.SSHKey)
 	if err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to connect via SSH: %v", err))
+		logMsg(fmt.Sprintf("Failed to connect via SSH: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 	defer client.Close()
 
 	// 0. Stop existing service if running
-	s.appendAgentLog(ctx, server.Id, "Stopping existing service (if any)...")
+	logMsg("Stopping existing service (if any)...")
 	stopCmd := "systemctl stop sylix-agent || true"
-	if out, err := client.RunCommand(stopCmd); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Warning: Failed to stop service: %v", err))
-	} else if out != "" {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Stop service output: %s", out))
+	if err := client.RunCommandStream(stopCmd, l, l); err != nil {
+		logMsg(fmt.Sprintf("Warning: Failed to stop service: %v", err))
 	}
 
 	// 1. Download Agent Binary
-	s.appendAgentLog(ctx, server.Id, "Downloading agent binary...")
+	logMsg("Downloading agent binary...")
 	remoteBinaryPath := "/usr/local/bin/sylix-agent"
 
 	version := os.Getenv("SYLIX_VERSION")
@@ -230,25 +252,23 @@ func (s *AgentService) runAgentInstallation(ctx context.Context, server *entity.
 	// Try curl first, then wget. Split commands to get better error reporting.
 	downloadCmd := fmt.Sprintf("if command -v curl >/dev/null 2>&1; then curl -L -f -o %s %s; elif command -v wget >/dev/null 2>&1; then wget -O %s %s; else echo 'Error: neither curl nor wget found'; exit 1; fi", remoteBinaryPath, downloadURL, remoteBinaryPath, downloadURL)
 
-	if out, err := client.RunCommand(downloadCmd); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to download agent binary from %s: %v", downloadURL, err))
+	if err := client.RunCommandStream(downloadCmd, l, l); err != nil {
+		logMsg(fmt.Sprintf("Failed to download agent binary from %s: %v", downloadURL, err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
-	} else {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Download output: %s", out))
 	}
 
-	if _, err := client.RunCommand("chmod +x " + remoteBinaryPath); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to make agent executable: %v", err))
+	if err := client.RunCommandStream("chmod +x "+remoteBinaryPath, l, l); err != nil {
+		logMsg(fmt.Sprintf("Failed to make agent executable: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 
 	// 1.5 Generate and Install Certificates
-	s.appendAgentLog(ctx, server.Id, "Generating certificates...")
+	logMsg("Generating certificates...")
 	serverCert, serverKey, err := util.GenerateSelfSignedCert(server.IpAddress)
 	if err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to generate server cert: %v", err))
+		logMsg(fmt.Sprintf("Failed to generate server cert: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
@@ -257,15 +277,15 @@ func (s *AgentService) runAgentInstallation(ctx context.Context, server *entity.
 	server.Agent.Cert = string(serverCert)
 	server.Agent.Key = string(serverKey)
 	if _, err := s.repo.Update(ctx, server); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to save Certs to DB: %v", err))
+		logMsg(fmt.Sprintf("Failed to save Certs to DB: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 
 	// Create certs directory
 	certsDir := "/etc/sylix-agent/certs"
-	if _, err := client.RunCommand("mkdir -p " + certsDir); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to create certs dir: %v", err))
+	if err := client.RunCommandStream("mkdir -p "+certsDir, l, l); err != nil {
+		logMsg(fmt.Sprintf("Failed to create certs dir: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
@@ -273,37 +293,37 @@ func (s *AgentService) runAgentInstallation(ctx context.Context, server *entity.
 	// Upload certs
 	tmpCertFile := fmt.Sprintf("server_cert_%s.pem", server.Id)
 	if err := os.WriteFile(tmpCertFile, serverCert, 0644); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to write temp cert file: %v", err))
+		logMsg(fmt.Sprintf("Failed to write temp cert file: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 	defer os.Remove(tmpCertFile)
 
 	if err := client.CopyFile(tmpCertFile, filepath.Join(certsDir, "server.crt")); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy cert file: %v", err))
+		logMsg(fmt.Sprintf("Failed to copy cert file: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 
 	tmpKeyFile := fmt.Sprintf("server_key_%s.pem", server.Id)
 	if err := os.WriteFile(tmpKeyFile, serverKey, 0644); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to write temp key file: %v", err))
+		logMsg(fmt.Sprintf("Failed to write temp key file: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 	defer os.Remove(tmpKeyFile)
 
 	if err := client.CopyFile(tmpKeyFile, filepath.Join(certsDir, "server.key")); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy key file: %v", err))
+		logMsg(fmt.Sprintf("Failed to copy key file: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 
 	// 2. Create Config File
-	s.appendAgentLog(ctx, server.Id, "Creating configuration file...")
+	logMsg("Creating configuration file...")
 	configDir := "/etc/sylix-agent"
-	if _, err := client.RunCommand("mkdir -p " + configDir); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to create config dir: %v", err))
+	if err := client.RunCommandStream("mkdir -p "+configDir, l, l); err != nil {
+		logMsg(fmt.Sprintf("Failed to create config dir: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
@@ -325,7 +345,7 @@ log:
 
 	tmpConfigFile := fmt.Sprintf("agent_config_setup_%s.yaml", server.Id)
 	if err := os.WriteFile(tmpConfigFile, []byte(defaultConfig), 0644); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to create temp config file: %v", err))
+		logMsg(fmt.Sprintf("Failed to create temp config file: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
@@ -333,13 +353,13 @@ log:
 
 	remoteConfigPath := filepath.Join(configDir, "config.yaml")
 	if err := client.CopyFile(tmpConfigFile, remoteConfigPath); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy config file: %v", err))
+		logMsg(fmt.Sprintf("Failed to copy config file: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 
 	// 3. Create Systemd Service
-	s.appendAgentLog(ctx, server.Id, "Creating systemd service...")
+	logMsg("Creating systemd service...")
 	serviceContent := `[Unit]
 Description=Sylix Agent
 After=network.target
@@ -354,7 +374,7 @@ WantedBy=multi-user.target
 `
 	tmpServiceFile := "sylix-agent.service"
 	if err := os.WriteFile(tmpServiceFile, []byte(serviceContent), 0644); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to create temp service file: %v", err))
+		logMsg(fmt.Sprintf("Failed to create temp service file: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
@@ -362,13 +382,13 @@ WantedBy=multi-user.target
 
 	remoteServicePath := "/etc/systemd/system/sylix-agent.service"
 	if err := client.CopyFile(tmpServiceFile, remoteServicePath); err != nil {
-		s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to copy service file: %v", err))
+		logMsg(fmt.Sprintf("Failed to copy service file: %v", err))
 		s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 		return
 	}
 
 	// 3. Start Service
-	s.appendAgentLog(ctx, server.Id, "Starting service...")
+	logMsg("Starting service...")
 	commands := []string{
 		"systemctl daemon-reload",
 		"systemctl enable sylix-agent",
@@ -376,15 +396,87 @@ WantedBy=multi-user.target
 	}
 
 	for _, cmd := range commands {
-		if _, err := client.RunCommand(cmd); err != nil {
-			s.appendAgentLog(ctx, server.Id, fmt.Sprintf("Failed to run command %s: %v", cmd, err))
+		if err := client.RunCommandStream(cmd, l, l); err != nil {
+			logMsg(fmt.Sprintf("Failed to run command %s: %v", cmd, err))
 			s.updateAgentStatus(ctx, server.Id, entity.AgentStatusFailed)
 			return
 		}
 	}
 
+	// 4. Install Docker
+	if err := s.installDocker(ctx, client, l, logMsg); err != nil {
+		logMsg(fmt.Sprintf("Failed to install Docker: %v", err))
+	}
+
 	s.updateAgentStatus(ctx, server.Id, entity.AgentStatusSuccess)
-	s.appendAgentLog(ctx, server.Id, "Agent installed successfully.")
+	logMsg("Agent installed successfully.")
+}
+
+func (s *AgentService) installDocker(ctx context.Context, client *util.SSHClient, logWriter io.Writer, logMsg func(string)) error {
+	logMsg("Checking for Docker installation...")
+	if err := client.RunCommandStream("docker --version", logWriter, logWriter); err == nil {
+		logMsg("Docker is already installed.")
+		return nil
+	}
+
+	logMsg("Installing Docker...")
+
+	installScript := `#!/bin/bash
+set -e
+export DEBIAN_FRONTEND=noninteractive
+
+echo "Removing conflicting packages..."
+sudo apt-get remove -y docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc || true
+
+echo "Installing prerequisites..."
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+
+echo "Adding Docker GPG key..."
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo "Adding Docker repository..."
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+echo "Updating package index..."
+sudo apt-get update
+
+echo "Installing Docker..."
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+echo "Docker installation complete."
+`
+	// Write script to temp file
+	tmpScriptFile := fmt.Sprintf("install_docker_%d.sh", time.Now().UnixNano())
+	if err := os.WriteFile(tmpScriptFile, []byte(installScript), 0644); err != nil {
+		return fmt.Errorf("failed to write temp docker install script: %w", err)
+	}
+	defer os.Remove(tmpScriptFile)
+
+	// Copy to remote
+	remoteScriptPath := "/tmp/install_docker.sh"
+	if err := client.CopyFile(tmpScriptFile, remoteScriptPath); err != nil {
+		return fmt.Errorf("failed to copy docker install script: %w", err)
+	}
+
+	// Run script
+	cmd := fmt.Sprintf("chmod +x %s && sudo %s", remoteScriptPath, remoteScriptPath)
+	if err := client.RunCommandStream(cmd, logWriter, logWriter); err != nil {
+		return fmt.Errorf("failed to run docker install script: %w", err)
+	}
+
+	// Cleanup remote script
+	client.RunCommandStream("rm "+remoteScriptPath, logWriter, logWriter)
+
+	return nil
 }
 
 func (s *AgentService) updateAgentStatus(ctx context.Context, serverID string, status int) {
@@ -395,27 +487,4 @@ func (s *AgentService) updateAgentStatus(ctx context.Context, serverID string, s
 	}
 	server.Agent.Status = status
 	s.repo.Update(ctx, server)
-}
-
-func (s *AgentService) appendAgentLog(ctx context.Context, serverID string, logMsg string) {
-	logDir := fmt.Sprintf("logs/servers/%s", serverID)
-	if err := os.MkdirAll(logDir, 0755); err != nil {
-		logger.Log.Error("Failed to create log dir", zap.Error(err))
-		return
-	}
-
-	logFile := filepath.Join(logDir, "setup_agent.log")
-	l := &lumberjack.Logger{
-		Filename:   logFile,
-		MaxSize:    25, // MB
-		MaxBackups: 3,
-		MaxAge:     28,
-		Compress:   true,
-	}
-	defer l.Close()
-
-	msg := fmt.Sprintf("[%s] %s\n", time.Now().Format(time.RFC3339), logMsg)
-	if _, err := l.Write([]byte(msg)); err != nil {
-		logger.Log.Error("Failed to write agent log", zap.Error(err))
-	}
 }

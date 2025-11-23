@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { LogFile } from "~/proto/controlplane/logs";
 import { logsService } from "~/lib/api";
@@ -15,6 +15,7 @@ export default function LogsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingContent, setLoadingContent] = useState(false);
+  const logContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchLogs();
@@ -22,7 +23,7 @@ export default function LogsPage() {
 
   useEffect(() => {
     if (selectedLog) {
-      fetchLogContent(1);
+      fetchLogContent(1000000);
     } else {
       setLogContent([]);
     }
@@ -67,6 +68,12 @@ export default function LogsPage() {
       fetchLogContent(newPage);
     }
   };
+
+  useEffect(() => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
+  }, [logContent]);
 
   return (
     <div className="flex h-full flex-col space-y-4 p-8 md:flex">
@@ -154,7 +161,7 @@ export default function LogsPage() {
           </CardHeader>
           <Separator />
           <CardContent className="flex-1 overflow-hidden p-0 font-mono text-xs">
-            <div className="h-full overflow-auto p-4">
+            <div className="h-full overflow-auto p-4" ref={logContainerRef}>
               {loadingContent ? (
                 <div className="flex items-center justify-center h-full">
                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
