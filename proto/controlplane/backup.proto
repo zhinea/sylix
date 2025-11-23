@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package controlplane;
+
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/controlplane";
+
+import "common/validation.proto";
+import "common/common.proto";
+
+service BackupStorageService {
+    rpc Create(BackupStorage) returns (BackupStorageResponse);
+    rpc Get(BackupStorageId) returns (BackupStorageResponse);
+    rpc All(common.Empty) returns (BackupStoragesResponse);
+    rpc Update(BackupStorage) returns (BackupStorageResponse);
+    rpc Delete(BackupStorageId) returns (BackupMessageResponse);
+    rpc TestConnection(BackupStorage) returns (BackupMessageResponse);
+}
+
+message BackupStorageId {
+    string id = 1;
+}
+
+enum BackupStatusCode {
+    BACKUP_UNSPECIFIED = 0;
+    BACKUP_OK = 200;
+    BACKUP_CREATED = 201;
+    BACKUP_NOT_FOUND = 404;
+    BACKUP_INTERNAL_ERROR = 500;
+    BACKUP_BAD_REQUEST = 400;
+}
+
+message BackupMessageResponse {
+    BackupStatusCode status = 1;
+    string message = 2;
+}
+
+message BackupStorage {
+    string id = 1;
+    string name = 2;
+    string endpoint = 3;
+    string region = 4;
+    string bucket = 5;
+    string access_key = 6;
+    string secret_key = 7;
+    string status = 8; // CONNECTED, ERROR
+    string error_message = 9;
+}
+
+message BackupStorageResponse {
+    BackupStorage data = 1;
+    BackupStatusCode status = 2;
+    repeated common.ValidationError errors = 3;
+    optional string error = 4;
+}
+
+message BackupStoragesResponse {
+    repeated BackupStorage data = 1;
+    BackupStatusCode status = 2;
+}

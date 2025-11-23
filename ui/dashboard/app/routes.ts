@@ -7,5 +7,6 @@ export default [
     route("logs", "routes/dashboard.logs.tsx"),
     route("stats", "routes/dashboard.stats.tsx"),
     route("accidents", "routes/dashboard.accidents.tsx"),
+    route("backups", "routes/dashboard.backups.tsx"),
   ]),
 ] satisfies RouteConfig;

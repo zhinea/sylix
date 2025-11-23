@@ -44,12 +44,15 @@ func main() {
 	// Initialize dependencies
 	serverRepo := repository.NewServerRepository(db)
 	monitoringRepo := repository.NewMonitoringRepository(db)
+	backupRepo := repository.NewBackupStorageRepository(db)
 
 	monitoringService := services.NewMonitoringService(monitoringRepo)
 	agentService := services.NewAgentService(serverRepo)
+	backupService := services.NewBackupService(backupRepo)
 
 	serverUseCase := app.NewServerUseCase(serverRepo, monitoringService, agentService)
 	serverService := grpcServices.NewServerService(serverUseCase)
+	backupStorageService := grpcServices.NewBackupStorageService(backupService)
 
 	logsUseCase := app.NewLogsUseCase()
 	logsService := grpcServices.NewLogsService(logsUseCase)
@@ -60,6 +63,7 @@ func main() {
 
 	pbControlPlane.RegisterServerServiceServer(grpcServer, serverService)
 	pbControlPlane.RegisterLogsServiceServer(grpcServer, logsService)
+	pbControlPlane.RegisterBackupStorageServiceServer(grpcServer, backupStorageService)
 
 	// Wrap gRPC server for gRPC-Web support
 	wrappedGrpc := grpcweb.WrapServer(grpcServer,

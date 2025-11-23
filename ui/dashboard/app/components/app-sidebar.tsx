@@ -1,10 +1,12 @@
 "use client"
 
 import * as React from "react"
+import { Link } from "react-router"
 import {
   BookOpen,
   Bot,
   Command,
+  Database,
   FileText,
   Frame,
   LifeBuoy,
@@ -47,6 +49,11 @@ const data = {
       title: "Statistics",
       url: "/stats",
       icon: PieChart,
+    },
+    {
+      title: "Backup Storage",
+      url: "/backups",
+      icon: Database,
     },
     {
       title: "Incidents",
@@ -97,7 +104,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <Link to="/">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>
@@ -105,7 +112,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="truncate font-medium">Sylix</span>
                   <span className="truncate text-xs">Enterprise</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
