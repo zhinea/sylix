@@ -1,51 +1,65 @@
 # Sylix Engine – AI Agent Guide
-So this application is a backend for database management (specifically Postgres, but in the future it should also support several databases such as MySQL and MongoDB)
 
-with the hope that key features such as easy installation of production-grade Postgres, multi-database server replication, auto backup, PITR, etc. will be available without any configuration. 
+Sylix Engine is a database management backend (Postgres focus) with a `controlplane` (master) and `agent` (node) architecture. It includes a React/Vite frontend (`ui/dashboard`).
 
-The main concept is that the `controlplane` acts as the master backend (installed on the main server), and the `agent` acts as the backend agent (installed on the main server and child servers).
+## 🏗 Architecture & Boundaries
 
+### Backend (Go)
+- **Entry Points**:
+  - `cmd/main.go`: Controlplane. Starts SQLite, runs migrations, wraps gRPC server with `grpc-web`, listens on `:8082`.
+  - `cmd/agent/main.go`: Agent. Connects to controlplane or listens for commands.
+- **Layering**:
+  - `internal/module/{module}`: Vertical slices (controlplane, agent).
+  - `entity`: Domain models (pure Go structs).
+  - `repository`: Interfaces in `domain/repository`, GORM impls in `domain/repository/*_impl.go`.
+  - `interface/grpc`: gRPC handlers. Maps proto messages <-> domain entities.
+- **Data**: SQLite (`sylix.db`) via GORM.
+- **Communication**: gRPC (Inter-service) & gRPC-Web (Frontend -> Controlplane).
 
-## Architecture & Layers
-- `cmd/main.go` is the only binary entrypoint: open SQLite via `internal/infra/db`, run `database.AutoMigrate`, then start a gRPC server on `:8082`; always inject the DB into services via `grpc.NewServerService(db)` so validators and persistence are wired.
-- The codebase follows a clean-ish layering: `internal/common` (shared models/validators), `internal/infra` (SQLite + generated protobuf stubs), and `internal/module/controlplane` (domain entities, repositories, transport adapters).
-- `internal/module/controlplane/entity/server.go` defines the canonical `Server` aggregate; other layers must translate to/from this struct rather than duplicating fields.
-- Repositories live under `domain/repository`; interfaces describe CRUD with context propagation, and implementations are expected to wrap a `*gorm.DB` (see `server_impl.go`).
+### Frontend (React Router v7 + Vite)
+- **Location**: `ui/dashboard`.
+- **Framework**: React Router v7 (SPA mode with `clientLoader`/`clientAction`).
+- **Network**: Custom `GrpcWebClient` (`lib/grpc-client.ts`) handling raw gRPC-Web frames.
+- **State**: URL-driven state via React Router loaders/actions.
 
-## gRPC & Protobuf
-- Public APIs are defined in `proto/frontend/server.proto`; regenerate stubs with `make compile-proto-frontend` (invokes `protoc` with `--experimental_allow_proto3_optional` and writes to `internal/infra/proto/server`).
-- Generated services/types sit in `internal/infra/proto/server`; `ServerService` in `interface/grpc/server.go` embeds `pbServer.UnimplementedServerServiceServer` and must marshal/unmarshal between protobuf messages and domain entities.
-- When adding new RPCs, update the proto first, rerun the Make target, then extend the service implementation—do not hand-edit the generated files.
+## 🛠 Developer Workflows
 
-## Validation & Error Conventions
-- `internal/common/validator` wraps `go-playground/validator` and yields `[]ValidationError`; provide user-friendly messages by registering tag overrides via `RegisterTagMessage`.
-- `ServerService` composes `validator.ServerValidator`, which enforces structure tags plus domain rules (password XOR SSH key). Reuse this pattern for other aggregates instead of ad-hoc checks.
-- Surface validation issues to clients in gRPC errors or response payloads consistently—collect the slice returned by `ValidateStruct` + `validateBusinessRules` before touching the DB.
+### Backend
+- **Run Controlplane**: `make run` (starts on `:8082`).
+- **Dev Mode**: `make dev` (uses `gowatch` for hot reload).
+- **Proto Generation**: `make compile-proto` (requires `protoc`).
+  - *Note*: Regenerates `internal/infra/proto`.
 
-## Persistence Rules
-- SQLite lives in `sylix.db`; schema comes from `database.AutoMigrate` using the `entity.Model` mixin (`internal/common/model/base.go`).
-- Repository implementations should call `s.db.WithContext(ctx)` and rely on GORM's error returns; don't panic inside repositories—bubble errors up so the gRPC layer can translate them.
-- `ServerCredential` is stored via `gorm:"embedded;embeddedPrefix:credential_"`; ensure new migrations keep this flattened naming.
+### Frontend
+- **Dev Server**: `cd ui/dashboard && npm run dev` (starts on `:5173`).
+- **Proto Generation**: `make compile-proto-frontend`.
+  - *Note*: Generates TS types in `ui/dashboard/app/proto`.
+  - *Critical*: Run this after any `.proto` change.
 
-## Developer Workflows
-- Run the server locally with `make run` (alias for `go run ./cmd/main.go`).
-- Run lightweight checks with `go test ./...` even though suites are sparse; add focused tests near any non-trivial logic (e.g., validators or repository helpers).
-- Proto compilation wipes `internal/infra/proto/*` before regenerating; stage only the relevant regenerated files to avoid accidental deletions of other infra code.
+## 🧩 Key Patterns & Conventions
 
-## Patterns to Follow
-- Prefer constructor helpers (`NewServerService`, `NewServerRepository`) over struct literals to ensure dependencies are initialized.
-- Always pass `context.Context` from gRPC handlers down into repositories/services for future cancellation and logging hooks.
-- Keep transport structs (protobuf) separate from domain entities; perform conversions in the gRPC layer and return protobuf message wrappers such as `pbServer.ServerResponse`.
-- When extending functionality, touch the layers in order: proto ➜ interface/grpc ➜ domain/service ➜ repository to keep boundaries consistent.
+### Go (Backend)
+- **Dependency Injection**: Manual wiring in `cmd/main.go`. Always inject DB/Repos into Services.
+- **Validation**: `internal/common/validator`. Use `ValidateStruct` in gRPC handlers before business logic.
+- **Error Handling**: Bubble errors from Repos. Translate to gRPC codes in `interface/grpc`.
+- **Database**: Use `gorm` with `context`. Do not panic in repos.
 
-## Code Conventions
-- Use `CamelCase` for Go struct fields and `snake_case` for JSON tags.
-- Make sure the code follows Go idioms for error handling, avoiding panics except in unrecoverable situations.
-- Write clear and concise comments for exported functions and types to enhance code readability and maintainability.
-- Reuse existing components and patterns rather than creating new ones for similar functionality.
-- Always format code with `go fmt` before committing.
+### TypeScript (Frontend)
+- **Data Fetching**: Use `clientLoader` for reads and `clientAction` for writes (React Router v7).
+  - Example: `export async function clientLoader() { ... }` in routes.
+- **API Calls**: Import services from `~/lib/api`.
+  - Example: `import { serverService } from "~/lib/api";`
+- **Forms**: Use `react-hook-form` + `zod` + `shadcn/ui` components.
+- **gRPC Client**: `GrpcWebClient` manually constructs frames. *Do not use standard grpc-web libraries unless replacing this implementation.*
 
+## 🔌 Integration Points
+- **Frontend -> Backend**:
+  - Frontend calls `http://localhost:8082` (proxied via `grpc-web`).
+  - CORS enabled in `cmd/main.go` for `localhost:5173`.
+- **Proto Files**:
+  - Source of truth: `proto/`.
+  - Changes require running **BOTH** `make compile-proto` and `make compile-proto-frontend`.
 
-IMPORTANT: DO NOT CREATE REDUNDANT AND NON-OPTIMAL CODE.
-
-IMPORTANT: CREATE CODE THAT IS OPTIMAL, EFFICIENT, MAINTAINABLE, AND CLEAN.
+## ⚠️ Gotchas
+- **gRPC-Web**: The backend manually wraps the gRPC server using `improbable-eng/grpc-web`. The frontend uses a custom binary frame parser/builder.
+- **Migrations**: `database.AutoMigrate` runs on startup in `cmd/main.go`.

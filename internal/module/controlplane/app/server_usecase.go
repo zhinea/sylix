@@ -19,7 +19,6 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v3"
 )
@@ -65,6 +64,23 @@ func (uc *ServerUseCase) GetAll(ctx context.Context) ([]*entity.Server, error) {
 }
 
 func (uc *ServerUseCase) Update(ctx context.Context, server *entity.Server) (*entity.Server, error) {
+	// Fetch existing server to preserve internal fields
+	existing, err := uc.repo.GetByID(ctx, server.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Preserve CaCert
+	server.Credential.CaCert = existing.Credential.CaCert
+
+	// Preserve Password and SSHKey if not provided (nil)
+	if server.Credential.Password == nil {
+		server.Credential.Password = existing.Credential.Password
+	}
+	if server.Credential.SSHKey == nil {
+		server.Credential.SSHKey = existing.Credential.SSHKey
+	}
+
 	// Check connection before updating
 	if err := uc.CheckConnection(server); err == nil {
 		server.Status = entity.ServerStatusConnected
@@ -118,20 +134,18 @@ func (uc *ServerUseCase) GetAgentConfig(ctx context.Context, id string) (string,
 	target := fmt.Sprintf("%s:%d", server.IpAddress, port)
 
 	var opts []grpc.DialOption
+
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,
+	}
 	if server.Credential.CaCert != "" {
 		cp := x509.NewCertPool()
-		if !cp.AppendCertsFromPEM([]byte(server.Credential.CaCert)) {
-			return "", "", fmt.Errorf("failed to append CA cert")
+		if cp.AppendCertsFromPEM([]byte(server.Credential.CaCert)) {
+			tlsConfig.RootCAs = cp
 		}
-		config := &tls.Config{
-			RootCAs:            cp,
-			InsecureSkipVerify: true,
-		}
-		creds := credentials.NewTLS(config)
-		opts = append(opts, grpc.WithTransportCredentials(creds))
-	} else {
-		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	}
+	creds := credentials.NewTLS(tlsConfig)
+	opts = append(opts, grpc.WithTransportCredentials(creds))
 
 	conn, err := grpc.Dial(target, opts...)
 	if err != nil {

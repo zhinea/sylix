@@ -14,7 +14,6 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type MonitoringWorker struct {
@@ -78,27 +77,21 @@ func (w *MonitoringWorker) pingServer(ctx context.Context, server *entity.Server
 	target := fmt.Sprintf("%s:%d", server.IpAddress, port)
 
 	var opts []grpc.DialOption
+
+	// Always use TLS, but relax verification if CaCert is missing or for hostname
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,
+	}
 	if server.Credential.CaCert != "" {
 		cp := x509.NewCertPool()
-		if !cp.AppendCertsFromPEM([]byte(server.Credential.CaCert)) {
-			w.recordPingFailure(ctx, server, "failed to append CA cert")
-			return
+		if cp.AppendCertsFromPEM([]byte(server.Credential.CaCert)) {
+			tlsConfig.RootCAs = cp
 		}
-		// We use InsecureSkipVerify: true here ONLY for the hostname check if we want to allow IP-based certs easily without strict hostname matching issues,
-		// BUT since we generated the cert with the IP as SAN, we should be fine.
-		// However, grpc-go's TLS credentials expect the server name to match.
-		// If we don't pass a server name override, it uses the target address.
-		config := &tls.Config{
-			RootCAs:            cp,
-			InsecureSkipVerify: true,
-		}
-		creds := credentials.NewTLS(config)
-		opts = append(opts, grpc.WithTransportCredentials(creds))
-	} else {
-		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	}
+	creds := credentials.NewTLS(tlsConfig)
+	opts = append(opts, grpc.WithTransportCredentials(creds))
 
-	conn, err := grpc.Dial(target, opts...)
+	conn, err := grpc.NewClient(target, opts...)
 	if err != nil {
 		w.recordPingFailure(ctx, server, err.Error())
 		return
