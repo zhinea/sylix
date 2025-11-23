@@ -33,6 +33,7 @@ const (
 	ServerService_ConfigureAgent_FullMethodName       = "/controlplane.ServerService/ConfigureAgent"
 	ServerService_UpdateAgentPort_FullMethodName      = "/controlplane.ServerService/UpdateAgentPort"
 	ServerService_UpdateServerTimeZone_FullMethodName = "/controlplane.ServerService/UpdateServerTimeZone"
+	ServerService_GetAgentConfig_FullMethodName       = "/controlplane.ServerService/GetAgentConfig"
 )
 
 // ServerServiceClient is the client API for ServerService service.
@@ -52,6 +53,7 @@ type ServerServiceClient interface {
 	ConfigureAgent(ctx context.Context, in *ConfigureAgentRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	UpdateAgentPort(ctx context.Context, in *UpdateAgentPortRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	UpdateServerTimeZone(ctx context.Context, in *UpdateServerTimeZoneRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	GetAgentConfig(ctx context.Context, in *Id, opts ...grpc.CallOption) (*GetAgentConfigResponse, error)
 }
 
 type serverServiceClient struct {
@@ -192,6 +194,16 @@ func (c *serverServiceClient) UpdateServerTimeZone(ctx context.Context, in *Upda
 	return out, nil
 }
 
+func (c *serverServiceClient) GetAgentConfig(ctx context.Context, in *Id, opts ...grpc.CallOption) (*GetAgentConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAgentConfigResponse)
+	err := c.cc.Invoke(ctx, ServerService_GetAgentConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ServerServiceServer is the server API for ServerService service.
 // All implementations must embed UnimplementedServerServiceServer
 // for forward compatibility.
@@ -209,6 +221,7 @@ type ServerServiceServer interface {
 	ConfigureAgent(context.Context, *ConfigureAgentRequest) (*MessageResponse, error)
 	UpdateAgentPort(context.Context, *UpdateAgentPortRequest) (*MessageResponse, error)
 	UpdateServerTimeZone(context.Context, *UpdateServerTimeZoneRequest) (*MessageResponse, error)
+	GetAgentConfig(context.Context, *Id) (*GetAgentConfigResponse, error)
 	mustEmbedUnimplementedServerServiceServer()
 }
 
@@ -257,6 +270,9 @@ func (UnimplementedServerServiceServer) UpdateAgentPort(context.Context, *Update
 }
 func (UnimplementedServerServiceServer) UpdateServerTimeZone(context.Context, *UpdateServerTimeZoneRequest) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateServerTimeZone not implemented")
+}
+func (UnimplementedServerServiceServer) GetAgentConfig(context.Context, *Id) (*GetAgentConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAgentConfig not implemented")
 }
 func (UnimplementedServerServiceServer) mustEmbedUnimplementedServerServiceServer() {}
 func (UnimplementedServerServiceServer) testEmbeddedByValue()                       {}
@@ -513,6 +529,24 @@ func _ServerService_UpdateServerTimeZone_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServerService_GetAgentConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServiceServer).GetAgentConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerService_GetAgentConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServiceServer).GetAgentConfig(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ServerService_ServiceDesc is the grpc.ServiceDesc for ServerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -571,6 +605,10 @@ var ServerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateServerTimeZone",
 			Handler:    _ServerService_UpdateServerTimeZone_Handler,
+		},
+		{
+			MethodName: "GetAgentConfig",
+			Handler:    _ServerService_GetAgentConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

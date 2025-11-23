@@ -51,7 +51,7 @@ func main() {
 		grpcServer = grpc.NewServer(grpc.Creds(creds))
 	}
 
-	agentService := grpcServices.NewAgentService()
+	agentService := grpcServices.NewAgentService(*configPath)
 	agentPb.RegisterAgentServer(grpcServer, agentService)
 
 	logger.Log.Info("Agent started", zap.String("address", addr))

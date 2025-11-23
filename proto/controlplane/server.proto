@@ -21,6 +21,12 @@ service ServerService {
     rpc ConfigureAgent(ConfigureAgentRequest) returns (MessageResponse);
     rpc UpdateAgentPort(UpdateAgentPortRequest) returns (MessageResponse);
     rpc UpdateServerTimeZone(UpdateServerTimeZoneRequest) returns (MessageResponse);
+    rpc GetAgentConfig(Id) returns (GetAgentConfigResponse);
+}
+
+message GetAgentConfigResponse {
+    string config = 1;
+    string timezone = 2;
 }
 
 message GetRealtimeStatsRequest {
@@ -154,6 +160,7 @@ message Server {
     StatusServer status = 8;
     AgentStatusServer agentStatus = 9;
     string agentLogs = 10;
+    int32 agentPort = 11;
 }
 
 message ServerCredential {

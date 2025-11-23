@@ -309,6 +309,94 @@ func (x *PingResponse) GetStatus() string {
 	return ""
 }
 
+type GetConfigRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetConfigRequest) Reset() {
+	*x = GetConfigRequest{}
+	mi := &file_agent_agent_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetConfigRequest) ProtoMessage() {}
+
+func (x *GetConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetConfigRequest.ProtoReflect.Descriptor instead.
+func (*GetConfigRequest) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{6}
+}
+
+type GetConfigResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Config        string                 `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
+	Timezone      string                 `protobuf:"bytes,2,opt,name=timezone,proto3" json:"timezone,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetConfigResponse) Reset() {
+	*x = GetConfigResponse{}
+	mi := &file_agent_agent_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetConfigResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetConfigResponse) ProtoMessage() {}
+
+func (x *GetConfigResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetConfigResponse.ProtoReflect.Descriptor instead.
+func (*GetConfigResponse) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetConfigResponse) GetConfig() string {
+	if x != nil {
+		return x.Config
+	}
+	return ""
+}
+
+func (x *GetConfigResponse) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
 var File_agent_agent_proto protoreflect.FileDescriptor
 
 const file_agent_agent_proto_rawDesc = "" +
@@ -328,11 +416,16 @@ const file_agent_agent_proto_rawDesc = "" +
 	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\"D\n" +
 	"\fPingResponse\x12\x1c\n" +
 	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status2\xb8\x01\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\"\x12\n" +
+	"\x10GetConfigRequest\"G\n" +
+	"\x11GetConfigResponse\x12\x16\n" +
+	"\x06config\x18\x01 \x01(\tR\x06config\x12\x1a\n" +
+	"\btimezone\x18\x02 \x01(\tR\btimezone2\xf8\x01\n" +
 	"\x05Agent\x12>\n" +
 	"\tGetStatus\x12\x17.agent.GetStatusRequest\x1a\x18.agent.GetStatusResponse\x12>\n" +
 	"\tHeartbeat\x12\x17.agent.HeartbeatRequest\x1a\x18.agent.HeartbeatResponse\x12/\n" +
-	"\x04Ping\x12\x12.agent.PingRequest\x1a\x13.agent.PingResponseB4Z2github.com/zhinea/sylix/internal/infra/proto/agentb\x06proto3"
+	"\x04Ping\x12\x12.agent.PingRequest\x1a\x13.agent.PingResponse\x12>\n" +
+	"\tGetConfig\x12\x17.agent.GetConfigRequest\x1a\x18.agent.GetConfigResponseB4Z2github.com/zhinea/sylix/internal/infra/proto/agentb\x06proto3"
 
 var (
 	file_agent_agent_proto_rawDescOnce sync.Once
@@ -346,7 +439,7 @@ func file_agent_agent_proto_rawDescGZIP() []byte {
 	return file_agent_agent_proto_rawDescData
 }
 
-var file_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_agent_agent_proto_goTypes = []any{
 	(*GetStatusRequest)(nil),  // 0: agent.GetStatusRequest
 	(*GetStatusResponse)(nil), // 1: agent.GetStatusResponse
@@ -354,16 +447,20 @@ var file_agent_agent_proto_goTypes = []any{
 	(*HeartbeatResponse)(nil), // 3: agent.HeartbeatResponse
 	(*PingRequest)(nil),       // 4: agent.PingRequest
 	(*PingResponse)(nil),      // 5: agent.PingResponse
+	(*GetConfigRequest)(nil),  // 6: agent.GetConfigRequest
+	(*GetConfigResponse)(nil), // 7: agent.GetConfigResponse
 }
 var file_agent_agent_proto_depIdxs = []int32{
 	0, // 0: agent.Agent.GetStatus:input_type -> agent.GetStatusRequest
 	2, // 1: agent.Agent.Heartbeat:input_type -> agent.HeartbeatRequest
 	4, // 2: agent.Agent.Ping:input_type -> agent.PingRequest
-	1, // 3: agent.Agent.GetStatus:output_type -> agent.GetStatusResponse
-	3, // 4: agent.Agent.Heartbeat:output_type -> agent.HeartbeatResponse
-	5, // 5: agent.Agent.Ping:output_type -> agent.PingResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
+	6, // 3: agent.Agent.GetConfig:input_type -> agent.GetConfigRequest
+	1, // 4: agent.Agent.GetStatus:output_type -> agent.GetStatusResponse
+	3, // 5: agent.Agent.Heartbeat:output_type -> agent.HeartbeatResponse
+	5, // 6: agent.Agent.Ping:output_type -> agent.PingResponse
+	7, // 7: agent.Agent.GetConfig:output_type -> agent.GetConfigResponse
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -380,7 +477,7 @@ func file_agent_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_agent_proto_rawDesc), len(file_agent_agent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

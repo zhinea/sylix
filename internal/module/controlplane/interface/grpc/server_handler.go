@@ -269,6 +269,18 @@ func (s *ServerService) InstallAgent(ctx context.Context, id *pbControlPlane.Id)
 	}, nil
 }
 
+func (s *ServerService) GetAgentConfig(ctx context.Context, id *pbControlPlane.Id) (*pbControlPlane.GetAgentConfigResponse, error) {
+	config, timezone, err := s.useCase.GetAgentConfig(ctx, id.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pbControlPlane.GetAgentConfigResponse{
+		Config:   config,
+		Timezone: timezone,
+	}, nil
+}
+
 // Helper functions for conversion
 var errStr = "Internal Server Error" // Placeholder for error string pointer
 
@@ -287,6 +299,7 @@ func (s *ServerService) entityToProto(server *entity.Server) *pbControlPlane.Ser
 		Status:      pbControlPlane.StatusServer(server.Status),
 		AgentStatus: pbControlPlane.AgentStatusServer(server.AgentStatus),
 		AgentLogs:   server.AgentLogs,
+		AgentPort:   int32(server.AgentPort),
 	}
 }
 
@@ -295,6 +308,7 @@ func (s *ServerService) protoToEntity(pb *pbControlPlane.Server) *entity.Server 
 		Name:      pb.Name,
 		IpAddress: pb.IpAddress,
 		Port:      int(pb.Port),
+		AgentPort: int(pb.AgentPort),
 		Protocol:  pb.Protocol,
 		Credential: entity.ServerCredential{
 			Username: pb.Credential.Username,

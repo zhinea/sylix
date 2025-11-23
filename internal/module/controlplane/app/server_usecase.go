@@ -2,8 +2,8 @@ package app
 
 import (
 	"context"
+	"crypto/x509"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -12,9 +12,13 @@ import (
 	"github.com/zhinea/sylix/internal/common/config"
 	"github.com/zhinea/sylix/internal/common/logger"
 	"github.com/zhinea/sylix/internal/common/util"
+	pbAgent "github.com/zhinea/sylix/internal/infra/proto/agent"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
 	"github.com/zhinea/sylix/internal/module/controlplane/entity"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v3"
 )
@@ -97,12 +101,46 @@ func (uc *ServerUseCase) CheckConnection(server *entity.Server) error {
 		return err
 	}
 	defer client.Close()
+	return nil
+}
 
-	log.Println(server)
+func (uc *ServerUseCase) GetAgentConfig(ctx context.Context, id string) (string, string, error) {
+	server, err := uc.repo.GetByID(ctx, id)
+	if err != nil {
+		return "", "", err
+	}
 
-	// Try to run a simple command
-	_, err = client.RunCommand("echo 'hello'")
-	return err
+	port := server.AgentPort
+	if port == 0 {
+		port = 8083
+	}
+	target := fmt.Sprintf("%s:%d", server.IpAddress, port)
+
+	var opts []grpc.DialOption
+	if server.Credential.CaCert != "" {
+		cp := x509.NewCertPool()
+		if !cp.AppendCertsFromPEM([]byte(server.Credential.CaCert)) {
+			return "", "", fmt.Errorf("failed to append CA cert")
+		}
+		creds := credentials.NewClientTLSFromCert(cp, "")
+		opts = append(opts, grpc.WithTransportCredentials(creds))
+	} else {
+		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}
+
+	conn, err := grpc.Dial(target, opts...)
+	if err != nil {
+		return "", "", err
+	}
+	defer conn.Close()
+
+	client := pbAgent.NewAgentClient(conn)
+	resp, err := client.GetConfig(ctx, &pbAgent.GetConfigRequest{})
+	if err != nil {
+		return "", "", err
+	}
+
+	return resp.Config, resp.Timezone, nil
 }
 
 func (uc *ServerUseCase) InstallAgent(ctx context.Context, serverID string) error {

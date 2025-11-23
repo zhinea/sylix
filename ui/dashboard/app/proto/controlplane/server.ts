@@ -171,6 +171,11 @@ export function agentStatusServerToJSON(object: AgentStatusServer): string {
   }
 }
 
+export interface GetAgentConfigResponse {
+  config: string;
+  timezone: string;
+}
+
 export interface GetRealtimeStatsRequest {
   serverId: string;
   limit: number;
@@ -276,6 +281,7 @@ export interface Server {
   status: StatusServer;
   agentStatus: AgentStatusServer;
   agentLogs: string;
+  agentPort: number;
 }
 
 export interface ServerCredential {
@@ -288,6 +294,82 @@ export interface MessageResponse {
   status: StatusCode;
   message: string;
 }
+
+function createBaseGetAgentConfigResponse(): GetAgentConfigResponse {
+  return { config: "", timezone: "" };
+}
+
+export const GetAgentConfigResponse: MessageFns<GetAgentConfigResponse> = {
+  encode(message: GetAgentConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.config !== "") {
+      writer.uint32(10).string(message.config);
+    }
+    if (message.timezone !== "") {
+      writer.uint32(18).string(message.timezone);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAgentConfigResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAgentConfigResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.config = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.timezone = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAgentConfigResponse {
+    return {
+      config: isSet(object.config) ? globalThis.String(object.config) : "",
+      timezone: isSet(object.timezone) ? globalThis.String(object.timezone) : "",
+    };
+  },
+
+  toJSON(message: GetAgentConfigResponse): unknown {
+    const obj: any = {};
+    if (message.config !== "") {
+      obj.config = message.config;
+    }
+    if (message.timezone !== "") {
+      obj.timezone = message.timezone;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetAgentConfigResponse>, I>>(base?: I): GetAgentConfigResponse {
+    return GetAgentConfigResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetAgentConfigResponse>, I>>(object: I): GetAgentConfigResponse {
+    const message = createBaseGetAgentConfigResponse();
+    message.config = object.config ?? "";
+    message.timezone = object.timezone ?? "";
+    return message;
+  },
+};
 
 function createBaseGetRealtimeStatsRequest(): GetRealtimeStatsRequest {
   return { serverId: "", limit: 0 };
@@ -1758,6 +1840,7 @@ function createBaseServer(): Server {
     status: 0,
     agentStatus: 0,
     agentLogs: "",
+    agentPort: 0,
   };
 }
 
@@ -1792,6 +1875,9 @@ export const Server: MessageFns<Server> = {
     }
     if (message.agentLogs !== "") {
       writer.uint32(82).string(message.agentLogs);
+    }
+    if (message.agentPort !== 0) {
+      writer.uint32(88).int32(message.agentPort);
     }
     return writer;
   },
@@ -1883,6 +1969,14 @@ export const Server: MessageFns<Server> = {
           message.agentLogs = reader.string();
           continue;
         }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.agentPort = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1904,6 +1998,7 @@ export const Server: MessageFns<Server> = {
       status: isSet(object.status) ? statusServerFromJSON(object.status) : 0,
       agentStatus: isSet(object.agentStatus) ? agentStatusServerFromJSON(object.agentStatus) : 0,
       agentLogs: isSet(object.agentLogs) ? globalThis.String(object.agentLogs) : "",
+      agentPort: isSet(object.agentPort) ? globalThis.Number(object.agentPort) : 0,
     };
   },
 
@@ -1939,6 +2034,9 @@ export const Server: MessageFns<Server> = {
     if (message.agentLogs !== "") {
       obj.agentLogs = message.agentLogs;
     }
+    if (message.agentPort !== 0) {
+      obj.agentPort = Math.round(message.agentPort);
+    }
     return obj;
   },
 
@@ -1959,6 +2057,7 @@ export const Server: MessageFns<Server> = {
     message.status = object.status ?? 0;
     message.agentStatus = object.agentStatus ?? 0;
     message.agentLogs = object.agentLogs ?? "";
+    message.agentPort = object.agentPort ?? 0;
     return message;
   },
 };
@@ -2145,6 +2244,7 @@ export interface ServerService {
   ConfigureAgent(request: ConfigureAgentRequest): Promise<MessageResponse>;
   UpdateAgentPort(request: UpdateAgentPortRequest): Promise<MessageResponse>;
   UpdateServerTimeZone(request: UpdateServerTimeZoneRequest): Promise<MessageResponse>;
+  GetAgentConfig(request: Id): Promise<GetAgentConfigResponse>;
 }
 
 export const ServerServiceServiceName = "controlplane.ServerService";
@@ -2167,6 +2267,7 @@ export class ServerServiceClientImpl implements ServerService {
     this.ConfigureAgent = this.ConfigureAgent.bind(this);
     this.UpdateAgentPort = this.UpdateAgentPort.bind(this);
     this.UpdateServerTimeZone = this.UpdateServerTimeZone.bind(this);
+    this.GetAgentConfig = this.GetAgentConfig.bind(this);
   }
   Create(request: Server): Promise<ServerResponse> {
     const data = Server.encode(request).finish();
@@ -2244,6 +2345,12 @@ export class ServerServiceClientImpl implements ServerService {
     const data = UpdateServerTimeZoneRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateServerTimeZone", data);
     return promise.then((data) => MessageResponse.decode(new BinaryReader(data)));
+  }
+
+  GetAgentConfig(request: Id): Promise<GetAgentConfigResponse> {
+    const data = Id.encode(request).finish();
+    const promise = this.rpc.request(this.service, "GetAgentConfig", data);
+    return promise.then((data) => GetAgentConfigResponse.decode(new BinaryReader(data)));
   }
 }
 

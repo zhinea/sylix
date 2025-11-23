@@ -8,6 +8,7 @@ service Agent {
     rpc GetStatus (GetStatusRequest) returns (GetStatusResponse);
     rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
     rpc Ping (PingRequest) returns (PingResponse);
+    rpc GetConfig (GetConfigRequest) returns (GetConfigResponse);
 }
 
 message GetStatusRequest {}
@@ -34,4 +35,11 @@ message PingRequest {
 message PingResponse {
     int64 timestamp = 1;
     string status = 2;
+}
+
+message GetConfigRequest {}
+
+message GetConfigResponse {
+    string config = 1;
+    string timezone = 2;
 }

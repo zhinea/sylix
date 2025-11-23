@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -90,7 +90,7 @@ export function ServerManagementModal({ server, open, onOpenChange }: ServerMana
           <TabsContent value="configuration" className="flex-1 overflow-auto p-4 space-y-6">
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Agent Port</h3>
-              <AgentPortForm serverId={server.id} />
+              <AgentPortForm serverId={server.id} initialPort={server.agentPort} />
             </div>
             
             <div className="space-y-4">
@@ -115,10 +115,10 @@ export function ServerManagementModal({ server, open, onOpenChange }: ServerMana
   );
 }
 
-function AgentPortForm({ serverId }: { serverId: string }) {
+function AgentPortForm({ serverId, initialPort }: { serverId: string, initialPort: number }) {
   const form = useForm<z.infer<typeof portSchema>>({
     resolver: zodResolver(portSchema as any),
-    defaultValues: { port: 8083 },
+    defaultValues: { port: initialPort || 8083 },
   });
 
   async function onSubmit(values: z.infer<typeof portSchema>) {
@@ -161,6 +161,20 @@ function TimezoneForm({ serverId }: { serverId: string }) {
     resolver: zodResolver(timezoneSchema as any),
     defaultValues: { timezone: "UTC" },
   });
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await serverService.GetAgentConfig({ id: serverId });
+        if (response.timezone) {
+          form.setValue("timezone", response.timezone);
+        }
+      } catch (error) {
+        console.error("Failed to fetch agent config", error);
+      }
+    };
+    fetchConfig();
+  }, [serverId, form]);
 
   async function onSubmit(values: z.infer<typeof timezoneSchema>) {
     try {
@@ -213,6 +227,20 @@ function AgentConfigForm({ serverId }: { serverId: string }) {
     resolver: zodResolver(configSchema as any),
     defaultValues: { config: "" },
   });
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await serverService.GetAgentConfig({ id: serverId });
+        if (response.config) {
+          form.setValue("config", response.config);
+        }
+      } catch (error) {
+        console.error("Failed to fetch agent config", error);
+      }
+    };
+    fetchConfig();
+  }, [serverId, form]);
 
   async function onSubmit(values: z.infer<typeof configSchema>) {
     try {

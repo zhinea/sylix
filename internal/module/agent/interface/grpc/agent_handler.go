@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"os"
+	"strings"
 	"time"
 
 	pbAgent "github.com/zhinea/sylix/internal/infra/proto/agent"
@@ -9,12 +11,14 @@ import (
 
 type AgentService struct {
 	pbAgent.UnimplementedAgentServer
-	startTime time.Time
+	startTime  time.Time
+	configPath string
 }
 
-func NewAgentService() *AgentService {
+func NewAgentService(configPath string) *AgentService {
 	return &AgentService{
-		startTime: time.Now(),
+		startTime:  time.Now(),
+		configPath: configPath,
 	}
 }
 
@@ -37,5 +41,27 @@ func (s *AgentService) Ping(ctx context.Context, req *pbAgent.PingRequest) (*pbA
 	return &pbAgent.PingResponse{
 		Timestamp: time.Now().Unix(),
 		Status:    "OK",
+	}, nil
+}
+
+func (s *AgentService) GetConfig(ctx context.Context, req *pbAgent.GetConfigRequest) (*pbAgent.GetConfigResponse, error) {
+	configContent, err := os.ReadFile(s.configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	timezone := "UTC"
+	if tzBytes, err := os.ReadFile("/etc/timezone"); err == nil {
+		timezone = strings.TrimSpace(string(tzBytes))
+	} else if link, err := os.Readlink("/etc/localtime"); err == nil {
+		parts := strings.Split(link, "zoneinfo/")
+		if len(parts) > 1 {
+			timezone = parts[1]
+		}
+	}
+
+	return &pbAgent.GetConfigResponse{
+		Config:   string(configContent),
+		Timezone: timezone,
 	}, nil
 }
