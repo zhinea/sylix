@@ -19,7 +19,7 @@ type DockerService struct {
 }
 
 func NewDockerService() (*DockerService, error) {
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithVersion("1.44"))
 	if err != nil {
 		return nil, err
 	}
