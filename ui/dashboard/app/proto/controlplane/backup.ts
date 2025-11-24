@@ -88,6 +88,7 @@ export interface BackupStorage {
   /** CONNECTED, ERROR */
   status: string;
   errorMessage: string;
+  serverIds: string[];
 }
 
 export interface BackupStorageResponse {
@@ -247,6 +248,7 @@ function createBaseBackupStorage(): BackupStorage {
     secretKey: "",
     status: "",
     errorMessage: "",
+    serverIds: [],
   };
 }
 
@@ -278,6 +280,9 @@ export const BackupStorage: MessageFns<BackupStorage> = {
     }
     if (message.errorMessage !== "") {
       writer.uint32(74).string(message.errorMessage);
+    }
+    for (const v of message.serverIds) {
+      writer.uint32(82).string(v!);
     }
     return writer;
   },
@@ -361,6 +366,14 @@ export const BackupStorage: MessageFns<BackupStorage> = {
           message.errorMessage = reader.string();
           continue;
         }
+        case 10: {
+          if (tag !== 82) {
+            break;
+          }
+
+          message.serverIds.push(reader.string());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -381,6 +394,9 @@ export const BackupStorage: MessageFns<BackupStorage> = {
       secretKey: isSet(object.secretKey) ? globalThis.String(object.secretKey) : "",
       status: isSet(object.status) ? globalThis.String(object.status) : "",
       errorMessage: isSet(object.errorMessage) ? globalThis.String(object.errorMessage) : "",
+      serverIds: globalThis.Array.isArray(object?.serverIds)
+        ? object.serverIds.map((e: any) => globalThis.String(e))
+        : [],
     };
   },
 
@@ -413,6 +429,9 @@ export const BackupStorage: MessageFns<BackupStorage> = {
     if (message.errorMessage !== "") {
       obj.errorMessage = message.errorMessage;
     }
+    if (message.serverIds?.length) {
+      obj.serverIds = message.serverIds;
+    }
     return obj;
   },
 
@@ -430,6 +449,7 @@ export const BackupStorage: MessageFns<BackupStorage> = {
     message.secretKey = object.secretKey ?? "";
     message.status = object.status ?? "";
     message.errorMessage = object.errorMessage ?? "";
+    message.serverIds = object.serverIds?.map((e) => e) || [];
     return message;
   },
 };

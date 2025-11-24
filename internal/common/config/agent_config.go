@@ -23,6 +23,17 @@ type AgentConfig struct {
 		MaxAge     int    `yaml:"max_age"` // days
 		Compress   bool   `yaml:"compress"`
 	} `yaml:"log"`
+	Storage []StorageConfig `yaml:"storage"`
+}
+
+type StorageConfig struct {
+	ID        string `yaml:"id"`
+	Name      string `yaml:"name"`
+	Endpoint  string `yaml:"endpoint"`
+	Region    string `yaml:"region"`
+	Bucket    string `yaml:"bucket"`
+	AccessKey string `yaml:"access_key"`
+	SecretKey string `yaml:"secret_key"`
 }
 
 func LoadAgentConfig(path string) (*AgentConfig, error) {

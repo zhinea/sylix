@@ -9,6 +9,7 @@ service Agent {
     rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
     rpc Ping (PingRequest) returns (PingResponse);
     rpc GetConfig (GetConfigRequest) returns (GetConfigResponse);
+    rpc CreateDatabase (CreateDatabaseRequest) returns (CreateDatabaseResponse);
 }
 
 message GetStatusRequest {}
@@ -42,4 +43,18 @@ message GetConfigRequest {}
 message GetConfigResponse {
     string config = 1;
     string timezone = 2;
+}
+
+message CreateDatabaseRequest {
+    string name = 1;
+    string user = 2;
+    string password = 3;
+    string db_name = 4;
+    string branch = 5;
+}
+
+message CreateDatabaseResponse {
+    string container_id = 1;
+    int32 port = 2;
+    string status = 3;
 }

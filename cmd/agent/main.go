@@ -8,6 +8,7 @@ import (
 	"github.com/zhinea/sylix/internal/common/config"
 	"github.com/zhinea/sylix/internal/common/logger"
 	agentPb "github.com/zhinea/sylix/internal/infra/proto/agent"
+	"github.com/zhinea/sylix/internal/module/agent/domain/services"
 	grpcServices "github.com/zhinea/sylix/internal/module/agent/interface/grpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -51,7 +52,12 @@ func main() {
 		grpcServer = grpc.NewServer(grpc.Creds(creds))
 	}
 
-	agentService := grpcServices.NewAgentService(*configPath)
+	dockerService, err := services.NewDockerService()
+	if err != nil {
+		logger.Log.Fatal("Failed to create Docker service", zap.Error(err))
+	}
+
+	agentService := grpcServices.NewAgentService(*configPath, dockerService)
 	agentPb.RegisterAgentServer(grpcServer, agentService)
 
 	logger.Log.Info("Agent started", zap.String("address", addr))

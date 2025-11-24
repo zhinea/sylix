@@ -100,15 +100,74 @@ func (s *AgentService) Configure(ctx context.Context, server *entity.Server, con
 	}
 	defer os.Remove(tmpFile)
 
-	// Copy to remote server
-	remotePath := "/etc/sylix-agent/config.yaml"
-	if err := client.CopyFile(tmpFile, remotePath); err != nil {
+	remoteConfigPath := "/etc/sylix-agent/config.yaml"
+	if err := client.CopyFile(tmpFile, remoteConfigPath); err != nil {
+		return fmt.Errorf("failed to copy config file to server: %w", err)
+	}
+
+	// Restart agent service
+	if _, err := client.RunCommand("systemctl restart sylix-agent"); err != nil {
+		return fmt.Errorf("failed to restart agent service: %w", err)
+	}
+
+	return nil
+}
+
+func (s *AgentService) SyncStorage(ctx context.Context, server *entity.Server, storages []*entity.BackupStorage) error {
+	client, err := util.NewSSHClient(server.IpAddress, server.Port, server.Credential.Username, server.Credential.Password, server.Credential.SSHKey)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	// Read existing config
+	remoteConfigPath := "/etc/sylix-agent/config.yaml"
+	output, err := client.RunCommand("cat " + remoteConfigPath)
+	if err != nil {
+		return fmt.Errorf("failed to read remote config: %w", err)
+	}
+
+	var agentConfig config.AgentConfig
+	if err := yaml.Unmarshal([]byte(output), &agentConfig); err != nil {
+		return fmt.Errorf("failed to parse remote config: %w", err)
+	}
+
+	// Update storage
+	var storageConfigs []config.StorageConfig
+	for _, st := range storages {
+		storageConfigs = append(storageConfigs, config.StorageConfig{
+			ID:        st.Id,
+			Name:      st.Name,
+			Endpoint:  st.Endpoint,
+			Region:    st.Region,
+			Bucket:    st.Bucket,
+			AccessKey: st.AccessKey,
+			SecretKey: st.SecretKey,
+		})
+	}
+	agentConfig.Storage = storageConfigs
+
+	// Marshal back to YAML
+	newConfigBytes, err := yaml.Marshal(&agentConfig)
+	if err != nil {
+		return fmt.Errorf("failed to marshal new config: %w", err)
+	}
+
+	// Write to temp file
+	tmpFile := fmt.Sprintf("agent_config_storage_%s.yaml", server.Id)
+	if err := os.WriteFile(tmpFile, newConfigBytes, 0644); err != nil {
+		return fmt.Errorf("failed to write temp config file: %w", err)
+	}
+	defer os.Remove(tmpFile)
+
+	// Copy to server
+	if err := client.CopyFile(tmpFile, remoteConfigPath); err != nil {
 		return fmt.Errorf("failed to copy config file to server: %w", err)
 	}
 
 	// Restart agent
 	if _, err := client.RunCommand("systemctl restart sylix-agent"); err != nil {
-		return fmt.Errorf("failed to restart agent: %w", err)
+		return fmt.Errorf("failed to restart agent service: %w", err)
 	}
 
 	return nil
@@ -300,4 +359,45 @@ func (s *AgentService) updateAgentStatus(ctx context.Context, serverID string, s
 	}
 	server.Agent.Status = status
 	s.repo.Update(ctx, server)
+}
+
+func (s *AgentService) CreateDatabase(ctx context.Context, server *entity.Server, req *pbAgent.CreateDatabaseRequest) (*pbAgent.CreateDatabaseResponse, error) {
+	port := server.Agent.Port
+	if port == 0 {
+		port = 8083
+	}
+	target := fmt.Sprintf("%s:%d", server.IpAddress, port)
+
+	logger.Log.Debug("Connecting to agent for CreateDatabase", zap.String("target", target))
+
+	var opts []grpc.DialOption
+
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+	if server.Agent.Cert != "" {
+		cp := x509.NewCertPool()
+		if cp.AppendCertsFromPEM([]byte(server.Agent.Cert)) {
+			tlsConfig.RootCAs = cp
+			tlsConfig.ServerName = server.IpAddress
+			tlsConfig.InsecureSkipVerify = false
+		}
+	}
+	creds := credentials.NewTLS(tlsConfig)
+	opts = append(opts, grpc.WithTransportCredentials(creds))
+
+	conn, err := grpc.NewClient(target, opts...)
+	if err != nil {
+		logger.Log.Error("Failed to dial agent", zap.Error(err), zap.String("target", target))
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pbAgent.NewAgentClient(conn)
+	resp, err := client.CreateDatabase(ctx, req)
+	if err != nil {
+		logger.Log.Error("Agent RPC CreateDatabase failed", zap.Error(err))
+		return nil, err
+	}
+	return resp, nil
 }

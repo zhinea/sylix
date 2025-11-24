@@ -18,13 +18,14 @@ type ServerAgent struct {
 
 type Server struct {
 	model.Model
-	Name       string           `json:"name"`
-	IpAddress  string           `json:"ip_address"`
-	Port       int              `json:"port"`
-	Protocol   string           `json:"protocol"`
-	Credential ServerCredential `json:"credential" gorm:"embedded;embeddedPrefix:credential_"`
-	Agent      ServerAgent      `json:"agent" gorm:"embedded;embeddedPrefix:agent_"`
-	Status     int              `json:"status"`
+	Name           string           `json:"name"`
+	IpAddress      string           `json:"ip_address"`
+	Port           int              `json:"port"`
+	Protocol       string           `json:"protocol"`
+	Credential     ServerCredential `json:"credential" gorm:"embedded;embeddedPrefix:credential_"`
+	Agent          ServerAgent      `json:"agent" gorm:"embedded;embeddedPrefix:agent_"`
+	Status         int              `json:"status"`
+	BackupStorages []*BackupStorage `json:"backup_storages" gorm:"many2many:server_backup_storages;"`
 }
 
 const (

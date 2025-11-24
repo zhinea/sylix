@@ -12,12 +12,16 @@ import (
 )
 
 type BackupService struct {
-	repo repository.BackupStorageRepository
+	repo         repository.BackupStorageRepository
+	serverRepo   repository.ServerRepository
+	agentService *AgentService
 }
 
-func NewBackupService(repo repository.BackupStorageRepository) *BackupService {
+func NewBackupService(repo repository.BackupStorageRepository, serverRepo repository.ServerRepository, agentService *AgentService) *BackupService {
 	return &BackupService{
-		repo: repo,
+		repo:         repo,
+		serverRepo:   serverRepo,
+		agentService: agentService,
 	}
 }
 
@@ -26,9 +30,17 @@ func (s *BackupService) Create(ctx context.Context, backup *entity.BackupStorage
 		return nil, err
 	}
 
+	// Ignore ServerIDs on creation, they will be added via Update if needed.
+	// This ensures we don't sync to agents on creation.
+
 	backup.Status = "CONNECTED"
 	backup.ErrorMessage = ""
-	return s.repo.Create(ctx, backup)
+	createdBackup, err := s.repo.Create(ctx, backup)
+	if err != nil {
+		return nil, err
+	}
+
+	return createdBackup, nil
 }
 
 func (s *BackupService) GetByID(ctx context.Context, id string) (*entity.BackupStorage, error) {
@@ -44,13 +56,89 @@ func (s *BackupService) Update(ctx context.Context, backup *entity.BackupStorage
 		return nil, err
 	}
 
+	oldBackup, err := s.repo.GetByID(ctx, backup.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(backup.ServerIDs) > 0 {
+		servers, err := s.fetchServers(ctx, backup.ServerIDs)
+		if err != nil {
+			return nil, err
+		}
+		backup.Servers = servers
+	} else {
+		backup.Servers = []*entity.Server{}
+	}
+
 	backup.Status = "CONNECTED"
 	backup.ErrorMessage = ""
-	return s.repo.Update(ctx, backup)
+	updatedBackup, err := s.repo.Update(ctx, backup)
+	if err != nil {
+		return nil, err
+	}
+
+	affectedServerIDs := make(map[string]bool)
+	for _, s := range oldBackup.Servers {
+		affectedServerIDs[s.Id] = true
+	}
+	for _, s := range updatedBackup.Servers {
+		affectedServerIDs[s.Id] = true
+	}
+
+	for serverID := range affectedServerIDs {
+		if err := s.syncAgentStorage(ctx, serverID); err != nil {
+			// log error
+		}
+	}
+
+	return updatedBackup, nil
 }
 
 func (s *BackupService) Delete(ctx context.Context, id string) error {
-	return s.repo.Delete(ctx, id)
+	backup, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if err := s.repo.Delete(ctx, id); err != nil {
+		return err
+	}
+
+	for _, server := range backup.Servers {
+		if err := s.syncAgentStorage(ctx, server.Id); err != nil {
+			// log error
+		}
+	}
+
+	return nil
+}
+
+func (s *BackupService) fetchServers(ctx context.Context, ids []string) ([]*entity.Server, error) {
+	var servers []*entity.Server
+	for _, id := range ids {
+		server, err := s.serverRepo.GetByID(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		servers = append(servers, server)
+	}
+	return servers, nil
+}
+
+func (s *BackupService) syncAgentStorage(ctx context.Context, serverID string) error {
+	if serverID == "" {
+		return nil
+	}
+	server, err := s.serverRepo.GetByID(ctx, serverID)
+	if err != nil {
+		return err
+	}
+	storages, err := s.repo.GetByServerID(ctx, serverID)
+	if err != nil {
+		return err
+	}
+	return s.agentService.SyncStorage(ctx, server, storages)
 }
 
 func (s *BackupService) TestConnection(ctx context.Context, backup *entity.BackupStorage) error {

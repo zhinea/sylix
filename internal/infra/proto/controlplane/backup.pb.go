@@ -187,6 +187,7 @@ type BackupStorage struct {
 	SecretKey     string                 `protobuf:"bytes,7,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"`
 	Status        string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"` // CONNECTED, ERROR
 	ErrorMessage  string                 `protobuf:"bytes,9,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	ServerIds     []string               `protobuf:"bytes,10,rep,name=server_ids,json=serverIds,proto3" json:"server_ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -282,6 +283,13 @@ func (x *BackupStorage) GetErrorMessage() string {
 		return x.ErrorMessage
 	}
 	return ""
+}
+
+func (x *BackupStorage) GetServerIds() []string {
+	if x != nil {
+		return x.ServerIds
+	}
+	return nil
 }
 
 type BackupStorageResponse struct {
@@ -413,7 +421,7 @@ const file_controlplane_backup_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"i\n" +
 	"\x15BackupMessageResponse\x126\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x1e.controlplane.BackupStatusCodeR\x06status\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xfa\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x99\x02\n" +
 	"\rBackupStorage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
@@ -425,7 +433,10 @@ const file_controlplane_backup_proto_rawDesc = "" +
 	"\n" +
 	"secret_key\x18\a \x01(\tR\tsecretKey\x12\x16\n" +
 	"\x06status\x18\b \x01(\tR\x06status\x12#\n" +
-	"\rerror_message\x18\t \x01(\tR\ferrorMessage\"\xd6\x01\n" +
+	"\rerror_message\x18\t \x01(\tR\ferrorMessage\x12\x1d\n" +
+	"\n" +
+	"server_ids\x18\n" +
+	" \x03(\tR\tserverIds\"\xd6\x01\n" +
 	"\x15BackupStorageResponse\x12/\n" +
 	"\x04data\x18\x01 \x01(\v2\x1b.controlplane.BackupStorageR\x04data\x126\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x1e.controlplane.BackupStatusCodeR\x06status\x12/\n" +

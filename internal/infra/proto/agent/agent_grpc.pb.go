@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Agent_GetStatus_FullMethodName = "/agent.Agent/GetStatus"
-	Agent_Heartbeat_FullMethodName = "/agent.Agent/Heartbeat"
-	Agent_Ping_FullMethodName      = "/agent.Agent/Ping"
-	Agent_GetConfig_FullMethodName = "/agent.Agent/GetConfig"
+	Agent_GetStatus_FullMethodName      = "/agent.Agent/GetStatus"
+	Agent_Heartbeat_FullMethodName      = "/agent.Agent/Heartbeat"
+	Agent_Ping_FullMethodName           = "/agent.Agent/Ping"
+	Agent_GetConfig_FullMethodName      = "/agent.Agent/GetConfig"
+	Agent_CreateDatabase_FullMethodName = "/agent.Agent/CreateDatabase"
 )
 
 // AgentClient is the client API for Agent service.
@@ -33,6 +34,7 @@ type AgentClient interface {
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
 	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error)
+	CreateDatabase(ctx context.Context, in *CreateDatabaseRequest, opts ...grpc.CallOption) (*CreateDatabaseResponse, error)
 }
 
 type agentClient struct {
@@ -83,6 +85,16 @@ func (c *agentClient) GetConfig(ctx context.Context, in *GetConfigRequest, opts 
 	return out, nil
 }
 
+func (c *agentClient) CreateDatabase(ctx context.Context, in *CreateDatabaseRequest, opts ...grpc.CallOption) (*CreateDatabaseResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateDatabaseResponse)
+	err := c.cc.Invoke(ctx, Agent_CreateDatabase_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServer is the server API for Agent service.
 // All implementations must embed UnimplementedAgentServer
 // for forward compatibility.
@@ -91,6 +103,7 @@ type AgentServer interface {
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
 	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
+	CreateDatabase(context.Context, *CreateDatabaseRequest) (*CreateDatabaseResponse, error)
 	mustEmbedUnimplementedAgentServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedAgentServer) Ping(context.Context, *PingRequest) (*PingRespon
 }
 func (UnimplementedAgentServer) GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
+}
+func (UnimplementedAgentServer) CreateDatabase(context.Context, *CreateDatabaseRequest) (*CreateDatabaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDatabase not implemented")
 }
 func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
 func (UnimplementedAgentServer) testEmbeddedByValue()               {}
@@ -206,6 +222,24 @@ func _Agent_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Agent_CreateDatabase_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDatabaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).CreateDatabase(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_CreateDatabase_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).CreateDatabase(ctx, req.(*CreateDatabaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Agent_ServiceDesc is the grpc.ServiceDesc for Agent service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +262,10 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetConfig",
 			Handler:    _Agent_GetConfig_Handler,
+		},
+		{
+			MethodName: "CreateDatabase",
+			Handler:    _Agent_CreateDatabase_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

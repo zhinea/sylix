@@ -397,6 +397,142 @@ func (x *GetConfigResponse) GetTimezone() string {
 	return ""
 }
 
+type CreateDatabaseRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	User          string                 `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	DbName        string                 `protobuf:"bytes,4,opt,name=db_name,json=dbName,proto3" json:"db_name,omitempty"`
+	Branch        string                 `protobuf:"bytes,5,opt,name=branch,proto3" json:"branch,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDatabaseRequest) Reset() {
+	*x = CreateDatabaseRequest{}
+	mi := &file_agent_agent_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDatabaseRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDatabaseRequest) ProtoMessage() {}
+
+func (x *CreateDatabaseRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDatabaseRequest.ProtoReflect.Descriptor instead.
+func (*CreateDatabaseRequest) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CreateDatabaseRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateDatabaseRequest) GetUser() string {
+	if x != nil {
+		return x.User
+	}
+	return ""
+}
+
+func (x *CreateDatabaseRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *CreateDatabaseRequest) GetDbName() string {
+	if x != nil {
+		return x.DbName
+	}
+	return ""
+}
+
+func (x *CreateDatabaseRequest) GetBranch() string {
+	if x != nil {
+		return x.Branch
+	}
+	return ""
+}
+
+type CreateDatabaseResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ContainerId   string                 `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
+	Port          int32                  `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
+	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDatabaseResponse) Reset() {
+	*x = CreateDatabaseResponse{}
+	mi := &file_agent_agent_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDatabaseResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDatabaseResponse) ProtoMessage() {}
+
+func (x *CreateDatabaseResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDatabaseResponse.ProtoReflect.Descriptor instead.
+func (*CreateDatabaseResponse) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CreateDatabaseResponse) GetContainerId() string {
+	if x != nil {
+		return x.ContainerId
+	}
+	return ""
+}
+
+func (x *CreateDatabaseResponse) GetPort() int32 {
+	if x != nil {
+		return x.Port
+	}
+	return 0
+}
+
+func (x *CreateDatabaseResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
 var File_agent_agent_proto protoreflect.FileDescriptor
 
 const file_agent_agent_proto_rawDesc = "" +
@@ -420,12 +556,23 @@ const file_agent_agent_proto_rawDesc = "" +
 	"\x10GetConfigRequest\"G\n" +
 	"\x11GetConfigResponse\x12\x16\n" +
 	"\x06config\x18\x01 \x01(\tR\x06config\x12\x1a\n" +
-	"\btimezone\x18\x02 \x01(\tR\btimezone2\xf8\x01\n" +
+	"\btimezone\x18\x02 \x01(\tR\btimezone\"\x8c\x01\n" +
+	"\x15CreateDatabaseRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
+	"\x04user\x18\x02 \x01(\tR\x04user\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x17\n" +
+	"\adb_name\x18\x04 \x01(\tR\x06dbName\x12\x16\n" +
+	"\x06branch\x18\x05 \x01(\tR\x06branch\"g\n" +
+	"\x16CreateDatabaseResponse\x12!\n" +
+	"\fcontainer_id\x18\x01 \x01(\tR\vcontainerId\x12\x12\n" +
+	"\x04port\x18\x02 \x01(\x05R\x04port\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status2\xc7\x02\n" +
 	"\x05Agent\x12>\n" +
 	"\tGetStatus\x12\x17.agent.GetStatusRequest\x1a\x18.agent.GetStatusResponse\x12>\n" +
 	"\tHeartbeat\x12\x17.agent.HeartbeatRequest\x1a\x18.agent.HeartbeatResponse\x12/\n" +
 	"\x04Ping\x12\x12.agent.PingRequest\x1a\x13.agent.PingResponse\x12>\n" +
-	"\tGetConfig\x12\x17.agent.GetConfigRequest\x1a\x18.agent.GetConfigResponseB4Z2github.com/zhinea/sylix/internal/infra/proto/agentb\x06proto3"
+	"\tGetConfig\x12\x17.agent.GetConfigRequest\x1a\x18.agent.GetConfigResponse\x12M\n" +
+	"\x0eCreateDatabase\x12\x1c.agent.CreateDatabaseRequest\x1a\x1d.agent.CreateDatabaseResponseB4Z2github.com/zhinea/sylix/internal/infra/proto/agentb\x06proto3"
 
 var (
 	file_agent_agent_proto_rawDescOnce sync.Once
@@ -439,28 +586,32 @@ func file_agent_agent_proto_rawDescGZIP() []byte {
 	return file_agent_agent_proto_rawDescData
 }
 
-var file_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_agent_agent_proto_goTypes = []any{
-	(*GetStatusRequest)(nil),  // 0: agent.GetStatusRequest
-	(*GetStatusResponse)(nil), // 1: agent.GetStatusResponse
-	(*HeartbeatRequest)(nil),  // 2: agent.HeartbeatRequest
-	(*HeartbeatResponse)(nil), // 3: agent.HeartbeatResponse
-	(*PingRequest)(nil),       // 4: agent.PingRequest
-	(*PingResponse)(nil),      // 5: agent.PingResponse
-	(*GetConfigRequest)(nil),  // 6: agent.GetConfigRequest
-	(*GetConfigResponse)(nil), // 7: agent.GetConfigResponse
+	(*GetStatusRequest)(nil),       // 0: agent.GetStatusRequest
+	(*GetStatusResponse)(nil),      // 1: agent.GetStatusResponse
+	(*HeartbeatRequest)(nil),       // 2: agent.HeartbeatRequest
+	(*HeartbeatResponse)(nil),      // 3: agent.HeartbeatResponse
+	(*PingRequest)(nil),            // 4: agent.PingRequest
+	(*PingResponse)(nil),           // 5: agent.PingResponse
+	(*GetConfigRequest)(nil),       // 6: agent.GetConfigRequest
+	(*GetConfigResponse)(nil),      // 7: agent.GetConfigResponse
+	(*CreateDatabaseRequest)(nil),  // 8: agent.CreateDatabaseRequest
+	(*CreateDatabaseResponse)(nil), // 9: agent.CreateDatabaseResponse
 }
 var file_agent_agent_proto_depIdxs = []int32{
 	0, // 0: agent.Agent.GetStatus:input_type -> agent.GetStatusRequest
 	2, // 1: agent.Agent.Heartbeat:input_type -> agent.HeartbeatRequest
 	4, // 2: agent.Agent.Ping:input_type -> agent.PingRequest
 	6, // 3: agent.Agent.GetConfig:input_type -> agent.GetConfigRequest
-	1, // 4: agent.Agent.GetStatus:output_type -> agent.GetStatusResponse
-	3, // 5: agent.Agent.Heartbeat:output_type -> agent.HeartbeatResponse
-	5, // 6: agent.Agent.Ping:output_type -> agent.PingResponse
-	7, // 7: agent.Agent.GetConfig:output_type -> agent.GetConfigResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+	8, // 4: agent.Agent.CreateDatabase:input_type -> agent.CreateDatabaseRequest
+	1, // 5: agent.Agent.GetStatus:output_type -> agent.GetStatusResponse
+	3, // 6: agent.Agent.Heartbeat:output_type -> agent.HeartbeatResponse
+	5, // 7: agent.Agent.Ping:output_type -> agent.PingResponse
+	7, // 8: agent.Agent.GetConfig:output_type -> agent.GetConfigResponse
+	9, // 9: agent.Agent.CreateDatabase:output_type -> agent.CreateDatabaseResponse
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -477,7 +628,7 @@ func file_agent_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_agent_proto_rawDesc), len(file_agent_agent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

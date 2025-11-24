@@ -128,10 +128,15 @@ func (s *BackupStorageService) protoToEntity(pb *pbControlPlane.BackupStorage) *
 		AccessKey: pb.AccessKey,
 		SecretKey: pb.SecretKey,
 		Status:    pb.Status,
+		ServerIDs: pb.ServerIds,
 	}
 }
 
 func (s *BackupStorageService) entityToProto(e *entity.BackupStorage) *pbControlPlane.BackupStorage {
+	var serverIds []string
+	for _, server := range e.Servers {
+		serverIds = append(serverIds, server.Id)
+	}
 	return &pbControlPlane.BackupStorage{
 		Id:           e.Id,
 		Name:         e.Name,
@@ -142,5 +147,6 @@ func (s *BackupStorageService) entityToProto(e *entity.BackupStorage) *pbControl
 		SecretKey:    e.SecretKey,
 		Status:       e.Status,
 		ErrorMessage: e.ErrorMessage,
+		ServerIds:    serverIds,
 	}
 }

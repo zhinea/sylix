@@ -44,6 +44,7 @@ message BackupStorage {
     string secret_key = 7;
     string status = 8; // CONNECTED, ERROR
     string error_message = 9;
+    repeated string server_ids = 10;
 }
 
 message BackupStorageResponse {

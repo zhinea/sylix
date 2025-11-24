@@ -56,6 +56,11 @@ const data = {
       icon: Database,
     },
     {
+      title: "Databases",
+      url: "/databases",
+      icon: Database,
+    },
+    {
       title: "Incidents",
       url: "/accidents",
       icon: LifeBuoy,
