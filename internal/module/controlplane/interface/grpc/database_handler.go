@@ -31,12 +31,13 @@ func (h *DatabaseHandler) Create(ctx context.Context, req *pb.Database) (*pb.Dat
 	)
 
 	db := &entity.Database{
-		Name:     req.Name,
-		User:     req.User,
-		Password: req.Password,
-		DbName:   req.DbName,
-		Branch:   req.Branch,
-		ServerID: req.ServerId,
+		Name:      req.Name,
+		User:      req.User,
+		Password:  req.Password,
+		DbName:    req.DbName,
+		Branch:    req.Branch,
+		ServerID:  req.ServerId,
+		PgVersion: int(req.PgVersion),
 	}
 
 	createdDb, err := h.service.Create(ctx, db)
@@ -101,5 +102,8 @@ func (h *DatabaseHandler) toProto(db *entity.Database) *pb.Database {
 		Status:      db.Status,
 		ContainerId: db.ContainerID,
 		Port:        int32(db.Port),
+		TenantId:    db.TenantID,
+		TimelineId:  db.TimelineID,
+		PgVersion:   int32(db.PgVersion),
 	}
 }

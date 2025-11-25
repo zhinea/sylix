@@ -14,6 +14,9 @@ type Database struct {
 	Status      string  `json:"status"` // e.g., CREATING, RUNNING, STOPPED, ERROR
 	ContainerID string  `json:"container_id"`
 	Port        int     `json:"port"`
+	TenantID    string  `json:"tenant_id"`
+	TimelineID  string  `json:"timeline_id"`
+	PgVersion   int     `json:"pg_version"`
 }
 
 const (

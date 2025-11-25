@@ -2,11 +2,12 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
 	"github.com/zhinea/sylix/internal/common/logger"
 	pbAgent "github.com/zhinea/sylix/internal/infra/proto/agent"
@@ -18,13 +19,15 @@ type AgentUseCase struct {
 	startTime     time.Time
 	configPath    string
 	dockerService *services.DockerService
+	neonService   *services.NeonService
 }
 
-func NewAgentUseCase(configPath string, dockerService *services.DockerService) *AgentUseCase {
+func NewAgentUseCase(configPath string, dockerService *services.DockerService, neonService *services.NeonService) *AgentUseCase {
 	return &AgentUseCase{
 		startTime:     time.Now(),
 		configPath:    configPath,
 		dockerService: dockerService,
+		neonService:   neonService,
 	}
 }
 
@@ -35,7 +38,38 @@ func (uc *AgentUseCase) CreateDatabase(ctx context.Context, req *pbAgent.CreateD
 		zap.String("branch", req.Branch),
 	)
 
-	imageName := "postgres:16"
+	// Ensure Neon Infrastructure is running
+	if err := uc.neonService.EnsureInfrastructure(ctx); err != nil {
+		logger.Log.Error("Failed to ensure neon infrastructure", zap.Error(err))
+		return nil, err
+	}
+
+	// Create Tenant
+	tenantID, err := uc.neonService.CreateTenant(ctx)
+	if err != nil {
+		logger.Log.Error("Failed to create tenant", zap.Error(err))
+		return nil, err
+	}
+	logger.Log.Info("Created Neon Tenant", zap.String("tenant_id", tenantID))
+
+	// Create Timeline
+	branch := req.Branch
+	if branch == "" {
+		branch = "main"
+	}
+	timelineID, err := uc.neonService.CreateTimeline(ctx, tenantID, branch, "")
+	if err != nil {
+		logger.Log.Error("Failed to create timeline", zap.Error(err))
+		return nil, err
+	}
+	logger.Log.Info("Created Neon Timeline", zap.String("timeline_id", timelineID))
+
+	pgVersion := req.PgVersion
+	if pgVersion == 0 {
+		pgVersion = 16
+	}
+	imageName := fmt.Sprintf("ghcr.io/neondatabase/compute-node-v%d:latest", pgVersion)
+
 	logger.Log.Debug("Pulling image", zap.String("image", imageName))
 	if err := uc.dockerService.PullImage(ctx, imageName); err != nil {
 		logger.Log.Error("Failed to pull image", zap.Error(err), zap.String("image", imageName))
@@ -46,6 +80,17 @@ func (uc *AgentUseCase) CreateDatabase(ctx context.Context, req *pbAgent.CreateD
 		"POSTGRES_USER=" + req.User,
 		"POSTGRES_PASSWORD=" + req.Password,
 		"POSTGRES_DB=" + req.DbName,
+	}
+
+	// Construct Postgres command with Neon extensions configuration
+	cmd := []string{
+		"postgres",
+		"-c", "config_file=/var/db/postgres/postgresql.conf",
+		"-c", "neon.pageserver_connstring=postgresql://no_user@pageserver:6400",
+		"-c", fmt.Sprintf("neon.tenant_id=%s", tenantID),
+		"-c", fmt.Sprintf("neon.timeline_id=%s", timelineID),
+		"-c", "neon.safekeeper_connstring=postgresql://no_user@safekeeper1:5454",
+		"-h", "0.0.0.0",
 	}
 
 	port := "5432/tcp"
@@ -63,9 +108,16 @@ func (uc *AgentUseCase) CreateDatabase(ctx context.Context, req *pbAgent.CreateD
 		},
 	}
 
+	networkingConfig := &network.NetworkingConfig{
+		EndpointsConfig: map[string]*network.EndpointSettings{
+			"sylix-neon": {},
+		},
+	}
+
 	config := &container.Config{
 		Image: imageName,
 		Env:   env,
+		Cmd:   cmd,
 		ExposedPorts: nat.PortSet{
 			nat.Port(port): struct{}{},
 		},
@@ -74,33 +126,18 @@ func (uc *AgentUseCase) CreateDatabase(ctx context.Context, req *pbAgent.CreateD
 	containerName := "sylix-db-" + req.Name + "-" + req.Branch
 	logger.Log.Debug("Creating container", zap.String("container_name", containerName))
 
-	containerID, err := uc.dockerService.CreateAndStartContainer(ctx, config, hostConfig, containerName)
+	containerID, err := uc.dockerService.CreateAndStartContainer(ctx, config, hostConfig, networkingConfig, containerName)
 	if err != nil {
 		logger.Log.Error("Failed to create/start container", zap.Error(err), zap.String("container_name", containerName))
 		return nil, err
 	}
 
-	hostPort, err := uc.dockerService.GetContainerPort(ctx, containerID, port)
-	if err != nil {
-		logger.Log.Error("Failed to get container port", zap.Error(err), zap.String("container_id", containerID))
-		return nil, err
-	}
-
-	p, err := strconv.Atoi(hostPort)
-	if err != nil {
-		logger.Log.Error("Failed to parse port", zap.Error(err), zap.String("port_str", hostPort))
-		return nil, err
-	}
-
-	logger.Log.Info("Database container started successfully",
-		zap.String("container_id", containerID),
-		zap.Int("port", p),
-	)
-
 	return &pbAgent.CreateDatabaseResponse{
 		ContainerId: containerID,
-		Port:        int32(p),
+		Port:        5432, // TODO: Get actual mapped port
 		Status:      "RUNNING",
+		TenantId:    tenantID,
+		TimelineId:  timelineID,
 	}, nil
 }
 

@@ -7,6 +7,7 @@ export const databaseFormSchema = z.object({
   dbName: z.string().min(1, "Database Name is required"),
   branch: z.string().optional(), // or default to "main"
   serverId: z.string().min(1, "Server is required"),
+  pgVersion: z.string().default("16"),
 });
 
 export type DatabaseFormValues = z.infer<typeof databaseFormSchema>;

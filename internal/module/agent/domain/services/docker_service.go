@@ -8,6 +8,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/zhinea/sylix/internal/common/logger"
@@ -38,7 +39,7 @@ func (s *DockerService) PullImage(ctx context.Context, imageName string) error {
 	return nil
 }
 
-func (s *DockerService) CreateAndStartContainer(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, containerName string) (string, error) {
+func (s *DockerService) CreateAndStartContainer(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, containerName string) (string, error) {
 	// Check if container exists
 	_, err := s.cli.ContainerInspect(ctx, containerName)
 	if err == nil {
@@ -48,7 +49,7 @@ func (s *DockerService) CreateAndStartContainer(ctx context.Context, config *con
 		logger.Log.Warn("DockerService: Container already exists", zap.String("container_name", containerName))
 	}
 
-	resp, err := s.cli.ContainerCreate(ctx, config, hostConfig, nil, nil, containerName)
+	resp, err := s.cli.ContainerCreate(ctx, config, hostConfig, networkingConfig, nil, containerName)
 	if err != nil {
 		logger.Log.Error("DockerService: Failed to create container", zap.Error(err), zap.String("container_name", containerName))
 		return "", err

@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  minio:
+    restart: always
+    image: quay.io/minio/minio:RELEASE.2022-10-20T00-55-09Z
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=password
+    command: server /data --address :9000 --console-address ":9001"
+    networks:
+      - neon-network
+
+  minio_create_buckets:
+    image: minio/mc
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=password
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+    command:
+      - "until (/usr/bin/mc alias set minio http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD) do echo 'Waiting to start minio...' && sleep 1; done; /usr/bin/mc mb minio/neon --region=eu-north-1; exit 0;"
+    depends_on:
+      - minio
+    networks:
+      - neon-network
+
+  storage_broker:
+    restart: always
+    image: ghcr.io/neondatabase/neon:latest
+    ports:
+      - 50051:50051
+    command:
+      - "storage_broker"
+      - "--listen-addr=0.0.0.0:50051"
+    networks:
+      - neon-network
+
+  pageserver:
+    restart: always
+    image: ghcr.io/neondatabase/neon:latest
+    environment:
+      - AWS_ACCESS_KEY_ID=minio
+      - AWS_SECRET_ACCESS_KEY=password
+    ports:
+      - 9898:9898 # http endpoints
+      - 6400:6400 # pg protocol handler
+    command:
+      - "pageserver"
+      - "-D"
+      - "/data"
+      - "-c"
+      - "broker_endpoint='http://storage_broker:50051'"
+      - "-c"
+      - "listen_pg_addr='0.0.0.0:6400'"
+      - "-c"
+      - "listen_http_addr='0.0.0.0:9898'"
+      - "-c"
+      - "remote_storage={endpoint='http://minio:9000', bucket_name='neon', bucket_region='eu-north-1', prefix_in_bucket='/pageserver/'}"
+    depends_on:
+      - storage_broker
+      - minio_create_buckets
+    networks:
+      - neon-network
+
+  safekeeper1:
+    restart: always
+    image: ghcr.io/neondatabase/neon:latest
+    environment:
+      - SAFEKEEPER_ADVERTISE_URL=safekeeper1:5454
+      - SAFEKEEPER_ID=1
+      - BROKER_ENDPOINT=http://storage_broker:50051
+      - AWS_ACCESS_KEY_ID=minio
+      - AWS_SECRET_ACCESS_KEY=password
+    ports:
+      - 7676:7676 # http endpoints
+      - 5454:5454 # pg protocol handler
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+    command:
+      - "safekeeper --listen-pg=0.0.0.0:5454 --listen-http=0.0.0.0:7676 --id=$$SAFEKEEPER_ID --broker-endpoint=$$BROKER_ENDPOINT -D /data --remote-storage=\"{endpoint='http://minio:9000', bucket_name='neon', bucket_region='eu-north-1', prefix_in_bucket='/safekeeper/'}\""
+    depends_on:
+      - storage_broker
+      - minio_create_buckets
+    networks:
+      - neon-network
+
+networks:
+  neon-network:
+    name: sylix-neon
+    driver: bridge

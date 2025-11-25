@@ -47,6 +47,7 @@ export function DatabaseFormDialog({ servers }: DatabaseFormDialogProps) {
       dbName: "",
       branch: "main",
       serverId: "",
+      pgVersion: "16",
     },
   });
 
@@ -174,6 +175,30 @@ export function DatabaseFormDialog({ servers }: DatabaseFormDialogProps) {
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="pgVersion"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Postgres Version</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select version" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="14">Postgres 14</SelectItem>
+                      <SelectItem value="15">Postgres 15</SelectItem>
+                      <SelectItem value="16">Postgres 16</SelectItem>
+                      <SelectItem value="17">Postgres 17</SelectItem>
+                      <SelectItem value="18">Postgres 18</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter>
               <Button type="submit" disabled={fetcher.state !== "idle"}>
                 {fetcher.state !== "idle" ? "Creating..." : "Create"}

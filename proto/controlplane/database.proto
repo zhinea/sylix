@@ -28,6 +28,9 @@ message Database {
     string status = 8;
     string container_id = 9;
     int32 port = 10;
+    string tenant_id = 11;
+    string timeline_id = 12;
+    int32 pg_version = 13;
 }
 
 message DatabaseResponse {

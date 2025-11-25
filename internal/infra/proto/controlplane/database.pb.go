@@ -78,6 +78,9 @@ type Database struct {
 	Status        string                 `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
 	ContainerId   string                 `protobuf:"bytes,9,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	Port          int32                  `protobuf:"varint,10,opt,name=port,proto3" json:"port,omitempty"`
+	TenantId      string                 `protobuf:"bytes,11,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	TimelineId    string                 `protobuf:"bytes,12,opt,name=timeline_id,json=timelineId,proto3" json:"timeline_id,omitempty"`
+	PgVersion     int32                  `protobuf:"varint,13,opt,name=pg_version,json=pgVersion,proto3" json:"pg_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -178,6 +181,27 @@ func (x *Database) GetContainerId() string {
 func (x *Database) GetPort() int32 {
 	if x != nil {
 		return x.Port
+	}
+	return 0
+}
+
+func (x *Database) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+func (x *Database) GetTimelineId() string {
+	if x != nil {
+		return x.TimelineId
+	}
+	return ""
+}
+
+func (x *Database) GetPgVersion() int32 {
+	if x != nil {
+		return x.PgVersion
 	}
 	return 0
 }
@@ -329,7 +353,7 @@ const file_controlplane_database_proto_rawDesc = "" +
 	"\x1bcontrolplane/database.proto\x12\fcontrolplane\x1a\x13common/common.proto\"\x1c\n" +
 	"\n" +
 	"DatabaseId\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xfb\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xd8\x02\n" +
 	"\bDatabase\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -341,7 +365,12 @@ const file_controlplane_database_proto_rawDesc = "" +
 	"\x06status\x18\b \x01(\tR\x06status\x12!\n" +
 	"\fcontainer_id\x18\t \x01(\tR\vcontainerId\x12\x12\n" +
 	"\x04port\x18\n" +
-	" \x01(\x05R\x04port\"F\n" +
+	" \x01(\x05R\x04port\x12\x1b\n" +
+	"\ttenant_id\x18\v \x01(\tR\btenantId\x12\x1f\n" +
+	"\vtimeline_id\x18\f \x01(\tR\n" +
+	"timelineId\x12\x1d\n" +
+	"\n" +
+	"pg_version\x18\r \x01(\x05R\tpgVersion\"F\n" +
 	"\x10DatabaseResponse\x122\n" +
 	"\bdatabase\x18\x01 \x01(\v2\x16.controlplane.DatabaseR\bdatabase\"I\n" +
 	"\x11DatabasesResponse\x124\n" +

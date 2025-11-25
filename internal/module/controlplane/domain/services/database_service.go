@@ -58,11 +58,12 @@ func (s *DatabaseService) Create(ctx context.Context, db *entity.Database) (*ent
 
 	// 3. Call Agent
 	req := &pbAgent.CreateDatabaseRequest{
-		Name:     db.Name,
-		User:     db.User,
-		Password: db.Password,
-		DbName:   db.DbName,
-		Branch:   db.Branch,
+		Name:      db.Name,
+		User:      db.User,
+		Password:  db.Password,
+		DbName:    db.DbName,
+		Branch:    db.Branch,
+		PgVersion: int32(db.PgVersion),
 	}
 
 	logger.Log.Info("Delegating to agent for container creation", zap.String("server_ip", server.IpAddress))
@@ -81,6 +82,8 @@ func (s *DatabaseService) Create(ctx context.Context, db *entity.Database) (*ent
 	createdDb.Status = entity.DatabaseStatusRunning
 	createdDb.ContainerID = resp.ContainerId
 	createdDb.Port = int(resp.Port)
+	createdDb.TenantID = resp.TenantId
+	createdDb.TimelineID = resp.TimelineId
 
 	updatedDb, err := s.repo.Update(ctx, createdDb)
 	if err != nil {

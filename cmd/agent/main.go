@@ -58,7 +58,12 @@ func main() {
 		logger.Log.Fatal("Failed to create Docker service", zap.Error(err))
 	}
 
-	agentUseCase := app.NewAgentUseCase(*configPath, dockerService)
+	// Initialize Neon Service
+	// Assuming running from project root for dev
+	neonComposeFile := "internal/module/agent/neon/docker-compose.yml"
+	neonService := services.NewNeonService(neonComposeFile)
+
+	agentUseCase := app.NewAgentUseCase(*configPath, dockerService, neonService)
 	agentHandler := grpcServices.NewAgentHandler(agentUseCase)
 	agentPb.RegisterAgentServer(grpcServer, agentHandler)
 

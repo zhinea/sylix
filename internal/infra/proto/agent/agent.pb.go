@@ -404,6 +404,7 @@ type CreateDatabaseRequest struct {
 	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	DbName        string                 `protobuf:"bytes,4,opt,name=db_name,json=dbName,proto3" json:"db_name,omitempty"`
 	Branch        string                 `protobuf:"bytes,5,opt,name=branch,proto3" json:"branch,omitempty"`
+	PgVersion     int32                  `protobuf:"varint,6,opt,name=pg_version,json=pgVersion,proto3" json:"pg_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -473,11 +474,20 @@ func (x *CreateDatabaseRequest) GetBranch() string {
 	return ""
 }
 
+func (x *CreateDatabaseRequest) GetPgVersion() int32 {
+	if x != nil {
+		return x.PgVersion
+	}
+	return 0
+}
+
 type CreateDatabaseResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ContainerId   string                 `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	Port          int32                  `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
 	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	TenantId      string                 `protobuf:"bytes,4,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	TimelineId    string                 `protobuf:"bytes,5,opt,name=timeline_id,json=timelineId,proto3" json:"timeline_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -533,6 +543,20 @@ func (x *CreateDatabaseResponse) GetStatus() string {
 	return ""
 }
 
+func (x *CreateDatabaseResponse) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+func (x *CreateDatabaseResponse) GetTimelineId() string {
+	if x != nil {
+		return x.TimelineId
+	}
+	return ""
+}
+
 var File_agent_agent_proto protoreflect.FileDescriptor
 
 const file_agent_agent_proto_rawDesc = "" +
@@ -556,17 +580,22 @@ const file_agent_agent_proto_rawDesc = "" +
 	"\x10GetConfigRequest\"G\n" +
 	"\x11GetConfigResponse\x12\x16\n" +
 	"\x06config\x18\x01 \x01(\tR\x06config\x12\x1a\n" +
-	"\btimezone\x18\x02 \x01(\tR\btimezone\"\x8c\x01\n" +
+	"\btimezone\x18\x02 \x01(\tR\btimezone\"\xab\x01\n" +
 	"\x15CreateDatabaseRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
 	"\x04user\x18\x02 \x01(\tR\x04user\x12\x1a\n" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x17\n" +
 	"\adb_name\x18\x04 \x01(\tR\x06dbName\x12\x16\n" +
-	"\x06branch\x18\x05 \x01(\tR\x06branch\"g\n" +
+	"\x06branch\x18\x05 \x01(\tR\x06branch\x12\x1d\n" +
+	"\n" +
+	"pg_version\x18\x06 \x01(\x05R\tpgVersion\"\xa5\x01\n" +
 	"\x16CreateDatabaseResponse\x12!\n" +
 	"\fcontainer_id\x18\x01 \x01(\tR\vcontainerId\x12\x12\n" +
 	"\x04port\x18\x02 \x01(\x05R\x04port\x12\x16\n" +
-	"\x06status\x18\x03 \x01(\tR\x06status2\xc7\x02\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x12\x1b\n" +
+	"\ttenant_id\x18\x04 \x01(\tR\btenantId\x12\x1f\n" +
+	"\vtimeline_id\x18\x05 \x01(\tR\n" +
+	"timelineId2\xc7\x02\n" +
 	"\x05Agent\x12>\n" +
 	"\tGetStatus\x12\x17.agent.GetStatusRequest\x1a\x18.agent.GetStatusResponse\x12>\n" +
 	"\tHeartbeat\x12\x17.agent.HeartbeatRequest\x1a\x18.agent.HeartbeatResponse\x12/\n" +

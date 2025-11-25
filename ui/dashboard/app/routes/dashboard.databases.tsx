@@ -46,6 +46,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
         dbName: result.data.dbName,
         branch: result.data.branch,
         serverId: result.data.serverId,
+        pgVersion: parseInt(result.data.pgVersion),
         // These are set by backend/agent
         id: "",
         status: "",

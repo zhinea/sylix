@@ -63,3 +63,17 @@ Sylix Engine is a database management backend (Postgres focus) with a `controlpl
 ## ⚠️ Gotchas
 - **gRPC-Web**: The backend manually wraps the gRPC server using `improbable-eng/grpc-web`. The frontend uses a custom binary frame parser/builder.
 - **Migrations**: `database.AutoMigrate` runs on startup in `cmd/main.go`.
+
+
+## Flow
+`interface -> app -> (optional: domain/services) -> domain/repository -> entity`
+
+All business logic is stored in the domain/services, such as installing agents, querying databases, calculating something, etc.
+
+- interface: for connecting the “app” with grpc
+- app: as a connector between the interface and services, where services are responsible for business logic.
+- domain/services:  main business logic app, but not all of it is placed in services. The ideal portion is between the app and services.
+- domain/repository: for database query implementation
+
+## Context
+Okay, as context, I want to create a Postgres management database, where there is a main (control plane) and node (agent) which by default already enable backup storage, PITR, WAL, branching, easy Postgres version changes, and other production-grade Postgres configurations.

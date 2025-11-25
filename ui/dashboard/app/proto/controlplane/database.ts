@@ -25,6 +25,9 @@ export interface Database {
   status: string;
   containerId: string;
   port: number;
+  tenantId: string;
+  timelineId: string;
+  pgVersion: number;
 }
 
 export interface DatabaseResponse {
@@ -110,6 +113,9 @@ function createBaseDatabase(): Database {
     status: "",
     containerId: "",
     port: 0,
+    tenantId: "",
+    timelineId: "",
+    pgVersion: 0,
   };
 }
 
@@ -144,6 +150,15 @@ export const Database: MessageFns<Database> = {
     }
     if (message.port !== 0) {
       writer.uint32(80).int32(message.port);
+    }
+    if (message.tenantId !== "") {
+      writer.uint32(90).string(message.tenantId);
+    }
+    if (message.timelineId !== "") {
+      writer.uint32(98).string(message.timelineId);
+    }
+    if (message.pgVersion !== 0) {
+      writer.uint32(104).int32(message.pgVersion);
     }
     return writer;
   },
@@ -235,6 +250,30 @@ export const Database: MessageFns<Database> = {
           message.port = reader.int32();
           continue;
         }
+        case 11: {
+          if (tag !== 90) {
+            break;
+          }
+
+          message.tenantId = reader.string();
+          continue;
+        }
+        case 12: {
+          if (tag !== 98) {
+            break;
+          }
+
+          message.timelineId = reader.string();
+          continue;
+        }
+        case 13: {
+          if (tag !== 104) {
+            break;
+          }
+
+          message.pgVersion = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -256,6 +295,9 @@ export const Database: MessageFns<Database> = {
       status: isSet(object.status) ? globalThis.String(object.status) : "",
       containerId: isSet(object.containerId) ? globalThis.String(object.containerId) : "",
       port: isSet(object.port) ? globalThis.Number(object.port) : 0,
+      tenantId: isSet(object.tenantId) ? globalThis.String(object.tenantId) : "",
+      timelineId: isSet(object.timelineId) ? globalThis.String(object.timelineId) : "",
+      pgVersion: isSet(object.pgVersion) ? globalThis.Number(object.pgVersion) : 0,
     };
   },
 
@@ -291,6 +333,15 @@ export const Database: MessageFns<Database> = {
     if (message.port !== 0) {
       obj.port = Math.round(message.port);
     }
+    if (message.tenantId !== "") {
+      obj.tenantId = message.tenantId;
+    }
+    if (message.timelineId !== "") {
+      obj.timelineId = message.timelineId;
+    }
+    if (message.pgVersion !== 0) {
+      obj.pgVersion = Math.round(message.pgVersion);
+    }
     return obj;
   },
 
@@ -309,6 +360,9 @@ export const Database: MessageFns<Database> = {
     message.status = object.status ?? "";
     message.containerId = object.containerId ?? "";
     message.port = object.port ?? 0;
+    message.tenantId = object.tenantId ?? "";
+    message.timelineId = object.timelineId ?? "";
+    message.pgVersion = object.pgVersion ?? 0;
     return message;
   },
 };
