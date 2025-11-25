@@ -9,11 +9,15 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 
+	"github.com/zhinea/sylix/internal/common"
 	"github.com/zhinea/sylix/internal/common/logger"
 	"go.uber.org/zap"
 )
+
+const DefaultComposeURLTemplate = "https://raw.githubusercontent.com/zhinea/sylix/%s/internal/module/agent/neon/docker-compose.yml"
 
 type NeonService struct {
 	composeFile string
@@ -32,7 +36,10 @@ func (s *NeonService) EnsureInfrastructure(ctx context.Context) error {
 
 	// Check if compose file exists
 	if _, err := os.Stat(s.composeFile); os.IsNotExist(err) {
-		return fmt.Errorf("docker-compose file not found at %s", s.composeFile)
+		logger.Log.Info("docker-compose file not found locally, attempting to download from GitHub", zap.String("path", s.composeFile))
+		if err := s.downloadComposeFile(ctx); err != nil {
+			return fmt.Errorf("docker-compose file not found at %s and failed to download: %w", s.composeFile, err)
+		}
 	}
 
 	cmd := exec.CommandContext(ctx, "docker", "compose", "-f", s.composeFile, "up", "-d")
@@ -44,6 +51,47 @@ func (s *NeonService) EnsureInfrastructure(ctx context.Context) error {
 
 	logger.Log.Info("Neon infrastructure started successfully")
 	return nil
+}
+
+func (s *NeonService) downloadComposeFile(ctx context.Context) error {
+	version := common.Version
+	branchOrTag := "main"
+	if version != "0.0.0-dev" {
+		branchOrTag = "v" + version
+	}
+
+	url := fmt.Sprintf(DefaultComposeURLTemplate, branchOrTag)
+	logger.Log.Info("Downloading docker-compose file", zap.String("url", url))
+
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to download file: status %d", resp.StatusCode)
+	}
+
+	// Ensure directory exists
+	dir := filepath.Dir(s.composeFile)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", dir, err)
+	}
+
+	out, err := os.Create(s.composeFile)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, resp.Body)
+	return err
 }
 
 type CreateTenantResponse struct {
