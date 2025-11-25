@@ -17,7 +17,10 @@ import (
 	"go.uber.org/zap"
 )
 
-const DefaultComposeURLTemplate = "https://raw.githubusercontent.com/zhinea/sylix/%s/internal/module/agent/neon/docker-compose.yml"
+const (
+	DevComposeURL             = "https://raw.githubusercontent.com/zhinea/sylix/main/internal/module/agent/neon/docker-compose.yml"
+	ReleaseComposeURLTemplate = "https://github.com/zhinea/sylix/releases/download/v%s/docker-compose.yml"
+)
 
 type NeonService struct {
 	composeFile string
@@ -55,12 +58,14 @@ func (s *NeonService) EnsureInfrastructure(ctx context.Context) error {
 
 func (s *NeonService) downloadComposeFile(ctx context.Context) error {
 	version := common.Version
-	branchOrTag := "main"
-	if version != "0.0.0-dev" {
-		branchOrTag = "v" + version
+	var url string
+
+	if version == "0.0.0-dev" {
+		url = DevComposeURL
+	} else {
+		url = fmt.Sprintf(ReleaseComposeURLTemplate, version)
 	}
 
-	url := fmt.Sprintf(DefaultComposeURLTemplate, branchOrTag)
 	logger.Log.Info("Downloading docker-compose file", zap.String("url", url))
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
