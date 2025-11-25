@@ -43,6 +43,7 @@ func (uc *AgentUseCase) CreateDatabase(ctx context.Context, req *pbAgent.CreateD
 		logger.Log.Error("Failed to ensure neon infrastructure", zap.Error(err))
 		return nil, err
 	}
+	logger.Log.Info("Neon infrastructure is ready")
 
 	// Create Tenant
 	tenantID, err := uc.neonService.CreateTenant(ctx)
@@ -68,6 +69,7 @@ func (uc *AgentUseCase) CreateDatabase(ctx context.Context, req *pbAgent.CreateD
 	if pgVersion == 0 {
 		pgVersion = 16
 	}
+	logger.Log.Info("Using Postgres version", zap.Int32("version", pgVersion))
 	imageName := fmt.Sprintf("ghcr.io/neondatabase/compute-node-v%d:latest", pgVersion)
 
 	logger.Log.Debug("Pulling image", zap.String("image", imageName))

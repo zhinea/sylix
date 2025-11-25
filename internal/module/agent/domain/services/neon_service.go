@@ -114,6 +114,7 @@ type tenantResponse struct {
 }
 
 func (s *NeonService) CreateTenant(ctx context.Context) (string, error) {
+	logger.Log.Info("Creating Neon Tenant")
 	url := "http://localhost:9898/v1/tenant"
 	req, err := http.NewRequestWithContext(ctx, "POST", url, nil)
 	if err != nil {
@@ -123,12 +124,14 @@ func (s *NeonService) CreateTenant(ctx context.Context) (string, error) {
 
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
+		logger.Log.Error("Failed to execute CreateTenant request", zap.Error(err))
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
+		logger.Log.Error("CreateTenant returned error status", zap.Int("status", resp.StatusCode), zap.String("body", string(body)))
 		return "", fmt.Errorf("failed to create tenant: status %d, body: %s", resp.StatusCode, string(body))
 	}
 
@@ -169,6 +172,7 @@ type timelineResponse struct {
 }
 
 func (s *NeonService) CreateTimeline(ctx context.Context, tenantID string, branchName string, parentTimelineID string) (string, error) {
+	logger.Log.Info("Creating Neon Timeline", zap.String("tenant_id", tenantID), zap.String("branch", branchName))
 	url := fmt.Sprintf("http://localhost:9898/v1/tenant/%s/timeline", tenantID)
 
 	payload := map[string]interface{}{
@@ -195,12 +199,14 @@ func (s *NeonService) CreateTimeline(ctx context.Context, tenantID string, branc
 
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
+		logger.Log.Error("Failed to execute CreateTimeline request", zap.Error(err))
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
+		logger.Log.Error("CreateTimeline returned error status", zap.Int("status", resp.StatusCode), zap.String("body", string(body)))
 		return "", fmt.Errorf("failed to create timeline: status %d, body: %s", resp.StatusCode, string(body))
 	}
 
