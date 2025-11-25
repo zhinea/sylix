@@ -37,14 +37,14 @@ func NewNeonService(composeFile string) *NeonService {
 func (s *NeonService) EnsureInfrastructure(ctx context.Context) error {
 	logger.Log.Info("Ensuring Neon infrastructure is running...")
 
-	// Always attempt to download/update the compose file
-	logger.Log.Info("Downloading/Updating docker-compose file from GitHub", zap.String("path", s.composeFile))
-	if err := s.downloadComposeFile(ctx); err != nil {
-		// If download fails, check if we have a local copy to fall back on
-		if _, statErr := os.Stat(s.composeFile); os.IsNotExist(statErr) {
+	// Check if file exists locally first
+	if _, err := os.Stat(s.composeFile); err == nil {
+		logger.Log.Info("Using local docker-compose file", zap.String("path", s.composeFile))
+	} else {
+		logger.Log.Info("Downloading/Updating docker-compose file from GitHub", zap.String("path", s.composeFile))
+		if err := s.downloadComposeFile(ctx); err != nil {
 			return fmt.Errorf("docker-compose file not found at %s and failed to download: %w", s.composeFile, err)
 		}
-		logger.Log.Warn("Failed to download docker-compose file, using local copy", zap.Error(err))
 	}
 
 	cmd := exec.CommandContext(ctx, "docker", "compose", "-f", s.composeFile, "up", "-d")

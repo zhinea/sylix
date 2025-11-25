@@ -49,18 +49,16 @@ services:
     ports:
       - 9898:9898 # http endpoints
       - 6400:6400 # pg protocol handler
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
     command:
-      - "pageserver"
-      - "-D"
-      - "/data"
-      - "-c"
-      - "broker_endpoint='http://storage_broker:50051'"
-      - "-c"
-      - "listen_pg_addr='0.0.0.0:6400'"
-      - "-c"
-      - "listen_http_addr='0.0.0.0:9898'"
-      - "-c"
-      - "remote_storage={endpoint='http://minio:9000', bucket_name='neon', bucket_region='eu-north-1', prefix_in_bucket='/pageserver/'}"
+      - |
+        echo "broker_endpoint = 'http://storage_broker:50051'" > /data/pageserver.toml
+        echo "listen_pg_addr = '0.0.0.0:6400'" >> /data/pageserver.toml
+        echo "listen_http_addr = '0.0.0.0:9898'" >> /data/pageserver.toml
+        echo "remote_storage = {endpoint='http://minio:9000', bucket_name='neon', bucket_region='eu-north-1', prefix_in_bucket='/pageserver/'}" >> /data/pageserver.toml
+        pageserver -D /data
     depends_on:
       - storage_broker
       - minio_create_buckets
