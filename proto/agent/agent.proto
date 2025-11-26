@@ -4,11 +4,19 @@ package agent;
 
 option go_package = "github.com/zhinea/sylix/internal/infra/proto/agent";
 
+import "common/common.proto";
+
 service Agent {
     rpc GetStatus (GetStatusRequest) returns (GetStatusResponse);
     rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
     rpc Ping (PingRequest) returns (PingResponse);
     rpc GetConfig (GetConfigRequest) returns (GetConfigResponse);
+    
+    // Docker Compose Management
+    rpc DeployCompose(DeployComposeRequest) returns (common.MessageResponse);
+    rpc StopCompose(StopComposeRequest) returns (common.MessageResponse);
+    rpc GetComposeStatus(GetComposeStatusRequest) returns (GetComposeStatusResponse);
+    rpc GetComposeLogs(GetComposeLogsRequest) returns (stream GetComposeLogsResponse);
 }
 
 message GetStatusRequest {}
@@ -42,4 +50,32 @@ message GetConfigRequest {}
 message GetConfigResponse {
     string config = 1;
     string timezone = 2;
+}
+
+message DeployComposeRequest {
+    string project_name = 1;
+    string compose_content = 2;
+}
+
+message StopComposeRequest {
+    string project_name = 1;
+}
+
+message GetComposeStatusRequest {
+    string project_name = 1;
+}
+
+message GetComposeStatusResponse {
+    bool running = 1;
+    repeated string services = 2;
+}
+
+message GetComposeLogsRequest {
+    string project_name = 1;
+    bool follow = 2;
+    int32 tail = 3;
+}
+
+message GetComposeLogsResponse {
+    string log_line = 1;
 }

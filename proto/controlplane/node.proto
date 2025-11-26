@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package controlplane;
+
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/controlplane";
+
+import "common/validation.proto";
+import "common/common.proto";
+
+service NodeService {
+    rpc CreateNodeGraph(CreateNodeGraphRequest) returns (NodeGraphResponse);
+    rpc GetNodeGraph(GetNodeGraphRequest) returns (NodeGraphResponse);
+    rpc UpdateNodeGraph(UpdateNodeGraphRequest) returns (NodeGraphResponse);
+    rpc DeleteNodeGraph(DeleteNodeGraphRequest) returns (common.MessageResponse);
+    rpc DeployNodeGraph(DeployNodeGraphRequest) returns (common.MessageResponse);
+    rpc GetNodeGraphStatus(GetNodeGraphStatusRequest) returns (GetNodeGraphStatusResponse);
+    rpc GetDeploymentLogs(GetDeploymentLogsRequest) returns (GetDeploymentLogsResponse);
+}
+
+message NodeGraph {
+    string id = 1;
+    string name = 2;
+    repeated Node nodes = 3;
+    repeated Edge edges = 4;
+    string created_at = 5;
+    string updated_at = 6;
+}
+
+message Node {
+    string id = 1;
+    string type = 2; // compute, pageserver, safekeeper, storage_broker
+    string label = 3;
+    NodePosition position = 4;
+    NodeData data = 5;
+}
+
+message NodePosition {
+    double x = 1;
+    double y = 2;
+}
+
+message NodeData {
+    string server_id = 1;
+    // Specific fields for different node types
+    string pg_version = 2; // compute
+    int32 pg_port = 3; // compute
+    bool expose_internet = 4; // compute
+    string backup_storage_id = 5; // pageserver, safekeeper
+    // Add other fields as needed based on spec-en.md
+}
+
+message Edge {
+    string id = 1;
+    string source = 2;
+    string target = 3;
+    string source_handle = 4;
+    string target_handle = 5;
+}
+
+message CreateNodeGraphRequest {
+    string name = 1;
+    repeated Node nodes = 2;
+    repeated Edge edges = 3;
+}
+
+message GetNodeGraphRequest {
+    string id = 1;
+}
+
+message UpdateNodeGraphRequest {
+    string id = 1;
+    string name = 2;
+    repeated Node nodes = 3;
+    repeated Edge edges = 4;
+}
+
+message DeleteNodeGraphRequest {
+    string id = 1;
+}
+
+message DeployNodeGraphRequest {
+    string id = 1;
+}
+
+message GetNodeGraphStatusRequest {
+    string id = 1;
+}
+
+message GetNodeGraphStatusResponse {
+    string status = 1; // DEPLOYING, RUNNING, STOPPED, ERROR
+    map<string, string> node_statuses = 2; // key: node_id, value: status
+}
+
+message GetDeploymentLogsRequest {
+    string id = 1;
+    string node_id = 2; // Optional: filter by specific node in the graph
+}
+
+message GetDeploymentLogsResponse {
+    repeated string logs = 1;
+}
+
+message NodeGraphResponse {
+    common.StatusCode status = 1;
+    NodeGraph graph = 2;
+    repeated common.ValidationError errors = 3;
+    string error = 4;
+}

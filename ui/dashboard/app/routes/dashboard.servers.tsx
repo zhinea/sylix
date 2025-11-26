@@ -15,7 +15,8 @@ import type { ServerFormValues } from "~/components/servers/schema";
 import { ServerFormDialog } from "~/components/servers/server-form-dialog";
 import { ServerList } from "~/components/servers/server-list";
 import { serverService } from "~/lib/api";
-import { AgentStatusServer, Server, StatusCode, StatusServer } from "~/proto/controlplane/server";
+import { AgentStatusServer, Server, StatusServer } from "~/proto/controlplane/server";
+import { StatusCode } from "~/proto/common/common";
 import type { Route } from "./+types/dashboard.servers";
 
 // --- Loader ---

@@ -7,6 +7,7 @@
 package agent
 
 import (
+	common "github.com/zhinea/sylix/internal/infra/proto/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -397,32 +398,28 @@ func (x *GetConfigResponse) GetTimezone() string {
 	return ""
 }
 
-type CreateDatabaseRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	User          string                 `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
-	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
-	DbName        string                 `protobuf:"bytes,4,opt,name=db_name,json=dbName,proto3" json:"db_name,omitempty"`
-	Branch        string                 `protobuf:"bytes,5,opt,name=branch,proto3" json:"branch,omitempty"`
-	PgVersion     int32                  `protobuf:"varint,6,opt,name=pg_version,json=pgVersion,proto3" json:"pg_version,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+type DeployComposeRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ProjectName    string                 `protobuf:"bytes,1,opt,name=project_name,json=projectName,proto3" json:"project_name,omitempty"`
+	ComposeContent string                 `protobuf:"bytes,2,opt,name=compose_content,json=composeContent,proto3" json:"compose_content,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
-func (x *CreateDatabaseRequest) Reset() {
-	*x = CreateDatabaseRequest{}
+func (x *DeployComposeRequest) Reset() {
+	*x = DeployComposeRequest{}
 	mi := &file_agent_agent_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateDatabaseRequest) String() string {
+func (x *DeployComposeRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateDatabaseRequest) ProtoMessage() {}
+func (*DeployComposeRequest) ProtoMessage() {}
 
-func (x *CreateDatabaseRequest) ProtoReflect() protoreflect.Message {
+func (x *DeployComposeRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_agent_agent_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -434,78 +431,46 @@ func (x *CreateDatabaseRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateDatabaseRequest.ProtoReflect.Descriptor instead.
-func (*CreateDatabaseRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use DeployComposeRequest.ProtoReflect.Descriptor instead.
+func (*DeployComposeRequest) Descriptor() ([]byte, []int) {
 	return file_agent_agent_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *CreateDatabaseRequest) GetName() string {
+func (x *DeployComposeRequest) GetProjectName() string {
 	if x != nil {
-		return x.Name
+		return x.ProjectName
 	}
 	return ""
 }
 
-func (x *CreateDatabaseRequest) GetUser() string {
+func (x *DeployComposeRequest) GetComposeContent() string {
 	if x != nil {
-		return x.User
+		return x.ComposeContent
 	}
 	return ""
 }
 
-func (x *CreateDatabaseRequest) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-func (x *CreateDatabaseRequest) GetDbName() string {
-	if x != nil {
-		return x.DbName
-	}
-	return ""
-}
-
-func (x *CreateDatabaseRequest) GetBranch() string {
-	if x != nil {
-		return x.Branch
-	}
-	return ""
-}
-
-func (x *CreateDatabaseRequest) GetPgVersion() int32 {
-	if x != nil {
-		return x.PgVersion
-	}
-	return 0
-}
-
-type CreateDatabaseResponse struct {
+type StopComposeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ContainerId   string                 `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
-	Port          int32                  `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
-	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	TenantId      string                 `protobuf:"bytes,4,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
-	TimelineId    string                 `protobuf:"bytes,5,opt,name=timeline_id,json=timelineId,proto3" json:"timeline_id,omitempty"`
+	ProjectName   string                 `protobuf:"bytes,1,opt,name=project_name,json=projectName,proto3" json:"project_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateDatabaseResponse) Reset() {
-	*x = CreateDatabaseResponse{}
+func (x *StopComposeRequest) Reset() {
+	*x = StopComposeRequest{}
 	mi := &file_agent_agent_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateDatabaseResponse) String() string {
+func (x *StopComposeRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateDatabaseResponse) ProtoMessage() {}
+func (*StopComposeRequest) ProtoMessage() {}
 
-func (x *CreateDatabaseResponse) ProtoReflect() protoreflect.Message {
+func (x *StopComposeRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_agent_agent_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -517,42 +482,214 @@ func (x *CreateDatabaseResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateDatabaseResponse.ProtoReflect.Descriptor instead.
-func (*CreateDatabaseResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use StopComposeRequest.ProtoReflect.Descriptor instead.
+func (*StopComposeRequest) Descriptor() ([]byte, []int) {
 	return file_agent_agent_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *CreateDatabaseResponse) GetContainerId() string {
+func (x *StopComposeRequest) GetProjectName() string {
 	if x != nil {
-		return x.ContainerId
+		return x.ProjectName
 	}
 	return ""
 }
 
-func (x *CreateDatabaseResponse) GetPort() int32 {
+type GetComposeStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProjectName   string                 `protobuf:"bytes,1,opt,name=project_name,json=projectName,proto3" json:"project_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetComposeStatusRequest) Reset() {
+	*x = GetComposeStatusRequest{}
+	mi := &file_agent_agent_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetComposeStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetComposeStatusRequest) ProtoMessage() {}
+
+func (x *GetComposeStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[10]
 	if x != nil {
-		return x.Port
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetComposeStatusRequest.ProtoReflect.Descriptor instead.
+func (*GetComposeStatusRequest) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetComposeStatusRequest) GetProjectName() string {
+	if x != nil {
+		return x.ProjectName
+	}
+	return ""
+}
+
+type GetComposeStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Running       bool                   `protobuf:"varint,1,opt,name=running,proto3" json:"running,omitempty"`
+	Services      []string               `protobuf:"bytes,2,rep,name=services,proto3" json:"services,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetComposeStatusResponse) Reset() {
+	*x = GetComposeStatusResponse{}
+	mi := &file_agent_agent_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetComposeStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetComposeStatusResponse) ProtoMessage() {}
+
+func (x *GetComposeStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetComposeStatusResponse.ProtoReflect.Descriptor instead.
+func (*GetComposeStatusResponse) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetComposeStatusResponse) GetRunning() bool {
+	if x != nil {
+		return x.Running
+	}
+	return false
+}
+
+func (x *GetComposeStatusResponse) GetServices() []string {
+	if x != nil {
+		return x.Services
+	}
+	return nil
+}
+
+type GetComposeLogsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProjectName   string                 `protobuf:"bytes,1,opt,name=project_name,json=projectName,proto3" json:"project_name,omitempty"`
+	Follow        bool                   `protobuf:"varint,2,opt,name=follow,proto3" json:"follow,omitempty"`
+	Tail          int32                  `protobuf:"varint,3,opt,name=tail,proto3" json:"tail,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetComposeLogsRequest) Reset() {
+	*x = GetComposeLogsRequest{}
+	mi := &file_agent_agent_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetComposeLogsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetComposeLogsRequest) ProtoMessage() {}
+
+func (x *GetComposeLogsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetComposeLogsRequest.ProtoReflect.Descriptor instead.
+func (*GetComposeLogsRequest) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetComposeLogsRequest) GetProjectName() string {
+	if x != nil {
+		return x.ProjectName
+	}
+	return ""
+}
+
+func (x *GetComposeLogsRequest) GetFollow() bool {
+	if x != nil {
+		return x.Follow
+	}
+	return false
+}
+
+func (x *GetComposeLogsRequest) GetTail() int32 {
+	if x != nil {
+		return x.Tail
 	}
 	return 0
 }
 
-func (x *CreateDatabaseResponse) GetStatus() string {
-	if x != nil {
-		return x.Status
-	}
-	return ""
+type GetComposeLogsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	LogLine       string                 `protobuf:"bytes,1,opt,name=log_line,json=logLine,proto3" json:"log_line,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateDatabaseResponse) GetTenantId() string {
-	if x != nil {
-		return x.TenantId
-	}
-	return ""
+func (x *GetComposeLogsResponse) Reset() {
+	*x = GetComposeLogsResponse{}
+	mi := &file_agent_agent_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateDatabaseResponse) GetTimelineId() string {
+func (x *GetComposeLogsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetComposeLogsResponse) ProtoMessage() {}
+
+func (x *GetComposeLogsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_agent_proto_msgTypes[13]
 	if x != nil {
-		return x.TimelineId
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetComposeLogsResponse.ProtoReflect.Descriptor instead.
+func (*GetComposeLogsResponse) Descriptor() ([]byte, []int) {
+	return file_agent_agent_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetComposeLogsResponse) GetLogLine() string {
+	if x != nil {
+		return x.LogLine
 	}
 	return ""
 }
@@ -561,7 +698,7 @@ var File_agent_agent_proto protoreflect.FileDescriptor
 
 const file_agent_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x11agent/agent.proto\x12\x05agent\"\x12\n" +
+	"\x11agent/agent.proto\x12\x05agent\x1a\x13common/common.proto\"\x12\n" +
 	"\x10GetStatusRequest\"]\n" +
 	"\x11GetStatusResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status\x12\x18\n" +
@@ -580,28 +717,32 @@ const file_agent_agent_proto_rawDesc = "" +
 	"\x10GetConfigRequest\"G\n" +
 	"\x11GetConfigResponse\x12\x16\n" +
 	"\x06config\x18\x01 \x01(\tR\x06config\x12\x1a\n" +
-	"\btimezone\x18\x02 \x01(\tR\btimezone\"\xab\x01\n" +
-	"\x15CreateDatabaseRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
-	"\x04user\x18\x02 \x01(\tR\x04user\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x17\n" +
-	"\adb_name\x18\x04 \x01(\tR\x06dbName\x12\x16\n" +
-	"\x06branch\x18\x05 \x01(\tR\x06branch\x12\x1d\n" +
-	"\n" +
-	"pg_version\x18\x06 \x01(\x05R\tpgVersion\"\xa5\x01\n" +
-	"\x16CreateDatabaseResponse\x12!\n" +
-	"\fcontainer_id\x18\x01 \x01(\tR\vcontainerId\x12\x12\n" +
-	"\x04port\x18\x02 \x01(\x05R\x04port\x12\x16\n" +
-	"\x06status\x18\x03 \x01(\tR\x06status\x12\x1b\n" +
-	"\ttenant_id\x18\x04 \x01(\tR\btenantId\x12\x1f\n" +
-	"\vtimeline_id\x18\x05 \x01(\tR\n" +
-	"timelineId2\xc7\x02\n" +
+	"\btimezone\x18\x02 \x01(\tR\btimezone\"b\n" +
+	"\x14DeployComposeRequest\x12!\n" +
+	"\fproject_name\x18\x01 \x01(\tR\vprojectName\x12'\n" +
+	"\x0fcompose_content\x18\x02 \x01(\tR\x0ecomposeContent\"7\n" +
+	"\x12StopComposeRequest\x12!\n" +
+	"\fproject_name\x18\x01 \x01(\tR\vprojectName\"<\n" +
+	"\x17GetComposeStatusRequest\x12!\n" +
+	"\fproject_name\x18\x01 \x01(\tR\vprojectName\"P\n" +
+	"\x18GetComposeStatusResponse\x12\x18\n" +
+	"\arunning\x18\x01 \x01(\bR\arunning\x12\x1a\n" +
+	"\bservices\x18\x02 \x03(\tR\bservices\"f\n" +
+	"\x15GetComposeLogsRequest\x12!\n" +
+	"\fproject_name\x18\x01 \x01(\tR\vprojectName\x12\x16\n" +
+	"\x06follow\x18\x02 \x01(\bR\x06follow\x12\x12\n" +
+	"\x04tail\x18\x03 \x01(\x05R\x04tail\"3\n" +
+	"\x16GetComposeLogsResponse\x12\x19\n" +
+	"\blog_line\x18\x01 \x01(\tR\alogLine2\xa8\x04\n" +
 	"\x05Agent\x12>\n" +
 	"\tGetStatus\x12\x17.agent.GetStatusRequest\x1a\x18.agent.GetStatusResponse\x12>\n" +
 	"\tHeartbeat\x12\x17.agent.HeartbeatRequest\x1a\x18.agent.HeartbeatResponse\x12/\n" +
 	"\x04Ping\x12\x12.agent.PingRequest\x1a\x13.agent.PingResponse\x12>\n" +
-	"\tGetConfig\x12\x17.agent.GetConfigRequest\x1a\x18.agent.GetConfigResponse\x12M\n" +
-	"\x0eCreateDatabase\x12\x1c.agent.CreateDatabaseRequest\x1a\x1d.agent.CreateDatabaseResponseB4Z2github.com/zhinea/sylix/internal/infra/proto/agentb\x06proto3"
+	"\tGetConfig\x12\x17.agent.GetConfigRequest\x1a\x18.agent.GetConfigResponse\x12E\n" +
+	"\rDeployCompose\x12\x1b.agent.DeployComposeRequest\x1a\x17.common.MessageResponse\x12A\n" +
+	"\vStopCompose\x12\x19.agent.StopComposeRequest\x1a\x17.common.MessageResponse\x12S\n" +
+	"\x10GetComposeStatus\x12\x1e.agent.GetComposeStatusRequest\x1a\x1f.agent.GetComposeStatusResponse\x12O\n" +
+	"\x0eGetComposeLogs\x12\x1c.agent.GetComposeLogsRequest\x1a\x1d.agent.GetComposeLogsResponse0\x01B4Z2github.com/zhinea/sylix/internal/infra/proto/agentb\x06proto3"
 
 var (
 	file_agent_agent_proto_rawDescOnce sync.Once
@@ -615,35 +756,46 @@ func file_agent_agent_proto_rawDescGZIP() []byte {
 	return file_agent_agent_proto_rawDescData
 }
 
-var file_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_agent_agent_proto_goTypes = []any{
-	(*GetStatusRequest)(nil),       // 0: agent.GetStatusRequest
-	(*GetStatusResponse)(nil),      // 1: agent.GetStatusResponse
-	(*HeartbeatRequest)(nil),       // 2: agent.HeartbeatRequest
-	(*HeartbeatResponse)(nil),      // 3: agent.HeartbeatResponse
-	(*PingRequest)(nil),            // 4: agent.PingRequest
-	(*PingResponse)(nil),           // 5: agent.PingResponse
-	(*GetConfigRequest)(nil),       // 6: agent.GetConfigRequest
-	(*GetConfigResponse)(nil),      // 7: agent.GetConfigResponse
-	(*CreateDatabaseRequest)(nil),  // 8: agent.CreateDatabaseRequest
-	(*CreateDatabaseResponse)(nil), // 9: agent.CreateDatabaseResponse
+	(*GetStatusRequest)(nil),         // 0: agent.GetStatusRequest
+	(*GetStatusResponse)(nil),        // 1: agent.GetStatusResponse
+	(*HeartbeatRequest)(nil),         // 2: agent.HeartbeatRequest
+	(*HeartbeatResponse)(nil),        // 3: agent.HeartbeatResponse
+	(*PingRequest)(nil),              // 4: agent.PingRequest
+	(*PingResponse)(nil),             // 5: agent.PingResponse
+	(*GetConfigRequest)(nil),         // 6: agent.GetConfigRequest
+	(*GetConfigResponse)(nil),        // 7: agent.GetConfigResponse
+	(*DeployComposeRequest)(nil),     // 8: agent.DeployComposeRequest
+	(*StopComposeRequest)(nil),       // 9: agent.StopComposeRequest
+	(*GetComposeStatusRequest)(nil),  // 10: agent.GetComposeStatusRequest
+	(*GetComposeStatusResponse)(nil), // 11: agent.GetComposeStatusResponse
+	(*GetComposeLogsRequest)(nil),    // 12: agent.GetComposeLogsRequest
+	(*GetComposeLogsResponse)(nil),   // 13: agent.GetComposeLogsResponse
+	(*common.MessageResponse)(nil),   // 14: common.MessageResponse
 }
 var file_agent_agent_proto_depIdxs = []int32{
-	0, // 0: agent.Agent.GetStatus:input_type -> agent.GetStatusRequest
-	2, // 1: agent.Agent.Heartbeat:input_type -> agent.HeartbeatRequest
-	4, // 2: agent.Agent.Ping:input_type -> agent.PingRequest
-	6, // 3: agent.Agent.GetConfig:input_type -> agent.GetConfigRequest
-	8, // 4: agent.Agent.CreateDatabase:input_type -> agent.CreateDatabaseRequest
-	1, // 5: agent.Agent.GetStatus:output_type -> agent.GetStatusResponse
-	3, // 6: agent.Agent.Heartbeat:output_type -> agent.HeartbeatResponse
-	5, // 7: agent.Agent.Ping:output_type -> agent.PingResponse
-	7, // 8: agent.Agent.GetConfig:output_type -> agent.GetConfigResponse
-	9, // 9: agent.Agent.CreateDatabase:output_type -> agent.CreateDatabaseResponse
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: agent.Agent.GetStatus:input_type -> agent.GetStatusRequest
+	2,  // 1: agent.Agent.Heartbeat:input_type -> agent.HeartbeatRequest
+	4,  // 2: agent.Agent.Ping:input_type -> agent.PingRequest
+	6,  // 3: agent.Agent.GetConfig:input_type -> agent.GetConfigRequest
+	8,  // 4: agent.Agent.DeployCompose:input_type -> agent.DeployComposeRequest
+	9,  // 5: agent.Agent.StopCompose:input_type -> agent.StopComposeRequest
+	10, // 6: agent.Agent.GetComposeStatus:input_type -> agent.GetComposeStatusRequest
+	12, // 7: agent.Agent.GetComposeLogs:input_type -> agent.GetComposeLogsRequest
+	1,  // 8: agent.Agent.GetStatus:output_type -> agent.GetStatusResponse
+	3,  // 9: agent.Agent.Heartbeat:output_type -> agent.HeartbeatResponse
+	5,  // 10: agent.Agent.Ping:output_type -> agent.PingResponse
+	7,  // 11: agent.Agent.GetConfig:output_type -> agent.GetConfigResponse
+	14, // 12: agent.Agent.DeployCompose:output_type -> common.MessageResponse
+	14, // 13: agent.Agent.StopCompose:output_type -> common.MessageResponse
+	11, // 14: agent.Agent.GetComposeStatus:output_type -> agent.GetComposeStatusResponse
+	13, // 15: agent.Agent.GetComposeLogs:output_type -> agent.GetComposeLogsResponse
+	8,  // [8:16] is the sub-list for method output_type
+	0,  // [0:8] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_agent_agent_proto_init() }
@@ -657,7 +809,7 @@ func file_agent_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_agent_proto_rawDesc), len(file_agent_agent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

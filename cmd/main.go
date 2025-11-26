@@ -57,6 +57,10 @@ func main() {
 	logsUseCase := app.NewLogsUseCase()
 	logsService := grpcServices.NewLogsService(logsUseCase)
 
+	nodeRepo := repository.NewNodeRepository(db)
+	nodeService := services.NewNodeService(nodeRepo, serverRepo)
+	nodeHandler := grpcServices.NewNodeHandler(nodeService)
+
 	// Monitoring
 	monitoringWorker := app.NewMonitoringWorker(serverRepo, monitoringRepo)
 	monitoringWorker.Start()
@@ -64,6 +68,7 @@ func main() {
 	pbControlPlane.RegisterServerServiceServer(grpcServer, serverService)
 	pbControlPlane.RegisterLogsServiceServer(grpcServer, logsService)
 	pbControlPlane.RegisterBackupStorageServiceServer(grpcServer, backupStorageService)
+	pbControlPlane.RegisterNodeServiceServer(grpcServer, nodeHandler)
 
 	// Wrap gRPC server for gRPC-Web support
 	wrappedGrpc := grpcweb.WrapServer(grpcServer,

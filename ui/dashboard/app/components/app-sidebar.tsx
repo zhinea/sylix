@@ -65,6 +65,11 @@ const data = {
       url: "/logs",
       icon: FileText,
     },
+    {
+      title: "Nodes",
+      url: "/nodes",
+      icon: Database,
+    },
   ],
   navSecondary: [
     {

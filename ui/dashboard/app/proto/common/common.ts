@@ -9,7 +9,75 @@ import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 
 export const protobufPackage = "common";
 
+export enum StatusCode {
+  UNSPECIFIED = 0,
+  OK = 200,
+  CREATED = 201,
+  NOT_FOUND = 404,
+  INTERNAL_ERROR = 500,
+  BAD_REQUEST = 400,
+  VALIDATION_FAILED = 402,
+  UNRECOGNIZED = -1,
+}
+
+export function statusCodeFromJSON(object: any): StatusCode {
+  switch (object) {
+    case 0:
+    case "UNSPECIFIED":
+      return StatusCode.UNSPECIFIED;
+    case 200:
+    case "OK":
+      return StatusCode.OK;
+    case 201:
+    case "CREATED":
+      return StatusCode.CREATED;
+    case 404:
+    case "NOT_FOUND":
+      return StatusCode.NOT_FOUND;
+    case 500:
+    case "INTERNAL_ERROR":
+      return StatusCode.INTERNAL_ERROR;
+    case 400:
+    case "BAD_REQUEST":
+      return StatusCode.BAD_REQUEST;
+    case 402:
+    case "VALIDATION_FAILED":
+      return StatusCode.VALIDATION_FAILED;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return StatusCode.UNRECOGNIZED;
+  }
+}
+
+export function statusCodeToJSON(object: StatusCode): string {
+  switch (object) {
+    case StatusCode.UNSPECIFIED:
+      return "UNSPECIFIED";
+    case StatusCode.OK:
+      return "OK";
+    case StatusCode.CREATED:
+      return "CREATED";
+    case StatusCode.NOT_FOUND:
+      return "NOT_FOUND";
+    case StatusCode.INTERNAL_ERROR:
+      return "INTERNAL_ERROR";
+    case StatusCode.BAD_REQUEST:
+      return "BAD_REQUEST";
+    case StatusCode.VALIDATION_FAILED:
+      return "VALIDATION_FAILED";
+    case StatusCode.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface Empty {
+}
+
+export interface MessageResponse {
+  status: StatusCode;
+  message: string;
 }
 
 function createBaseEmpty(): Empty {
@@ -55,6 +123,82 @@ export const Empty: MessageFns<Empty> = {
   },
 };
 
+function createBaseMessageResponse(): MessageResponse {
+  return { status: 0, message: "" };
+}
+
+export const MessageResponse: MessageFns<MessageResponse> = {
+  encode(message: MessageResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.status !== 0) {
+      writer.uint32(8).int32(message.status);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): MessageResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMessageResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.status = reader.int32() as any;
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MessageResponse {
+    return {
+      status: isSet(object.status) ? statusCodeFromJSON(object.status) : 0,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+    };
+  },
+
+  toJSON(message: MessageResponse): unknown {
+    const obj: any = {};
+    if (message.status !== 0) {
+      obj.status = statusCodeToJSON(message.status);
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<MessageResponse>, I>>(base?: I): MessageResponse {
+    return MessageResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<MessageResponse>, I>>(object: I): MessageResponse {
+    const message = createBaseMessageResponse();
+    message.status = object.status ?? 0;
+    message.message = object.message ?? "";
+    return message;
+  },
+};
+
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
@@ -66,6 +210,10 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function isSet(value: any): boolean {
+  return value !== null && value !== undefined;
+}
 
 export interface MessageFns<T> {
   encode(message: T, writer?: BinaryWriter): BinaryWriter;

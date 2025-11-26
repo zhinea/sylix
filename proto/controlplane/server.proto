@@ -12,17 +12,17 @@ service ServerService {
     rpc Get(Id) returns (ServerResponse);
     rpc All(common.Empty) returns (ServersResponse);
     rpc Update(Server) returns (ServerResponse);
-    rpc Delete(Id) returns (MessageResponse);
+    rpc Delete(Id) returns (common.MessageResponse);
     rpc RetryConnection(Id) returns (ServerResponse);
-    rpc InstallAgent(Id) returns (MessageResponse);
+    rpc InstallAgent(Id) returns (common.MessageResponse);
     rpc GetStats(GetStatsRequest) returns (GetStatsResponse);
     rpc GetAccidents(GetAccidentsRequest) returns (GetAccidentsResponse);
-    rpc DeleteAccident(Id) returns (MessageResponse);
-    rpc BatchDeleteAccidents(BatchDeleteAccidentsRequest) returns (MessageResponse);
+    rpc DeleteAccident(Id) returns (common.MessageResponse);
+    rpc BatchDeleteAccidents(BatchDeleteAccidentsRequest) returns (common.MessageResponse);
     rpc GetRealtimeStats(GetRealtimeStatsRequest) returns (GetRealtimeStatsResponse);
-    rpc ConfigureAgent(ConfigureAgentRequest) returns (MessageResponse);
-    rpc UpdateAgentPort(UpdateAgentPortRequest) returns (MessageResponse);
-    rpc UpdateServerTimeZone(UpdateServerTimeZoneRequest) returns (MessageResponse);
+    rpc ConfigureAgent(ConfigureAgentRequest) returns (common.MessageResponse);
+    rpc UpdateAgentPort(UpdateAgentPortRequest) returns (common.MessageResponse);
+    rpc UpdateServerTimeZone(UpdateServerTimeZoneRequest) returns (common.MessageResponse);
     rpc GetAgentConfig(Id) returns (GetAgentConfigResponse);
 }
 
@@ -107,15 +107,7 @@ message GetAccidentsResponse {
     int64 total_count = 2;
 }
 
-enum StatusCode {
-    UNSPECIFIED = 0;
-    OK = 200;
-    CREATED = 201;
-    NOT_FOUND = 404;
-    INTERNAL_ERROR = 500;
-    BAD_REQUEST = 400;
-    VALIDATION_FAILED = 402;
-}
+
 
 // Status dimana hanya untuk koneksi ke server, apakah koneksi berhasil atau tidak
 enum StatusServer {
@@ -138,14 +130,14 @@ message Id {
 }
 
 message ServerResponse {
-    StatusCode status = 1;
+    common.StatusCode status = 1;
     Server server = 2;
     repeated common.ValidationError errors = 3;
     optional string error = 4; 
 }
 
 message ServersResponse {
-    StatusCode status = 1;
+    common.StatusCode status = 1;
     repeated Server servers = 2;
     repeated common.ValidationError errors = 3;
     optional string error = 4; 
@@ -175,10 +167,7 @@ message ServerCredential {
     optional string sshKey = 3;
 }
 
-message MessageResponse {
-    StatusCode status = 1;
-    string message = 2;
-}
+
 
 message BatchDeleteAccidentsRequest {
     repeated string ids = 1;

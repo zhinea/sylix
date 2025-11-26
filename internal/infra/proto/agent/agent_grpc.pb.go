@@ -8,6 +8,7 @@ package agent
 
 import (
 	context "context"
+	common "github.com/zhinea/sylix/internal/infra/proto/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,11 +20,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Agent_GetStatus_FullMethodName      = "/agent.Agent/GetStatus"
-	Agent_Heartbeat_FullMethodName      = "/agent.Agent/Heartbeat"
-	Agent_Ping_FullMethodName           = "/agent.Agent/Ping"
-	Agent_GetConfig_FullMethodName      = "/agent.Agent/GetConfig"
-	Agent_CreateDatabase_FullMethodName = "/agent.Agent/CreateDatabase"
+	Agent_GetStatus_FullMethodName        = "/agent.Agent/GetStatus"
+	Agent_Heartbeat_FullMethodName        = "/agent.Agent/Heartbeat"
+	Agent_Ping_FullMethodName             = "/agent.Agent/Ping"
+	Agent_GetConfig_FullMethodName        = "/agent.Agent/GetConfig"
+	Agent_DeployCompose_FullMethodName    = "/agent.Agent/DeployCompose"
+	Agent_StopCompose_FullMethodName      = "/agent.Agent/StopCompose"
+	Agent_GetComposeStatus_FullMethodName = "/agent.Agent/GetComposeStatus"
+	Agent_GetComposeLogs_FullMethodName   = "/agent.Agent/GetComposeLogs"
 )
 
 // AgentClient is the client API for Agent service.
@@ -34,7 +38,11 @@ type AgentClient interface {
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
 	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error)
-	CreateDatabase(ctx context.Context, in *CreateDatabaseRequest, opts ...grpc.CallOption) (*CreateDatabaseResponse, error)
+	// Docker Compose Management
+	DeployCompose(ctx context.Context, in *DeployComposeRequest, opts ...grpc.CallOption) (*common.MessageResponse, error)
+	StopCompose(ctx context.Context, in *StopComposeRequest, opts ...grpc.CallOption) (*common.MessageResponse, error)
+	GetComposeStatus(ctx context.Context, in *GetComposeStatusRequest, opts ...grpc.CallOption) (*GetComposeStatusResponse, error)
+	GetComposeLogs(ctx context.Context, in *GetComposeLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetComposeLogsResponse], error)
 }
 
 type agentClient struct {
@@ -85,15 +93,54 @@ func (c *agentClient) GetConfig(ctx context.Context, in *GetConfigRequest, opts 
 	return out, nil
 }
 
-func (c *agentClient) CreateDatabase(ctx context.Context, in *CreateDatabaseRequest, opts ...grpc.CallOption) (*CreateDatabaseResponse, error) {
+func (c *agentClient) DeployCompose(ctx context.Context, in *DeployComposeRequest, opts ...grpc.CallOption) (*common.MessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateDatabaseResponse)
-	err := c.cc.Invoke(ctx, Agent_CreateDatabase_FullMethodName, in, out, cOpts...)
+	out := new(common.MessageResponse)
+	err := c.cc.Invoke(ctx, Agent_DeployCompose_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
+
+func (c *agentClient) StopCompose(ctx context.Context, in *StopComposeRequest, opts ...grpc.CallOption) (*common.MessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(common.MessageResponse)
+	err := c.cc.Invoke(ctx, Agent_StopCompose_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentClient) GetComposeStatus(ctx context.Context, in *GetComposeStatusRequest, opts ...grpc.CallOption) (*GetComposeStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetComposeStatusResponse)
+	err := c.cc.Invoke(ctx, Agent_GetComposeStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentClient) GetComposeLogs(ctx context.Context, in *GetComposeLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetComposeLogsResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Agent_ServiceDesc.Streams[0], Agent_GetComposeLogs_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[GetComposeLogsRequest, GetComposeLogsResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Agent_GetComposeLogsClient = grpc.ServerStreamingClient[GetComposeLogsResponse]
 
 // AgentServer is the server API for Agent service.
 // All implementations must embed UnimplementedAgentServer
@@ -103,7 +150,11 @@ type AgentServer interface {
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
 	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
-	CreateDatabase(context.Context, *CreateDatabaseRequest) (*CreateDatabaseResponse, error)
+	// Docker Compose Management
+	DeployCompose(context.Context, *DeployComposeRequest) (*common.MessageResponse, error)
+	StopCompose(context.Context, *StopComposeRequest) (*common.MessageResponse, error)
+	GetComposeStatus(context.Context, *GetComposeStatusRequest) (*GetComposeStatusResponse, error)
+	GetComposeLogs(*GetComposeLogsRequest, grpc.ServerStreamingServer[GetComposeLogsResponse]) error
 	mustEmbedUnimplementedAgentServer()
 }
 
@@ -126,8 +177,17 @@ func (UnimplementedAgentServer) Ping(context.Context, *PingRequest) (*PingRespon
 func (UnimplementedAgentServer) GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
 }
-func (UnimplementedAgentServer) CreateDatabase(context.Context, *CreateDatabaseRequest) (*CreateDatabaseResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateDatabase not implemented")
+func (UnimplementedAgentServer) DeployCompose(context.Context, *DeployComposeRequest) (*common.MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeployCompose not implemented")
+}
+func (UnimplementedAgentServer) StopCompose(context.Context, *StopComposeRequest) (*common.MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopCompose not implemented")
+}
+func (UnimplementedAgentServer) GetComposeStatus(context.Context, *GetComposeStatusRequest) (*GetComposeStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetComposeStatus not implemented")
+}
+func (UnimplementedAgentServer) GetComposeLogs(*GetComposeLogsRequest, grpc.ServerStreamingServer[GetComposeLogsResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method GetComposeLogs not implemented")
 }
 func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
 func (UnimplementedAgentServer) testEmbeddedByValue()               {}
@@ -222,23 +282,70 @@ func _Agent_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_CreateDatabase_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateDatabaseRequest)
+func _Agent_DeployCompose_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeployComposeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).CreateDatabase(ctx, in)
+		return srv.(AgentServer).DeployCompose(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Agent_CreateDatabase_FullMethodName,
+		FullMethod: Agent_DeployCompose_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).CreateDatabase(ctx, req.(*CreateDatabaseRequest))
+		return srv.(AgentServer).DeployCompose(ctx, req.(*DeployComposeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
+
+func _Agent_StopCompose_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopComposeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).StopCompose(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_StopCompose_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).StopCompose(ctx, req.(*StopComposeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Agent_GetComposeStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetComposeStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).GetComposeStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Agent_GetComposeStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).GetComposeStatus(ctx, req.(*GetComposeStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Agent_GetComposeLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetComposeLogsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(AgentServer).GetComposeLogs(m, &grpc.GenericServerStream[GetComposeLogsRequest, GetComposeLogsResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Agent_GetComposeLogsServer = grpc.ServerStreamingServer[GetComposeLogsResponse]
 
 // Agent_ServiceDesc is the grpc.ServiceDesc for Agent service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -264,10 +371,24 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Agent_GetConfig_Handler,
 		},
 		{
-			MethodName: "CreateDatabase",
-			Handler:    _Agent_CreateDatabase_Handler,
+			MethodName: "DeployCompose",
+			Handler:    _Agent_DeployCompose_Handler,
+		},
+		{
+			MethodName: "StopCompose",
+			Handler:    _Agent_StopCompose_Handler,
+		},
+		{
+			MethodName: "GetComposeStatus",
+			Handler:    _Agent_GetComposeStatus_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetComposeLogs",
+			Handler:       _Agent_GetComposeLogs_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "agent/agent.proto",
 }
