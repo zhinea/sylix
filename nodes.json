@@ -1,0 +1,79 @@
+{
+    "nodes": [
+        {
+            "name": "Compute Engine",
+            "description": "The main computing neondb, where this node will run postgres. use ghcr.io/neondatabase/compute-node-vxx",
+            "type": "compute",
+            "fields": {
+                "server_id": {
+                    "description": "server where the node will be placed",
+                    "relatedTable": "servers"
+                },
+                "pg_version": {
+                    "description": "The version of Postgres to be used, the type is options with several choices.",
+                    "options": [
+                        "postgres-14",
+                        "postgres-15",
+                        "postgres-16",
+                        "postgres-17",
+                        "postgres-18"
+                    ]
+                },
+                "pg_port": {
+                    "description": "port to be used by postgres"
+                },
+                "expose_internet": {
+                    "description": "Will the Postgres port be exposed to the internet? The input is a checkbox type."
+                }
+            },
+            "pipes": {
+                "in": [
+                    {
+                        "from": "safekeeper",
+                        "imported": {
+                            "5454/tcp": "PG/WAL listener (compute writes WAL to safekeeper)"
+                        }
+                    },
+                    {
+                        "from": "pageserver",
+                        "imported": {
+                            "9898/tcp": "Pageserver HTTP API (fetch pages)"
+                        }
+                    },
+                    {
+                        "from": "storage_broker",
+                        "imported": {
+                            "50051/tcp": "Discovery/coordination (gRPC)"
+                        }
+                    }
+                ],
+                "out": [
+                    {
+                        "to": "clients/app",
+                        "exported": {
+                            "55433/tcp": "PostgreSQL protocol",
+                            "3080/tcp": "HTTP admin/metrics (optional)"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Pageserver",
+            "description": "The main storage engine for neondb, good when one server with Compute Engine.",
+            "type": "pageserver",
+            "fields": {
+                "server_id": {
+                    "required": true,
+                    "description": "server where the node will be placed",
+                    "relatedTable": "servers"
+                },
+                "backup_storage_id": {
+                    "required": true,
+                    "description": "The base backup account, use account same as like on the Safekeeper 1",
+                    "relatedTable": "backup_storage"
+                }
+            }
+        }
+    ]
+}

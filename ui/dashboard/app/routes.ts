@@ -8,6 +8,5 @@ export default [
     route("stats", "routes/dashboard.stats.tsx"),
     route("accidents", "routes/dashboard.accidents.tsx"),
     route("backups", "routes/dashboard.backups.tsx"),
-    route("databases", "routes/dashboard.databases.tsx"),
   ]),
 ] satisfies RouteConfig;

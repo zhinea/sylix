@@ -46,6 +46,5 @@ jobs:
           files: |
             bin/controlplane
             bin/agent
-            internal/module/agent/neon/docker-compose.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

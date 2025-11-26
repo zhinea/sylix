@@ -19,7 +19,6 @@ func AutoMigrate(db *gorm.DB) error {
 		&entity.ServerStat{},
 		&entity.ServerAccident{},
 		&entity.BackupStorage{},
-		&entity.Database{},
 	); err != nil {
 		return err
 	}

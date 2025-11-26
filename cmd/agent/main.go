@@ -9,7 +9,6 @@ import (
 	"github.com/zhinea/sylix/internal/common/logger"
 	agentPb "github.com/zhinea/sylix/internal/infra/proto/agent"
 	"github.com/zhinea/sylix/internal/module/agent/app"
-	"github.com/zhinea/sylix/internal/module/agent/domain/services"
 	grpcServices "github.com/zhinea/sylix/internal/module/agent/interface/grpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -53,17 +52,7 @@ func main() {
 		grpcServer = grpc.NewServer(grpc.Creds(creds))
 	}
 
-	dockerService, err := services.NewDockerService()
-	if err != nil {
-		logger.Log.Fatal("Failed to create Docker service", zap.Error(err))
-	}
-
-	// Initialize Neon Service
-	// Assuming running from project root for dev
-	neonComposeFile := "internal/module/agent/neon/docker-compose.yml"
-	neonService := services.NewNeonService(neonComposeFile)
-
-	agentUseCase := app.NewAgentUseCase(*configPath, dockerService, neonService)
+	agentUseCase := app.NewAgentUseCase(*configPath)
 	agentHandler := grpcServices.NewAgentHandler(agentUseCase)
 	agentPb.RegisterAgentServer(grpcServer, agentHandler)
 

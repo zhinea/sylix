@@ -18,10 +18,6 @@ func NewAgentHandler(useCase *app.AgentUseCase) *AgentHandler {
 	}
 }
 
-func (h *AgentHandler) CreateDatabase(ctx context.Context, req *pbAgent.CreateDatabaseRequest) (*pbAgent.CreateDatabaseResponse, error) {
-	return h.useCase.CreateDatabase(ctx, req)
-}
-
 func (h *AgentHandler) GetStatus(ctx context.Context, req *pbAgent.GetStatusRequest) (*pbAgent.GetStatusResponse, error) {
 	return h.useCase.GetStatus(ctx)
 }
