@@ -11,6 +11,7 @@ import {
   Frame,
   LifeBuoy,
   Map,
+  Network,
   PieChart,
   Send,
   Server,
@@ -54,6 +55,11 @@ const data = {
       title: "Backup Storage",
       url: "/backups",
       icon: Database,
+    },
+    {
+      title: "Nodes",
+      url: "/nodes",
+      icon: Network,
     },
     {
       title: "Incidents",

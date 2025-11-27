@@ -21,6 +21,67 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type StatusCode int32
+
+const (
+	StatusCode_UNSPECIFIED       StatusCode = 0
+	StatusCode_OK                StatusCode = 200
+	StatusCode_CREATED           StatusCode = 201
+	StatusCode_NOT_FOUND         StatusCode = 404
+	StatusCode_INTERNAL_ERROR    StatusCode = 500
+	StatusCode_BAD_REQUEST       StatusCode = 400
+	StatusCode_VALIDATION_FAILED StatusCode = 402
+)
+
+// Enum value maps for StatusCode.
+var (
+	StatusCode_name = map[int32]string{
+		0:   "UNSPECIFIED",
+		200: "OK",
+		201: "CREATED",
+		404: "NOT_FOUND",
+		500: "INTERNAL_ERROR",
+		400: "BAD_REQUEST",
+		402: "VALIDATION_FAILED",
+	}
+	StatusCode_value = map[string]int32{
+		"UNSPECIFIED":       0,
+		"OK":                200,
+		"CREATED":           201,
+		"NOT_FOUND":         404,
+		"INTERNAL_ERROR":    500,
+		"BAD_REQUEST":       400,
+		"VALIDATION_FAILED": 402,
+	}
+)
+
+func (x StatusCode) Enum() *StatusCode {
+	p := new(StatusCode)
+	*p = x
+	return p
+}
+
+func (x StatusCode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (StatusCode) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_common_proto_enumTypes[0].Descriptor()
+}
+
+func (StatusCode) Type() protoreflect.EnumType {
+	return &file_common_common_proto_enumTypes[0]
+}
+
+func (x StatusCode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use StatusCode.Descriptor instead.
+func (StatusCode) EnumDescriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{0}
+}
+
 type Empty struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -57,12 +118,76 @@ func (*Empty) Descriptor() ([]byte, []int) {
 	return file_common_common_proto_rawDescGZIP(), []int{0}
 }
 
+type MessageResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        StatusCode             `protobuf:"varint,1,opt,name=status,proto3,enum=common.StatusCode" json:"status,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MessageResponse) Reset() {
+	*x = MessageResponse{}
+	mi := &file_common_common_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MessageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MessageResponse) ProtoMessage() {}
+
+func (x *MessageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_common_common_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MessageResponse.ProtoReflect.Descriptor instead.
+func (*MessageResponse) Descriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *MessageResponse) GetStatus() StatusCode {
+	if x != nil {
+		return x.Status
+	}
+	return StatusCode_UNSPECIFIED
+}
+
+func (x *MessageResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_common_common_proto protoreflect.FileDescriptor
 
 const file_common_common_proto_rawDesc = "" +
 	"\n" +
 	"\x13common/common.proto\x12\x06common\"\a\n" +
-	"\x05EmptyB5Z3github.com/zhinea/sylix/internal/infra/proto/commonb\x06proto3"
+	"\x05Empty\"W\n" +
+	"\x0fMessageResponse\x12*\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x12.common.StatusCodeR\x06status\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage*\x83\x01\n" +
+	"\n" +
+	"StatusCode\x12\x0f\n" +
+	"\vUNSPECIFIED\x10\x00\x12\a\n" +
+	"\x02OK\x10\xc8\x01\x12\f\n" +
+	"\aCREATED\x10\xc9\x01\x12\x0e\n" +
+	"\tNOT_FOUND\x10\x94\x03\x12\x13\n" +
+	"\x0eINTERNAL_ERROR\x10\xf4\x03\x12\x10\n" +
+	"\vBAD_REQUEST\x10\x90\x03\x12\x16\n" +
+	"\x11VALIDATION_FAILED\x10\x92\x03B5Z3github.com/zhinea/sylix/internal/infra/proto/commonb\x06proto3"
 
 var (
 	file_common_common_proto_rawDescOnce sync.Once
@@ -76,16 +201,20 @@ func file_common_common_proto_rawDescGZIP() []byte {
 	return file_common_common_proto_rawDescData
 }
 
-var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_common_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_common_common_proto_goTypes = []any{
-	(*Empty)(nil), // 0: common.Empty
+	(StatusCode)(0),         // 0: common.StatusCode
+	(*Empty)(nil),           // 1: common.Empty
+	(*MessageResponse)(nil), // 2: common.MessageResponse
 }
 var file_common_common_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: common.MessageResponse.status:type_name -> common.StatusCode
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_common_common_proto_init() }
@@ -98,13 +227,14 @@ func file_common_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_common_proto_rawDesc), len(file_common_common_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   1,
+			NumEnums:      1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_common_common_proto_goTypes,
 		DependencyIndexes: file_common_common_proto_depIdxs,
+		EnumInfos:         file_common_common_proto_enumTypes,
 		MessageInfos:      file_common_common_proto_msgTypes,
 	}.Build()
 	File_common_common_proto = out.File

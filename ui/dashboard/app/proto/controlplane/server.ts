@@ -6,73 +6,10 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import { Empty } from "../common/common";
+import { Empty, MessageResponse, StatusCode, statusCodeFromJSON, statusCodeToJSON } from "../common/common";
 import { ValidationError } from "../common/validation";
 
 export const protobufPackage = "controlplane";
-
-export enum StatusCode {
-  UNSPECIFIED = 0,
-  OK = 200,
-  CREATED = 201,
-  NOT_FOUND = 404,
-  INTERNAL_ERROR = 500,
-  BAD_REQUEST = 400,
-  VALIDATION_FAILED = 402,
-  UNRECOGNIZED = -1,
-}
-
-export function statusCodeFromJSON(object: any): StatusCode {
-  switch (object) {
-    case 0:
-    case "UNSPECIFIED":
-      return StatusCode.UNSPECIFIED;
-    case 200:
-    case "OK":
-      return StatusCode.OK;
-    case 201:
-    case "CREATED":
-      return StatusCode.CREATED;
-    case 404:
-    case "NOT_FOUND":
-      return StatusCode.NOT_FOUND;
-    case 500:
-    case "INTERNAL_ERROR":
-      return StatusCode.INTERNAL_ERROR;
-    case 400:
-    case "BAD_REQUEST":
-      return StatusCode.BAD_REQUEST;
-    case 402:
-    case "VALIDATION_FAILED":
-      return StatusCode.VALIDATION_FAILED;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return StatusCode.UNRECOGNIZED;
-  }
-}
-
-export function statusCodeToJSON(object: StatusCode): string {
-  switch (object) {
-    case StatusCode.UNSPECIFIED:
-      return "UNSPECIFIED";
-    case StatusCode.OK:
-      return "OK";
-    case StatusCode.CREATED:
-      return "CREATED";
-    case StatusCode.NOT_FOUND:
-      return "NOT_FOUND";
-    case StatusCode.INTERNAL_ERROR:
-      return "INTERNAL_ERROR";
-    case StatusCode.BAD_REQUEST:
-      return "BAD_REQUEST";
-    case StatusCode.VALIDATION_FAILED:
-      return "VALIDATION_FAILED";
-    case StatusCode.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
 
 /** Status dimana hanya untuk koneksi ke server, apakah koneksi berhasil atau tidak */
 export enum StatusServer {
@@ -292,11 +229,6 @@ export interface ServerCredential {
   username: string;
   password?: string | undefined;
   sshKey?: string | undefined;
-}
-
-export interface MessageResponse {
-  status: StatusCode;
-  message: string;
 }
 
 export interface BatchDeleteAccidentsRequest {
@@ -2218,82 +2150,6 @@ export const ServerCredential: MessageFns<ServerCredential> = {
     message.username = object.username ?? "";
     message.password = object.password ?? undefined;
     message.sshKey = object.sshKey ?? undefined;
-    return message;
-  },
-};
-
-function createBaseMessageResponse(): MessageResponse {
-  return { status: 0, message: "" };
-}
-
-export const MessageResponse: MessageFns<MessageResponse> = {
-  encode(message: MessageResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.status !== 0) {
-      writer.uint32(8).int32(message.status);
-    }
-    if (message.message !== "") {
-      writer.uint32(18).string(message.message);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): MessageResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMessageResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
-
-          message.status = reader.int32() as any;
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.message = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MessageResponse {
-    return {
-      status: isSet(object.status) ? statusCodeFromJSON(object.status) : 0,
-      message: isSet(object.message) ? globalThis.String(object.message) : "",
-    };
-  },
-
-  toJSON(message: MessageResponse): unknown {
-    const obj: any = {};
-    if (message.status !== 0) {
-      obj.status = statusCodeToJSON(message.status);
-    }
-    if (message.message !== "") {
-      obj.message = message.message;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<MessageResponse>, I>>(base?: I): MessageResponse {
-    return MessageResponse.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<MessageResponse>, I>>(object: I): MessageResponse {
-    const message = createBaseMessageResponse();
-    message.status = object.status ?? 0;
-    message.message = object.message ?? "";
     return message;
   },
 };

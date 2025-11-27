@@ -56,6 +56,10 @@ func main() {
 	agentHandler := grpcServices.NewAgentHandler(agentUseCase)
 	agentPb.RegisterAgentServer(grpcServer, agentHandler)
 
+	// Register Node service
+	nodeHandler := grpcServices.NewAgentNodeService("/var/lib/sylix-agent/nodes")
+	agentPb.RegisterAgentNodeServiceServer(grpcServer, nodeHandler)
+
 	logger.Log.Info("Agent started", zap.String("address", addr))
 	if err := grpcServer.Serve(netListen); err != nil {
 		logger.Log.Fatal("Failed to serve gRPC server", zap.String("address", addr), zap.Error(err))

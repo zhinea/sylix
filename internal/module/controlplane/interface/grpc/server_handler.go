@@ -30,7 +30,7 @@ func (s *ServerService) All(ctx context.Context, _ *pbCommon.Empty) (*pbControlP
 	if err != nil {
 		errStr := err.Error()
 		return &pbControlPlane.ServersResponse{
-			Status: pbControlPlane.StatusCode_INTERNAL_ERROR,
+			Status: pbCommon.StatusCode_INTERNAL_ERROR,
 			Error:  &errStr,
 		}, nil
 	}
@@ -41,7 +41,7 @@ func (s *ServerService) All(ctx context.Context, _ *pbCommon.Empty) (*pbControlP
 	}
 
 	return &pbControlPlane.ServersResponse{
-		Status:  pbControlPlane.StatusCode_OK,
+		Status:  pbCommon.StatusCode_OK,
 		Servers: pbControlPlanes,
 	}, nil
 }
@@ -51,13 +51,13 @@ func (s *ServerService) Get(ctx context.Context, id *pbControlPlane.Id) (*pbCont
 	if err != nil {
 		errStr := err.Error()
 		return &pbControlPlane.ServerResponse{
-			Status: pbControlPlane.StatusCode_NOT_FOUND,
+			Status: pbCommon.StatusCode_NOT_FOUND,
 			Error:  &errStr,
 		}, nil
 	}
 
 	return &pbControlPlane.ServerResponse{
-		Status: pbControlPlane.StatusCode_OK,
+		Status: pbCommon.StatusCode_OK,
 		Server: s.entityToProto(server),
 	}, nil
 }
@@ -68,7 +68,7 @@ func (s *ServerService) Create(ctx context.Context, pb *pbControlPlane.Server) (
 
 	if err := s.validator.Validate(entityServer); err != nil {
 		return &pbControlPlane.ServerResponse{
-			Status: pbControlPlane.StatusCode_VALIDATION_FAILED,
+			Status: pbCommon.StatusCode_VALIDATION_FAILED,
 			Server: &pbControlPlane.Server{},
 			Errors: err,
 		}, nil
@@ -78,13 +78,13 @@ func (s *ServerService) Create(ctx context.Context, pb *pbControlPlane.Server) (
 	if err != nil {
 		errStr := err.Error()
 		return &pbControlPlane.ServerResponse{
-			Status: pbControlPlane.StatusCode_INTERNAL_ERROR,
+			Status: pbCommon.StatusCode_INTERNAL_ERROR,
 			Error:  &errStr,
 		}, nil
 	}
 
 	return &pbControlPlane.ServerResponse{
-		Status: pbControlPlane.StatusCode_CREATED,
+		Status: pbCommon.StatusCode_CREATED,
 		Server: s.entityToProto(createdServer),
 	}, nil
 }
@@ -96,13 +96,13 @@ func (s *ServerService) Update(ctx context.Context, pb *pbControlPlane.Server) (
 	if err != nil {
 		errStr := err.Error()
 		return &pbControlPlane.ServerResponse{
-			Status: pbControlPlane.StatusCode_INTERNAL_ERROR,
+			Status: pbCommon.StatusCode_INTERNAL_ERROR,
 			Error:  &errStr,
 		}, nil
 	}
 
 	return &pbControlPlane.ServerResponse{
-		Status: pbControlPlane.StatusCode_OK,
+		Status: pbCommon.StatusCode_OK,
 		Server: s.entityToProto(updatedServer),
 	}, nil
 }
@@ -202,69 +202,69 @@ func (s *ServerService) GetRealtimeStats(ctx context.Context, req *pbControlPlan
 	}, nil
 }
 
-func (s *ServerService) ConfigureAgent(ctx context.Context, req *pbControlPlane.ConfigureAgentRequest) (*pbControlPlane.MessageResponse, error) {
+func (s *ServerService) ConfigureAgent(ctx context.Context, req *pbControlPlane.ConfigureAgentRequest) (*pbCommon.MessageResponse, error) {
 	if err := s.useCase.ConfigureAgent(ctx, req.ServerId, req.Config); err != nil {
-		return &pbControlPlane.MessageResponse{
-			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+		return &pbCommon.MessageResponse{
+			Status:  pbCommon.StatusCode_INTERNAL_ERROR,
 			Message: err.Error(),
 		}, nil
 	}
-	return &pbControlPlane.MessageResponse{
-		Status:  pbControlPlane.StatusCode_OK,
+	return &pbCommon.MessageResponse{
+		Status:  pbCommon.StatusCode_OK,
 		Message: "Agent configured successfully",
 	}, nil
 }
 
-func (s *ServerService) UpdateAgentPort(ctx context.Context, req *pbControlPlane.UpdateAgentPortRequest) (*pbControlPlane.MessageResponse, error) {
+func (s *ServerService) UpdateAgentPort(ctx context.Context, req *pbControlPlane.UpdateAgentPortRequest) (*pbCommon.MessageResponse, error) {
 	if err := s.useCase.UpdateAgentPort(ctx, req.ServerId, int(req.Port)); err != nil {
-		return &pbControlPlane.MessageResponse{
-			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+		return &pbCommon.MessageResponse{
+			Status:  pbCommon.StatusCode_INTERNAL_ERROR,
 			Message: err.Error(),
 		}, nil
 	}
-	return &pbControlPlane.MessageResponse{
-		Status:  pbControlPlane.StatusCode_OK,
+	return &pbCommon.MessageResponse{
+		Status:  pbCommon.StatusCode_OK,
 		Message: "Agent port updated successfully",
 	}, nil
 }
 
-func (s *ServerService) UpdateServerTimeZone(ctx context.Context, req *pbControlPlane.UpdateServerTimeZoneRequest) (*pbControlPlane.MessageResponse, error) {
+func (s *ServerService) UpdateServerTimeZone(ctx context.Context, req *pbControlPlane.UpdateServerTimeZoneRequest) (*pbCommon.MessageResponse, error) {
 	if err := s.useCase.UpdateServerTimeZone(ctx, req.ServerId, req.Timezone); err != nil {
-		return &pbControlPlane.MessageResponse{
-			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+		return &pbCommon.MessageResponse{
+			Status:  pbCommon.StatusCode_INTERNAL_ERROR,
 			Message: err.Error(),
 		}, nil
 	}
-	return &pbControlPlane.MessageResponse{
-		Status:  pbControlPlane.StatusCode_OK,
+	return &pbCommon.MessageResponse{
+		Status:  pbCommon.StatusCode_OK,
 		Message: "Server timezone updated successfully",
 	}, nil
 }
 
-func (s *ServerService) Delete(ctx context.Context, id *pbControlPlane.Id) (*pbControlPlane.MessageResponse, error) {
+func (s *ServerService) Delete(ctx context.Context, id *pbControlPlane.Id) (*pbCommon.MessageResponse, error) {
 	if err := s.useCase.Delete(ctx, id.Id); err != nil {
-		return &pbControlPlane.MessageResponse{
-			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+		return &pbCommon.MessageResponse{
+			Status:  pbCommon.StatusCode_INTERNAL_ERROR,
 			Message: err.Error(),
 		}, nil
 	}
 
-	return &pbControlPlane.MessageResponse{
-		Status:  pbControlPlane.StatusCode_OK,
+	return &pbCommon.MessageResponse{
+		Status:  pbCommon.StatusCode_OK,
 		Message: "Server deleted successfully",
 	}, nil
 }
 
-func (s *ServerService) InstallAgent(ctx context.Context, id *pbControlPlane.Id) (*pbControlPlane.MessageResponse, error) {
+func (s *ServerService) InstallAgent(ctx context.Context, id *pbControlPlane.Id) (*pbCommon.MessageResponse, error) {
 	if err := s.useCase.InstallAgent(ctx, id.Id); err != nil {
-		return &pbControlPlane.MessageResponse{
-			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+		return &pbCommon.MessageResponse{
+			Status:  pbCommon.StatusCode_INTERNAL_ERROR,
 			Message: err.Error(),
 		}, nil
 	}
 
-	return &pbControlPlane.MessageResponse{
-		Status:  pbControlPlane.StatusCode_OK,
+	return &pbCommon.MessageResponse{
+		Status:  pbCommon.StatusCode_OK,
 		Message: "Agent installed successfully",
 	}, nil
 }
@@ -281,30 +281,30 @@ func (s *ServerService) GetAgentConfig(ctx context.Context, id *pbControlPlane.I
 	}, nil
 }
 
-func (s *ServerService) DeleteAccident(ctx context.Context, req *pbControlPlane.Id) (*pbControlPlane.MessageResponse, error) {
+func (s *ServerService) DeleteAccident(ctx context.Context, req *pbControlPlane.Id) (*pbCommon.MessageResponse, error) {
 	err := s.useCase.DeleteAccident(ctx, req.Id)
 	if err != nil {
-		return &pbControlPlane.MessageResponse{
-			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+		return &pbCommon.MessageResponse{
+			Status:  pbCommon.StatusCode_INTERNAL_ERROR,
 			Message: err.Error(),
 		}, nil
 	}
-	return &pbControlPlane.MessageResponse{
-		Status:  pbControlPlane.StatusCode_OK,
+	return &pbCommon.MessageResponse{
+		Status:  pbCommon.StatusCode_OK,
 		Message: "Accident deleted successfully",
 	}, nil
 }
 
-func (s *ServerService) BatchDeleteAccidents(ctx context.Context, req *pbControlPlane.BatchDeleteAccidentsRequest) (*pbControlPlane.MessageResponse, error) {
+func (s *ServerService) BatchDeleteAccidents(ctx context.Context, req *pbControlPlane.BatchDeleteAccidentsRequest) (*pbCommon.MessageResponse, error) {
 	err := s.useCase.BatchDeleteAccidents(ctx, req.Ids)
 	if err != nil {
-		return &pbControlPlane.MessageResponse{
-			Status:  pbControlPlane.StatusCode_INTERNAL_ERROR,
+		return &pbCommon.MessageResponse{
+			Status:  pbCommon.StatusCode_INTERNAL_ERROR,
 			Message: err.Error(),
 		}, nil
 	}
-	return &pbControlPlane.MessageResponse{
-		Status:  pbControlPlane.StatusCode_OK,
+	return &pbCommon.MessageResponse{
+		Status:  pbCommon.StatusCode_OK,
 		Message: "Accidents deleted successfully",
 	}, nil
 }

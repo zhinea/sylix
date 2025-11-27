@@ -46,17 +46,17 @@ type ServerServiceClient interface {
 	Get(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ServerResponse, error)
 	All(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*ServersResponse, error)
 	Update(ctx context.Context, in *Server, opts ...grpc.CallOption) (*ServerResponse, error)
-	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
+	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*common.MessageResponse, error)
 	RetryConnection(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ServerResponse, error)
-	InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
+	InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*common.MessageResponse, error)
 	GetStats(ctx context.Context, in *GetStatsRequest, opts ...grpc.CallOption) (*GetStatsResponse, error)
 	GetAccidents(ctx context.Context, in *GetAccidentsRequest, opts ...grpc.CallOption) (*GetAccidentsResponse, error)
-	DeleteAccident(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error)
-	BatchDeleteAccidents(ctx context.Context, in *BatchDeleteAccidentsRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	DeleteAccident(ctx context.Context, in *Id, opts ...grpc.CallOption) (*common.MessageResponse, error)
+	BatchDeleteAccidents(ctx context.Context, in *BatchDeleteAccidentsRequest, opts ...grpc.CallOption) (*common.MessageResponse, error)
 	GetRealtimeStats(ctx context.Context, in *GetRealtimeStatsRequest, opts ...grpc.CallOption) (*GetRealtimeStatsResponse, error)
-	ConfigureAgent(ctx context.Context, in *ConfigureAgentRequest, opts ...grpc.CallOption) (*MessageResponse, error)
-	UpdateAgentPort(ctx context.Context, in *UpdateAgentPortRequest, opts ...grpc.CallOption) (*MessageResponse, error)
-	UpdateServerTimeZone(ctx context.Context, in *UpdateServerTimeZoneRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	ConfigureAgent(ctx context.Context, in *ConfigureAgentRequest, opts ...grpc.CallOption) (*common.MessageResponse, error)
+	UpdateAgentPort(ctx context.Context, in *UpdateAgentPortRequest, opts ...grpc.CallOption) (*common.MessageResponse, error)
+	UpdateServerTimeZone(ctx context.Context, in *UpdateServerTimeZoneRequest, opts ...grpc.CallOption) (*common.MessageResponse, error)
 	GetAgentConfig(ctx context.Context, in *Id, opts ...grpc.CallOption) (*GetAgentConfigResponse, error)
 }
 
@@ -108,9 +108,9 @@ func (c *serverServiceClient) Update(ctx context.Context, in *Server, opts ...gr
 	return out, nil
 }
 
-func (c *serverServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error) {
+func (c *serverServiceClient) Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*common.MessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MessageResponse)
+	out := new(common.MessageResponse)
 	err := c.cc.Invoke(ctx, ServerService_Delete_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -128,9 +128,9 @@ func (c *serverServiceClient) RetryConnection(ctx context.Context, in *Id, opts 
 	return out, nil
 }
 
-func (c *serverServiceClient) InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error) {
+func (c *serverServiceClient) InstallAgent(ctx context.Context, in *Id, opts ...grpc.CallOption) (*common.MessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MessageResponse)
+	out := new(common.MessageResponse)
 	err := c.cc.Invoke(ctx, ServerService_InstallAgent_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -158,9 +158,9 @@ func (c *serverServiceClient) GetAccidents(ctx context.Context, in *GetAccidents
 	return out, nil
 }
 
-func (c *serverServiceClient) DeleteAccident(ctx context.Context, in *Id, opts ...grpc.CallOption) (*MessageResponse, error) {
+func (c *serverServiceClient) DeleteAccident(ctx context.Context, in *Id, opts ...grpc.CallOption) (*common.MessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MessageResponse)
+	out := new(common.MessageResponse)
 	err := c.cc.Invoke(ctx, ServerService_DeleteAccident_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -168,9 +168,9 @@ func (c *serverServiceClient) DeleteAccident(ctx context.Context, in *Id, opts .
 	return out, nil
 }
 
-func (c *serverServiceClient) BatchDeleteAccidents(ctx context.Context, in *BatchDeleteAccidentsRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+func (c *serverServiceClient) BatchDeleteAccidents(ctx context.Context, in *BatchDeleteAccidentsRequest, opts ...grpc.CallOption) (*common.MessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MessageResponse)
+	out := new(common.MessageResponse)
 	err := c.cc.Invoke(ctx, ServerService_BatchDeleteAccidents_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -188,9 +188,9 @@ func (c *serverServiceClient) GetRealtimeStats(ctx context.Context, in *GetRealt
 	return out, nil
 }
 
-func (c *serverServiceClient) ConfigureAgent(ctx context.Context, in *ConfigureAgentRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+func (c *serverServiceClient) ConfigureAgent(ctx context.Context, in *ConfigureAgentRequest, opts ...grpc.CallOption) (*common.MessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MessageResponse)
+	out := new(common.MessageResponse)
 	err := c.cc.Invoke(ctx, ServerService_ConfigureAgent_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -198,9 +198,9 @@ func (c *serverServiceClient) ConfigureAgent(ctx context.Context, in *ConfigureA
 	return out, nil
 }
 
-func (c *serverServiceClient) UpdateAgentPort(ctx context.Context, in *UpdateAgentPortRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+func (c *serverServiceClient) UpdateAgentPort(ctx context.Context, in *UpdateAgentPortRequest, opts ...grpc.CallOption) (*common.MessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MessageResponse)
+	out := new(common.MessageResponse)
 	err := c.cc.Invoke(ctx, ServerService_UpdateAgentPort_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -208,9 +208,9 @@ func (c *serverServiceClient) UpdateAgentPort(ctx context.Context, in *UpdateAge
 	return out, nil
 }
 
-func (c *serverServiceClient) UpdateServerTimeZone(ctx context.Context, in *UpdateServerTimeZoneRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+func (c *serverServiceClient) UpdateServerTimeZone(ctx context.Context, in *UpdateServerTimeZoneRequest, opts ...grpc.CallOption) (*common.MessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MessageResponse)
+	out := new(common.MessageResponse)
 	err := c.cc.Invoke(ctx, ServerService_UpdateServerTimeZone_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -236,17 +236,17 @@ type ServerServiceServer interface {
 	Get(context.Context, *Id) (*ServerResponse, error)
 	All(context.Context, *common.Empty) (*ServersResponse, error)
 	Update(context.Context, *Server) (*ServerResponse, error)
-	Delete(context.Context, *Id) (*MessageResponse, error)
+	Delete(context.Context, *Id) (*common.MessageResponse, error)
 	RetryConnection(context.Context, *Id) (*ServerResponse, error)
-	InstallAgent(context.Context, *Id) (*MessageResponse, error)
+	InstallAgent(context.Context, *Id) (*common.MessageResponse, error)
 	GetStats(context.Context, *GetStatsRequest) (*GetStatsResponse, error)
 	GetAccidents(context.Context, *GetAccidentsRequest) (*GetAccidentsResponse, error)
-	DeleteAccident(context.Context, *Id) (*MessageResponse, error)
-	BatchDeleteAccidents(context.Context, *BatchDeleteAccidentsRequest) (*MessageResponse, error)
+	DeleteAccident(context.Context, *Id) (*common.MessageResponse, error)
+	BatchDeleteAccidents(context.Context, *BatchDeleteAccidentsRequest) (*common.MessageResponse, error)
 	GetRealtimeStats(context.Context, *GetRealtimeStatsRequest) (*GetRealtimeStatsResponse, error)
-	ConfigureAgent(context.Context, *ConfigureAgentRequest) (*MessageResponse, error)
-	UpdateAgentPort(context.Context, *UpdateAgentPortRequest) (*MessageResponse, error)
-	UpdateServerTimeZone(context.Context, *UpdateServerTimeZoneRequest) (*MessageResponse, error)
+	ConfigureAgent(context.Context, *ConfigureAgentRequest) (*common.MessageResponse, error)
+	UpdateAgentPort(context.Context, *UpdateAgentPortRequest) (*common.MessageResponse, error)
+	UpdateServerTimeZone(context.Context, *UpdateServerTimeZoneRequest) (*common.MessageResponse, error)
 	GetAgentConfig(context.Context, *Id) (*GetAgentConfigResponse, error)
 	mustEmbedUnimplementedServerServiceServer()
 }
@@ -270,13 +270,13 @@ func (UnimplementedServerServiceServer) All(context.Context, *common.Empty) (*Se
 func (UnimplementedServerServiceServer) Update(context.Context, *Server) (*ServerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedServerServiceServer) Delete(context.Context, *Id) (*MessageResponse, error) {
+func (UnimplementedServerServiceServer) Delete(context.Context, *Id) (*common.MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedServerServiceServer) RetryConnection(context.Context, *Id) (*ServerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RetryConnection not implemented")
 }
-func (UnimplementedServerServiceServer) InstallAgent(context.Context, *Id) (*MessageResponse, error) {
+func (UnimplementedServerServiceServer) InstallAgent(context.Context, *Id) (*common.MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InstallAgent not implemented")
 }
 func (UnimplementedServerServiceServer) GetStats(context.Context, *GetStatsRequest) (*GetStatsResponse, error) {
@@ -285,22 +285,22 @@ func (UnimplementedServerServiceServer) GetStats(context.Context, *GetStatsReque
 func (UnimplementedServerServiceServer) GetAccidents(context.Context, *GetAccidentsRequest) (*GetAccidentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccidents not implemented")
 }
-func (UnimplementedServerServiceServer) DeleteAccident(context.Context, *Id) (*MessageResponse, error) {
+func (UnimplementedServerServiceServer) DeleteAccident(context.Context, *Id) (*common.MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccident not implemented")
 }
-func (UnimplementedServerServiceServer) BatchDeleteAccidents(context.Context, *BatchDeleteAccidentsRequest) (*MessageResponse, error) {
+func (UnimplementedServerServiceServer) BatchDeleteAccidents(context.Context, *BatchDeleteAccidentsRequest) (*common.MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BatchDeleteAccidents not implemented")
 }
 func (UnimplementedServerServiceServer) GetRealtimeStats(context.Context, *GetRealtimeStatsRequest) (*GetRealtimeStatsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRealtimeStats not implemented")
 }
-func (UnimplementedServerServiceServer) ConfigureAgent(context.Context, *ConfigureAgentRequest) (*MessageResponse, error) {
+func (UnimplementedServerServiceServer) ConfigureAgent(context.Context, *ConfigureAgentRequest) (*common.MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConfigureAgent not implemented")
 }
-func (UnimplementedServerServiceServer) UpdateAgentPort(context.Context, *UpdateAgentPortRequest) (*MessageResponse, error) {
+func (UnimplementedServerServiceServer) UpdateAgentPort(context.Context, *UpdateAgentPortRequest) (*common.MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAgentPort not implemented")
 }
-func (UnimplementedServerServiceServer) UpdateServerTimeZone(context.Context, *UpdateServerTimeZoneRequest) (*MessageResponse, error) {
+func (UnimplementedServerServiceServer) UpdateServerTimeZone(context.Context, *UpdateServerTimeZoneRequest) (*common.MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateServerTimeZone not implemented")
 }
 func (UnimplementedServerServiceServer) GetAgentConfig(context.Context, *Id) (*GetAgentConfigResponse, error) {

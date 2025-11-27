@@ -9,7 +9,9 @@ import (
 	"github.com/rs/cors"
 	"github.com/zhinea/sylix/internal/common/logger"
 	database "github.com/zhinea/sylix/internal/infra/db"
+	"github.com/zhinea/sylix/internal/infra/db/sqlite"
 	pbControlPlane "github.com/zhinea/sylix/internal/infra/proto/controlplane"
+	pbNodes "github.com/zhinea/sylix/internal/infra/proto/controlplane/nodes"
 	"github.com/zhinea/sylix/internal/module/controlplane/app"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/services"
@@ -46,6 +48,12 @@ func main() {
 	monitoringRepo := repository.NewMonitoringRepository(db)
 	backupRepo := repository.NewBackupStorageRepository(db)
 
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+	nodeRepo := sqlite.NewNodeRepository(sqlDB)
+
 	monitoringService := services.NewMonitoringService(monitoringRepo)
 	agentService := services.NewAgentService(serverRepo)
 	backupService := services.NewBackupService(backupRepo, serverRepo, agentService)
@@ -57,6 +65,9 @@ func main() {
 	logsUseCase := app.NewLogsUseCase()
 	logsService := grpcServices.NewLogsService(logsUseCase)
 
+	nodeUseCase := app.NewNodeUseCase(nodeRepo)
+	nodeService := grpcServices.NewNodeService(nodeUseCase)
+
 	// Monitoring
 	monitoringWorker := app.NewMonitoringWorker(serverRepo, monitoringRepo)
 	monitoringWorker.Start()
@@ -64,6 +75,7 @@ func main() {
 	pbControlPlane.RegisterServerServiceServer(grpcServer, serverService)
 	pbControlPlane.RegisterLogsServiceServer(grpcServer, logsService)
 	pbControlPlane.RegisterBackupStorageServiceServer(grpcServer, backupStorageService)
+	pbNodes.RegisterNodeServiceServer(grpcServer, nodeService)
 
 	// Wrap gRPC server for gRPC-Web support
 	wrappedGrpc := grpcweb.WrapServer(grpcServer,

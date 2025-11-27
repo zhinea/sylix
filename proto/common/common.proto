@@ -5,3 +5,18 @@ package common;
 option go_package = "github.com/zhinea/sylix/internal/infra/proto/common";
 
 message Empty {}
+
+enum StatusCode {
+    UNSPECIFIED = 0;
+    OK = 200;
+    CREATED = 201;
+    NOT_FOUND = 404;
+    INTERNAL_ERROR = 500;
+    BAD_REQUEST = 400;
+    VALIDATION_FAILED = 402;
+}
+
+message MessageResponse {
+    StatusCode status = 1;
+    string message = 2;
+}

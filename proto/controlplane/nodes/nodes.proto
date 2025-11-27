@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package controlplane.nodes;
+
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/controlplane/nodes";
+
+import "common/validation.proto";
+import "common/common.proto";
+
+service NodeService {
+    rpc CreateNode(CreateNodeRequest) returns (NodeResponse);
+    rpc GetNode(GetNodeRequest) returns (NodeResponse);
+    rpc ListNodes(ListNodesRequest) returns (ListNodesResponse);
+    rpc UpdateNode(UpdateNodeRequest) returns (NodeResponse);
+    rpc DeleteNode(DeleteNodeRequest) returns (common.MessageResponse);
+    rpc GetNodeGraphStatus(GetNodeGraphStatusRequest) returns (GetNodeGraphStatusResponse);
+    rpc DeployNode(DeployNodeRequest) returns (common.MessageResponse);
+}
+
+message Node {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string type = 4;
+    int32 priority_startup = 5;
+    string fields = 6;
+    string imports = 7;
+    string exports = 8;
+    string server_id = 9;
+    string created_at = 10;
+    string updated_at = 11;
+}
+
+message CreateNodeRequest {
+    string name = 1;
+    string description = 2;
+    string type = 3;
+    int32 priority_startup = 4;
+    string fields = 5;
+    string imports = 6;
+    string exports = 7;
+    string server_id = 8;
+}
+
+message GetNodeRequest {
+    string id = 1;
+}
+
+message ListNodesRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+}
+
+message UpdateNodeRequest {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string type = 4;
+    int32 priority_startup = 5;
+    string fields = 6;
+    string imports = 7;
+    string exports = 8;
+    string server_id = 9;
+}
+
+message DeleteNodeRequest {
+    string id = 1;
+}
+
+message DeployNodeRequest {
+    string id = 1;
+}
+
+message GetNodeGraphStatusRequest {
+    string id = 1;
+}
+
+message GetNodeGraphStatusResponse {
+    string status = 1;
+    string logs = 2;
+}
+
+message NodeResponse {
+    common.StatusCode status = 1;
+    Node node = 2;
+    repeated common.ValidationError errors = 3;
+    string error = 4;
+}
+
+message ListNodesResponse {
+    common.StatusCode status = 1;
+    repeated Node nodes = 2;
+    int64 total_count = 3;
+    repeated common.ValidationError errors = 4;
+    string error = 5;
+}

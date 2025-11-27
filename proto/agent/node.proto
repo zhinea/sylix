@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package agent;
+
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/agent";
+
+import "common/common.proto";
+
+service AgentNodeService {
+    rpc DeployNodeCompose(DeployNodeComposeRequest) returns (stream DeployNodeComposeResponse);
+    rpc StopNodeCompose(StopNodeComposeRequest) returns (common.MessageResponse);
+    rpc GetNodeStatus(GetNodeStatusRequest) returns (GetNodeStatusResponse);
+    rpc GetNodeLogs(GetNodeLogsRequest) returns (stream NodeLogResponse);
+}
+
+message DeployNodeComposeRequest {
+    string node_id = 1;
+    string node_type = 2;
+    string compose_content = 3;
+    int32 priority_startup = 4;
+}
+
+message DeployNodeComposeResponse {
+    string log = 1;
+    string status = 2; // "running", "success", "failed"
+}
+
+message StopNodeComposeRequest {
+    string node_id = 1;
+}
+
+message GetNodeStatusRequest {
+    string node_id = 1;
+}
+
+message GetNodeStatusResponse {
+    string status = 1; // "running", "stopped", "failed", "unknown"
+    string error = 2;
+}
+
+message GetNodeLogsRequest {
+    string node_id = 1;
+    int32 tail = 2; // Number of lines to tail
+}
+
+message NodeLogResponse {
+    string log = 1;
+}
