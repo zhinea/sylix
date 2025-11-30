@@ -1,3 +1,6 @@
+Sylix Engine is a database management postgresql (NeonDB focus) with a `controlplane` (master) and `agent` (node) architecture. It includes a React/Vite frontend (`ui/dashboard`).
+
+so, i want create the core of system, where the system can manage the nodes.
 
 The database concept is similar to nodes.
 There are four types of nodes: compute, storage broker, pageserver, and safekeeper.
@@ -35,37 +38,35 @@ The following are the node specifications:
                     "description": "Will the Postgres port be exposed to the internet? The input is a checkbox type."
                 }
             },
-            "pipes": {
-                "in": [
-                    {
-                        "from": "safekeeper",
-                        "imported": {
-                            "5454/tcp": "PG/WAL listener (compute writes WAL to safekeeper)"
-                        }
-                    },
-                    {
-                        "from": "pageserver",
-                        "imported": {
-                            "9898/tcp": "Pageserver HTTP API (fetch pages)"
-                        }
-                    },
-                    {
-                        "from": "storage_broker",
-                        "imported": {
-                            "50051/tcp": "Discovery/coordination (gRPC)"
-                        }
+            "imports": [
+                {
+                    "from": "safekeeper",
+                    "ports": {
+                        "5454/tcp": "PG/WAL listener (compute writes WAL to safekeeper)"
                     }
-                ],
-                "out": [
-                    {
-                        "to": "clients/app",
-                        "exported": {
-                            "55433/tcp": "PostgreSQL protocol",
-                            "3080/tcp": "HTTP admin/metrics (optional)"
-                        }
+                },
+                {
+                    "from": "pageserver",
+                    "ports": {
+                        "9898/tcp": "Pageserver HTTP API (fetch pages)"
                     }
-                ]
-            }
+                },
+                {
+                    "from": "storage_broker",
+                    "ports": {
+                        "50051/tcp": "Discovery/coordination (gRPC)"
+                    }
+                }
+            ],
+            "exports": [
+                {
+                    "to": "clients/app",
+                    "ports": {
+                        "55433/tcp": "PostgreSQL protocol",
+                        "3080/tcp": "HTTP admin/metrics (optional)"
+                    }
+                }
+            ]
         },
         {
             "name": "Pageserver",
@@ -84,24 +85,22 @@ The following are the node specifications:
                     "relatedTable": "backup_storage"
                 }
             },
-            "pipes": {
-                "in": [
-                    {
-                        "from": "storage_broker",
-                        "imported": {
-                            "50051/tcp": "Discovery/coordination (gRPC)"
-                        }
+            "imports": [
+                {
+                    "from": "storage_broker",
+                    "ports": {
+                        "50051/tcp": "Discovery/coordination (gRPC)"
                     }
-                ],
-                "out": [
-                    {
-                        "to": "compute",
-                        "exported": {
-                            "9898/tcp": "Pageserver HTTP API (fetch pages)"
-                        }
+                }
+            ],
+            "exports": [
+                {
+                    "to": "compute",
+                    "ports": {
+                        "9898/tcp": "Pageserver HTTP API (fetch pages)"
                     }
-                ]
-            }
+                }
+            ]
         },
         {
             "name": "Safekeeper",
@@ -120,30 +119,28 @@ The following are the node specifications:
                     "relatedTable": "backup_storage"
                 }
             },
-            "pipes": {
-                "in": [
-                    {
-                        "from": "storage_broker",
-                        "imported": {
-                            "50051/tcp": "Discovery/coordination (gRPC)"
-                        }
+            "imports": [
+                {
+                    "from": "storage_broker",
+                    "ports": {
+                        "50051/tcp": "Discovery/coordination (gRPC)"
                     }
-                ],
-                "out": [
-                    {
-                        "to": "compute",
-                        "exported": {
-                            "5454/tcp": "WAL acceptor (Postgres protocol)"
-                        }
-                    },
-                    {
-                        "to": "pageserver",
-                        "exported": {
-                            "7676/tcp": "HTTP API (pull WAL)"
-                        }
+                }
+            ],
+            "exports": [
+                {
+                    "to": "compute",
+                    "ports": {
+                        "5454/tcp": "WAL acceptor (Postgres protocol)"
                     }
-                ]
-            }
+                },
+                {
+                    "to": "pageserver",
+                    "ports": {
+                        "7676/tcp": "HTTP API (pull WAL)"
+                    }
+                }
+            ]
         },
         {
             "name": "Storage Broker",
@@ -157,38 +154,44 @@ The following are the node specifications:
                     "relatedTable": "servers"
                 }
             },
-            "pipes": {
-                "out": [
-                    {
-                        "to": "safekeeper",
-                        "exported": {
-                            "50051/tcp": "Discovery/coordination (gRPC)"
-                        }
-                    },
-                    {
-                        "to": "pageserver",
-                        "exported": {
-                            "50051/tcp": "Discovery/coordination (gRPC)"
-                        }
-                    },
-                    {
-                        "to": "compute",
-                        "exported": {
-                            "50051/tcp": "Discovery/coordination (gRPC)"
-                        }
+            "exports": [
+                {
+                    "to": "safekeeper",
+                    "ports": {
+                        "50051/tcp": "Discovery/coordination (gRPC)"
                     }
-                ]
-            }
+                },
+                {
+                    "to": "pageserver",
+                    "ports": {
+                        "50051/tcp": "Discovery/coordination (gRPC)"
+                    }
+                },
+                {
+                    "to": "compute",
+                    "ports": {
+                        "50051/tcp": "Discovery/coordination (gRPC)"
+                    }
+                }
+            ]
         }
     ]
 }
 ```
 
 
-jadi pada "ui/dashboard" dibuat halaman baru yaitu "nodes" dan jangan lupa untuk menambahkan nya di sidebar.
-halaman "nodes" ini akan full seperti canvas graph (mirip seperti n8n) jadi nanti antar node bisa di sambung sambungkan.
+So, on “ui/dashboard,” create a new page called “nodes” and don't forget to add it to the sidebar.
+The “nodes” page will be full like a canvas graph (similar to n8n), so later the nodes can be connected to each other.
 
-kira kira seperti ini
+For each node, only one connection is needed per node. This means that if A is already connected to B, then B does not need to connect the graph to A again.
+So when the graph is connected between nodes, it is like an open connection network between nodes.
+
+Then, import and export ports are ports that will be opened or needed by each node. For example, Compute needs `imports` pageserver, so the port result from pageserver must be set in compute.
+
+Then, on the “ui/dashboard” display, when the node is clicked, a modal will appear for the node settings (the settings are like those in `fields`).
+
+for nodes, It will look something like this
+
 ```
 storage broker
     |
@@ -205,11 +208,12 @@ The flow is as follows.
 
 1. The user creates a canvas node.
 2. The flow node is created.
-3. The backend parses the Docker Compose file along with the ports to be exposed (the ports to be exposed are random), ensuring that all Docker Compose files are connected to the correct ports. 
-4. Deploy according to the server_id using the agent. (agent.deployCompose) by adjusting the `priority_startup` order, where the smallest order must be deployed first.
-5. Deploy according to the order, waiting for each node to activate (must wait).
-6. When all nodes have been deployed, verify port availability and perform health checks for all services.
-7. Send alerts to users.
+3. Users showing realtime logs deploying process
+4. The backend parses the Docker Compose file along with the ports to be exposed (the ports to be exposed are random), ensuring that all Docker Compose files are connected to the correct ports. 
+5. Deploy according to the server_id using the agent. (agent.deployCompose) by adjusting the `priority_startup` order, where the smallest order must be deployed first.
+6. Deploy according to the order, waiting for each node to activate (must wait).
+7. When all nodes have been deployed, verify port availability and perform health checks for all services.
+8. Send alerts to users.
 
 All of the above processes run in the background. From the user's perspective, it may be better to display real-time logs, as when installing the server agent.
 
@@ -228,6 +232,21 @@ If the action is to change the server_id (meaning moving the node)
 4. On the target server, download the Docker snapshot.
 5. Run the downloaded snapshot again.
 6. Change the credentials on other nodes to follow the credentials on the new server. (Also ensure that the startup sequence is followed.)
+
+# Phases
+
+## Phase 1
+- Create a base `node` entity structure (on agent and controlplane)
+- Implement the structure to proto file, based on requirements above.
+- After the proto file is implemented, run `make compile-proto` and `make compile-proto-frontend`.
+
+## Phase 2
+- Implement the `agent` core system node
+- Implement the `controlplane` core system node
+
+## Phase 3
+- Implement the `ui/dashboard` canvas node, with already implemented gRPC connection to the controlplane.
+
 
 ## Acceptance criteria
 - [ ] Production-grade postgres config

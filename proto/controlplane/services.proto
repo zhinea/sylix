@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+package controlplane;
+
+option go_package = "github.com/zhinea/sylix/internal/infra/proto/controlplane";
+
+import "common/validation.proto";
+import "common/common.proto";
+
+
+service ServicesService {
+    rpc All(QueryServices) returns (ServiceNodesResponse);
+    rpc One(QueryId) returns (ServiceNode);
+    rpc Create(CreateServiceRequest) returns (ServiceNode);
+    rpc Update(CreateServiceRequest) returns (ServiceNode);
+    rpc Delete(QueryId) returns (common.MessageResponse);
+    rpc TakeActions(QueryTakeActions) returns (ServiceNodesResponse);
+    rpc GetLogs(QueryLog) returns (LogsResponse);
+}
+
+//
+// Constants
+//
+
+enum ServiceType {
+    CLUSTER = 0;
+    NODE = 1;
+}
+
+enum ServiceStatus {
+    OFFLINE = 0;
+    PROVISIONING = 1;
+    RUNNING = 2;
+    DELETING = 3;
+    ERROR = 4;
+}
+
+enum ServicePortType {
+    IN = 0;
+    OUT = 1;
+}
+
+enum TakeAction {
+    START = 0;
+    STOP = 1;
+    RESTART = 2;
+}
+
+// 
+// Query
+// 
+message QueryId {
+    string service_id = 1;
+}
+
+message QueryServices {
+    int32 page = 1;
+    int32 limit = 2;
+    string search = 3;
+    string sort = 4;
+    string order = 5;
+}
+
+message QueryTakeActions {
+    TakeAction action = 1;
+    repeated string service_ids = 2;
+}
+
+message QueryLog {
+    string service_id = 1;
+    int32 limit = 2; // default is 100 lines
+    int32 page = 3; // reversed page. if 1 this mean is the latest logs
+}
+
+
+// 
+// Utils
+// 
+message ServiceNodeField {
+    string key = 1;
+    string value = 2;
+    string type = 3; // text, number, boolean, options, etc
+}
+
+message ServicePort {
+    ServicePortType type = 1; // IN or OUT
+    int32 port = 2;
+    string protocol = 3; // tcp, udp, etc
+    string host = 4;
+    bool enabled_expose = 5; // this mean, if true, expose to internet
+}
+
+message ServiceContainer {
+    string id = 1; // docker container id
+    string name = 2; 
+    string image = 3; // image container used.
+    string created_at = 4;
+    string updated_at = 5;
+}
+
+message ServiceApp {
+    string app = 1; // e.g. supabase, neondb, etc
+    string version = 2; // base version 
+    string service = 3; // e.g. if neondb -> pageserver, safekeeper, etc. 
+}
+
+//
+// Base
+//
+message CreateServiceRequest {
+    string name = 1;
+    ServiceType type = 2;
+    ServiceApp app = 3;
+    repeated ServiceNodeField fields = 4;
+    string server_id = 5;
+    optional string parent_id = 6;
+}
+
+// always get latest the logs
+message LogsResponse {
+    repeated string logs = 1;
+    string service_id = 2;
+    ServiceStatus status = 3;
+}
+
+
+message ServiceNode {
+    string id = 1;
+    string name = 2;
+
+    // app of the service, like if supabase, app is supabase. or if neondb, app is neondb
+    ServiceApp app = 3;
+
+    // type service, cluster or node
+    ServiceType type = 4; 
+
+    // status of the service
+    ServiceStatus status = 5; 
+
+    // fields of the service
+    repeated ServiceNodeField fields = 6;
+
+    // server id of the service
+    string server_id = 7;
+
+    // nodes. like if app = neondb, so the service children is safekeeper, pageserver, etc
+    repeated ServiceNode nodes = 8; 
+    
+    // ports of the service, like if app = neondb, ports is 5432, 5433, etc
+    repeated ServicePort ports = 9; 
+
+    // image container of docker
+    ServiceContainer container = 10;
+
+    // parent id of the service. default is null
+    string parent_id = 11;
+
+    // timestamp at of the service
+    string created_at = 12;
+    string updated_at = 13; 
+}
+
+
+
+message ServiceNodesResponse {
+    common.StatusCode status = 1;
+    repeated ServiceNode services = 2;
+    repeated common.ValidationError errors = 3;
+    optional string error = 4;
+}
