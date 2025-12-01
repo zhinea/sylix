@@ -20,12 +20,20 @@ type Server struct {
 	model.Model
 	Name           string           `json:"name"`
 	IpAddress      string           `json:"ip_address"`
+	InternalIP     string           `json:"internal_ip"`
 	Port           int              `json:"port"`
 	Protocol       string           `json:"protocol"`
 	Credential     ServerCredential `json:"credential" gorm:"embedded;embeddedPrefix:credential_"`
 	Agent          ServerAgent      `json:"agent" gorm:"embedded;embeddedPrefix:agent_"`
+	WireGuard      ServerWireGuard  `json:"wire_guard" gorm:"embedded;embeddedPrefix:wg_"`
 	Status         int              `json:"status"`
 	BackupStorages []*BackupStorage `json:"backup_storages" gorm:"many2many:server_backup_storages;"`
+}
+
+type ServerWireGuard struct {
+	PublicKey  string `json:"public_key"`
+	PrivateKey string `json:"private_key"`
+	ListenPort int    `json:"listen_port"`
 }
 
 const (

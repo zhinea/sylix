@@ -24,12 +24,3 @@ type ServerStat struct {
 	SuccessRate         float64   `json:"success_rate"`
 	Timestamp           time.Time `json:"timestamp"`
 }
-
-type ServerAccident struct {
-	model.Model
-	ServerID     string `json:"server_id" gorm:"index"`
-	ResponseTime int64  `json:"response_time"`
-	Error        string `json:"error"`
-	Details      string `json:"details"`
-	Resolved     bool   `json:"resolved"`
-}

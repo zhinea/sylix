@@ -37,7 +37,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
   try {
     if (intent === "create") {
       const data = Object.fromEntries(formData);
-      
+
       const server: Server = {
         id: "",
         name: data.name as string,
@@ -59,13 +59,13 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       };
 
       const response = await serverService.Create(server);
-      
+
       if (response.status === StatusCode.CREATED || response.status === StatusCode.OK) {
-          if (response.server?.status === StatusServer.CONNECTED) {
-              return { success: true, message: "Server credentials have been successfully connected", close: true, server: response.server };
-          } else {
-              return { success: true, warning: "Connection failed, credentials may be incorrect, or UFW is running", close: false, server: response.server };
-          }
+        if (response.server?.status === StatusServer.CONNECTED) {
+          return { success: true, message: "Server credentials have been successfully connected", close: true, server: response.server };
+        } else {
+          return { success: true, warning: "Connection failed, credentials may be incorrect, or UFW is running", close: false, server: response.server };
+        }
       }
       return { success: false, error: response.error || "Failed to create server" };
     }
@@ -121,11 +121,11 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       }
       return { success: false, error: response.error || "Failed to update server" };
     }
-    
-    if (intent === "install-agent") {
-        const id = formData.get("id") as string;
-        await serverService.InstallAgent({ id });
-        return { success: true, message: "Agent installation triggered" };
+
+    if (intent === "provision-node") {
+      const id = formData.get("id") as string;
+      await serverService.InstallAgent({ id }); // Maps to ProvisionNode in backend
+      return { success: true, message: "Node provisioning triggered" };
     }
 
     return { success: false, error: "Unknown intent" };
@@ -145,13 +145,13 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
   const submit = useSubmit();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
-  const isDeleting = 
-    navigation.state === "submitting" && 
+  const isDeleting =
+    navigation.state === "submitting" &&
     navigation.formData?.get("intent") === "delete";
-  const retryingServerId = 
-    navigation.state === "submitting" && 
-    navigation.formData?.get("intent") === "retry-connection" 
-      ? navigation.formData.get("id") as string 
+  const retryingServerId =
+    navigation.state === "submitting" &&
+      navigation.formData?.get("intent") === "retry-connection"
+      ? navigation.formData.get("id") as string
       : null;
   const actionData = useActionData<typeof clientAction>();
   const wasDeleting = useRef(false);
@@ -182,30 +182,30 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
   }, [isDeleting, navigation.state, actionData]);
 
   useEffect(() => {
-      if (actionData) {
-          if (actionData.success) {
-              if (actionData.warning) {
-                  toast.error(actionData.warning);
-              } else if (actionData.message) {
-                  toast.success(actionData.message);
-              }
-              
-              if (actionData.close) {
-                  setIsCreateOpen(false);
-                  setServerToUpdate(null);
-                  form.reset();
-              } else if (actionData.server) {
-                  if (isCreateOpen) {
-                      setIsCreateOpen(false);
-                      handleUpdate(actionData.server);
-                  } else if (serverToUpdate) {
-                      handleUpdate(actionData.server);
-                  }
-              }
-          } else if (actionData.error) {
-              toast.error(actionData.error);
+    if (actionData) {
+      if (actionData.success) {
+        if (actionData.warning) {
+          toast.error(actionData.warning);
+        } else if (actionData.message) {
+          toast.success(actionData.message);
+        }
+
+        if (actionData.close) {
+          setIsCreateOpen(false);
+          setServerToUpdate(null);
+          form.reset();
+        } else if (actionData.server) {
+          if (isCreateOpen) {
+            setIsCreateOpen(false);
+            handleUpdate(actionData.server);
+          } else if (serverToUpdate) {
+            handleUpdate(actionData.server);
           }
+        }
+      } else if (actionData.error) {
+        toast.error(actionData.error);
       }
+    }
   }, [actionData, form]);
 
   const onSubmit = (data: ServerFormValues) => {
@@ -214,7 +214,7 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
     Object.entries(data).forEach(([key, value]) => {
       if (value) formData.append(key, value.toString());
     });
-    
+
     submit(formData, { method: "post" });
     toast.info("Creating server...");
   };
@@ -226,7 +226,7 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
     Object.entries(data).forEach(([key, value]) => {
       if (value) formData.append(key, value.toString());
     });
-    
+
     submit(formData, { method: "post" });
     toast.info("Updating server...");
   };
@@ -240,14 +240,14 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
       toast.info("Deleting server...");
     }
   };
-  
-  const handleInstallAgent = (id: string) => {
-      const formData = new FormData();
-      formData.append("intent", "install-agent");
-      formData.append("id", id);
-      submit(formData, { method: "post" });
-      setInstallingServerId(id);
-      toast.info("Triggering agent installation...");
+
+  const handleProvisionNode = (id: string) => {
+    const formData = new FormData();
+    formData.append("intent", "provision-node");
+    formData.append("id", id);
+    submit(formData, { method: "post" });
+    setInstallingServerId(id);
+    toast.info("Triggering node provisioning...");
   }
 
   const handleRetryConnection = (id: string) => {
@@ -300,10 +300,10 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
           </CardContent>
         </Card>
       ) : (
-        <ServerList 
-          servers={servers} 
-          onDelete={setServerToDelete} 
-          onInstallAgent={handleInstallAgent}
+        <ServerList
+          servers={servers}
+          onDelete={setServerToDelete}
+          onInstallAgent={handleProvisionNode}
           onRetryConnection={handleRetryConnection}
           onUpdate={handleUpdate}
           retryingServerId={retryingServerId}
@@ -342,9 +342,9 @@ export default function ServersPage({ loaderData }: Route.ComponentProps) {
         isDeleting={isDeleting}
       />
 
-      <AgentLogsModal 
-        serverId={installingServerId} 
-        onClose={() => setInstallingServerId(null)} 
+      <AgentLogsModal
+        serverId={installingServerId}
+        onClose={() => setInstallingServerId(null)}
       />
     </div>
   );

@@ -47,10 +47,10 @@ func main() {
 	backupRepo := repository.NewBackupStorageRepository(db)
 
 	monitoringService := services.NewMonitoringService(monitoringRepo)
-	agentService := services.NewAgentService(serverRepo)
-	backupService := services.NewBackupService(backupRepo, serverRepo, agentService)
+	nodeService := services.NewNodeService(serverRepo)
+	backupService := services.NewBackupService(backupRepo, serverRepo)
 
-	serverUseCase := app.NewServerUseCase(serverRepo, monitoringService, agentService)
+	serverUseCase := app.NewServerUseCase(serverRepo, monitoringService, nodeService)
 	serverService := grpcServices.NewServerService(serverUseCase)
 	backupStorageService := grpcServices.NewBackupStorageService(backupService)
 

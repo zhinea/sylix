@@ -43,10 +43,10 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
         return (
           <div className="flex items-center gap-2">
             <Badge variant="destructive">Disconnected</Badge>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-6 w-6 hover:shadow-md transition-all" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 hover:shadow-md transition-all"
               onClick={() => onRetryConnection(server.id)}
               title="Retry Connection"
               isLoading={retryingServerId === server.id}
@@ -63,15 +63,15 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
   const getAgentStatusBadge = (status: AgentStatusServer) => {
     switch (status) {
       case AgentStatusServer.SUCCESS:
-        return <Badge variant="outline" className="border-green-500 text-green-500">Installed</Badge>;
+        return <Badge variant="outline" className="border-green-500 text-green-500">Provisioned</Badge>;
       case AgentStatusServer.INSTALLING:
       case AgentStatusServer.CONFIGURING:
       case AgentStatusServer.FINALIZING_SETUP:
-        return <Badge variant="outline" className="border-blue-500 text-blue-500 animate-pulse">Installing</Badge>;
+        return <Badge variant="outline" className="border-blue-500 text-blue-500 animate-pulse">Provisioning</Badge>;
       case AgentStatusServer.FAILED:
         return <Badge variant="outline" className="border-red-500 text-red-500">Failed</Badge>;
       default:
-        return <Badge variant="outline" className="text-muted-foreground">Not Installed</Badge>;
+        return <Badge variant="outline" className="text-muted-foreground">Not Provisioned</Badge>;
     }
   };
 
@@ -91,8 +91,8 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
           </TableHeader>
           <TableBody>
             {servers.map((server: Server) => (
-              <TableRow 
-                key={server.id} 
+              <TableRow
+                key={server.id}
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => setSelectedServer(server)}
               >
@@ -129,10 +129,10 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onInstallAgent(server.id); }}>
                         <RefreshCw className="mr-2 h-4 w-4" />
-                        Install Agent
+                        Provision Node
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         className="text-red-600"
                         onClick={(e) => { e.stopPropagation(); onDelete(server); }}
                       >
@@ -148,10 +148,10 @@ export function ServerList({ servers, onDelete, onInstallAgent, onRetryConnectio
         </Table>
       </div>
 
-      <ServerLogsDialog 
-        serverId={logsServerId} 
-        open={!!logsServerId} 
-        onOpenChange={(open) => !open && setLogsServerId(null)} 
+      <ServerLogsDialog
+        serverId={logsServerId}
+        open={!!logsServerId}
+        onOpenChange={(open) => !open && setLogsServerId(null)}
       />
 
       <ServerManagementModal

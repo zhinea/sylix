@@ -120,3 +120,27 @@ func (s *SSHClient) CopyFile(srcPath, dstPath string) error {
 
 	return nil
 }
+
+func (s *SSHClient) WriteFile(remotePath string, content []byte, mode os.FileMode) error {
+	session, err := s.client.NewSession()
+	if err != nil {
+		return fmt.Errorf("failed to create session: %w", err)
+	}
+	defer session.Close()
+
+	w, err := session.StdinPipe()
+	if err != nil {
+		return fmt.Errorf("failed to get stdin pipe: %w", err)
+	}
+
+	go func() {
+		defer w.Close()
+		w.Write(content)
+	}()
+
+	if err := session.Run(fmt.Sprintf("cat > %s && chmod %o %s", remotePath, mode, remotePath)); err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+
+	return nil
+}

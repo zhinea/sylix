@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/zhinea/sylix/internal/common/logger"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
@@ -15,18 +14,18 @@ import (
 type ServerUseCase struct {
 	repo              repository.ServerRepository
 	monitoringService *services.MonitoringService
-	agentService      *services.AgentService
+	nodeService       *services.NodeService
 }
 
 func NewServerUseCase(
 	repo repository.ServerRepository,
 	monitoringService *services.MonitoringService,
-	agentService *services.AgentService,
+	nodeService *services.NodeService,
 ) *ServerUseCase {
 	return &ServerUseCase{
 		repo:              repo,
 		monitoringService: monitoringService,
-		agentService:      agentService,
+		nodeService:       nodeService,
 	}
 }
 
@@ -35,7 +34,7 @@ func (uc *ServerUseCase) Create(ctx context.Context, server *entity.Server) (*en
 	server.Status = entity.ServerStatusDisconnected
 
 	// Check connection before creating
-	if err := uc.agentService.CheckConnection(server); err == nil {
+	if err := uc.nodeService.CheckConnection(server); err == nil {
 		server.Status = entity.ServerStatusConnected
 	} else {
 		server.Status = entity.ServerStatusDisconnected
@@ -80,7 +79,7 @@ func (uc *ServerUseCase) Update(ctx context.Context, server *entity.Server) (*en
 	}
 
 	// Check connection before updating
-	if err := uc.agentService.CheckConnection(server); err == nil {
+	if err := uc.nodeService.CheckConnection(server); err == nil {
 		server.Status = entity.ServerStatusConnected
 	} else {
 		server.Status = entity.ServerStatusDisconnected
@@ -96,7 +95,7 @@ func (uc *ServerUseCase) RetryConnection(ctx context.Context, id string) (*entit
 		return nil, err
 	}
 
-	if err := uc.agentService.CheckConnection(server); err == nil {
+	if err := uc.nodeService.CheckConnection(server); err == nil {
 		server.Status = entity.ServerStatusConnected
 	} else {
 		server.Status = entity.ServerStatusDisconnected
@@ -110,26 +109,13 @@ func (uc *ServerUseCase) Delete(ctx context.Context, id string) error {
 	return uc.repo.Delete(ctx, id)
 }
 
-func (uc *ServerUseCase) GetAgentConfig(ctx context.Context, id string) (string, string, error) {
-	server, err := uc.repo.GetByID(ctx, id)
-	if err != nil {
-		return "", "", err
-	}
-	return uc.agentService.GetAgentConfig(ctx, server)
-}
-
-func (uc *ServerUseCase) InstallAgent(ctx context.Context, serverID string) error {
-	server, err := uc.repo.GetByID(ctx, serverID)
-	if err != nil {
-		return fmt.Errorf("failed to get server: %w", err)
-	}
-
+func (uc *ServerUseCase) ProvisionNode(ctx context.Context, server *entity.Server) error {
 	if server.Status != entity.ServerStatusConnected {
-		return fmt.Errorf("server must be connected to install agent")
+		return fmt.Errorf("server must be connected to provision node")
 	}
 
-	// Start async installation
-	go uc.agentService.Install(context.Background(), server)
+	// Start async provisioning
+	go uc.nodeService.Install(context.Background(), server)
 
 	return nil
 }
@@ -140,40 +126,4 @@ func (uc *ServerUseCase) GetStats(ctx context.Context, serverID string) ([]*enti
 
 func (uc *ServerUseCase) GetRealtimeStats(ctx context.Context, serverID string, limit int) ([]*entity.ServerPing, error) {
 	return uc.monitoringService.GetRealtimeStats(ctx, serverID, limit)
-}
-
-func (uc *ServerUseCase) GetAccidents(ctx context.Context, serverID string, startDate, endDate *time.Time, resolved *bool, page, pageSize int) ([]*entity.ServerAccident, int64, error) {
-	return uc.monitoringService.GetAccidents(ctx, serverID, startDate, endDate, resolved, page, pageSize)
-}
-
-func (uc *ServerUseCase) ConfigureAgent(ctx context.Context, serverID string, configStr string) error {
-	server, err := uc.repo.GetByID(ctx, serverID)
-	if err != nil {
-		return err
-	}
-	return uc.agentService.Configure(ctx, server, configStr)
-}
-
-func (uc *ServerUseCase) UpdateAgentPort(ctx context.Context, serverID string, port int) error {
-	server, err := uc.repo.GetByID(ctx, serverID)
-	if err != nil {
-		return err
-	}
-	return uc.agentService.UpdatePort(ctx, server, port)
-}
-
-func (uc *ServerUseCase) UpdateServerTimeZone(ctx context.Context, serverID string, timezone string) error {
-	server, err := uc.repo.GetByID(ctx, serverID)
-	if err != nil {
-		return err
-	}
-	return uc.agentService.UpdateTimeZone(ctx, server, timezone)
-}
-
-func (uc *ServerUseCase) DeleteAccident(ctx context.Context, id string) error {
-	return uc.monitoringService.DeleteAccident(ctx, id)
-}
-
-func (uc *ServerUseCase) BatchDeleteAccidents(ctx context.Context, ids []string) error {
-	return uc.monitoringService.BatchDeleteAccidents(ctx, ids)
 }

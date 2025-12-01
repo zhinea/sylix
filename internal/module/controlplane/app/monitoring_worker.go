@@ -2,18 +2,13 @@ package app
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
-	"fmt"
 	"time"
 
 	"github.com/zhinea/sylix/internal/common/logger"
-	pbAgent "github.com/zhinea/sylix/internal/infra/proto/agent"
+	"github.com/zhinea/sylix/internal/common/util"
 	"github.com/zhinea/sylix/internal/module/controlplane/domain/repository"
 	"github.com/zhinea/sylix/internal/module/controlplane/entity"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 type MonitoringWorker struct {
@@ -70,49 +65,22 @@ func (w *MonitoringWorker) pingAllServers() {
 }
 
 func (w *MonitoringWorker) pingServer(ctx context.Context, server *entity.Server) {
-	port := server.Agent.Port
-	if port == 0 {
-		port = 8083
-	}
-	target := fmt.Sprintf("%s:%d", server.IpAddress, port)
-
-	var opts []grpc.DialOption
-
-	// Always use TLS, but relax verification if CaCert is missing or for hostname
-	tlsConfig := &tls.Config{
-		InsecureSkipVerify: true,
-	}
-	if server.Agent.Cert != "" {
-		cp := x509.NewCertPool()
-		if cp.AppendCertsFromPEM([]byte(server.Agent.Cert)) {
-			tlsConfig.RootCAs = cp
-			tlsConfig.ServerName = server.IpAddress
-			tlsConfig.InsecureSkipVerify = false
-		}
-	}
-	creds := credentials.NewTLS(tlsConfig)
-	opts = append(opts, grpc.WithTransportCredentials(creds))
-
-	conn, err := grpc.NewClient(target, opts...)
+	// TODO: Implement monitoring via SSH or Docker API
+	// For now, we just check if we can SSH into the server
+	client, err := util.NewSSHClient(server.IpAddress, server.Port, server.Credential.Username, server.Credential.Password, server.Credential.SSHKey)
 	if err != nil {
 		w.recordPingFailure(ctx, server, err.Error())
 		return
 	}
-	defer conn.Close()
-
-	client := pbAgent.NewAgentClient(conn)
+	defer client.Close()
 
 	start := time.Now()
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	_, err = client.Ping(ctx, &pbAgent.PingRequest{Timestamp: start.Unix()})
-	duration := time.Since(start).Milliseconds()
-
-	if err != nil {
+	// Simple command to check responsiveness
+	if _, err := client.RunCommand("echo 'ping'"); err != nil {
 		w.recordPingFailure(ctx, server, err.Error())
 		return
 	}
+	duration := time.Since(start).Milliseconds()
 
 	w.monitoringRepo.SavePing(ctx, &entity.ServerPing{
 		ServerID:     server.Id,
@@ -121,15 +89,7 @@ func (w *MonitoringWorker) pingServer(ctx context.Context, server *entity.Server
 	})
 
 	// Check for high latency
-	if duration > 500 {
-		w.monitoringRepo.SaveAccident(ctx, &entity.ServerAccident{
-			ServerID:     server.Id,
-			ResponseTime: duration,
-			Error:        "High Latency",
-			Details:      fmt.Sprintf("Response time %dms > 500ms", duration),
-			Resolved:     false,
-		})
-	}
+
 }
 
 func (w *MonitoringWorker) recordPingFailure(ctx context.Context, server *entity.Server, errorMsg string) {
@@ -140,13 +100,6 @@ func (w *MonitoringWorker) recordPingFailure(ctx context.Context, server *entity
 		Error:        errorMsg,
 	})
 
-	w.monitoringRepo.SaveAccident(ctx, &entity.ServerAccident{
-		ServerID:     server.Id,
-		ResponseTime: 0,
-		Error:        "Connection Failed",
-		Details:      errorMsg,
-		Resolved:     false,
-	})
 }
 
 func (w *MonitoringWorker) calculateStats() {

@@ -40,8 +40,8 @@ export function ServerFormDialog({
         <DialogHeader>
           <DialogTitle>{mode === "create" ? "Add Server" : "Edit Server"}</DialogTitle>
           <DialogDescription>
-            {mode === "create" 
-              ? "Enter the details of the server you want to manage." 
+            {mode === "create"
+              ? "Enter the details of the server you want to manage."
               : "Update the details of your server."}
           </DialogDescription>
         </DialogHeader>
@@ -69,7 +69,7 @@ export function ServerFormDialog({
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="port" className="text-right">
-                Port
+                SSH Port
               </Label>
               <Input
                 id="port"
@@ -78,6 +78,7 @@ export function ServerFormDialog({
                 {...form.register("port")}
               />
             </div>
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="username" className="text-right">
                 Username

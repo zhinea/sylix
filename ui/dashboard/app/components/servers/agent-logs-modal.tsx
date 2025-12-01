@@ -33,7 +33,7 @@ export function AgentLogsModal({ serverId, onClose }: AgentLogsModalProps) {
 
         const logsResponse = await logsService.ReadServerLog({
           serverId,
-          filename: "setup_agent.log",
+          filename: "provisioning.log",
           page: 1000000,
           pageSize: 1000,
         });
@@ -64,7 +64,7 @@ export function AgentLogsModal({ serverId, onClose }: AgentLogsModalProps) {
             Status: {AgentStatusServer[status]}
           </DialogDescription>
         </DialogHeader>
-        <div 
+        <div
           ref={logContainerRef}
           className="flex-1 bg-black text-white p-4 rounded overflow-auto font-mono text-sm whitespace-pre-wrap"
         >

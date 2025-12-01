@@ -191,58 +191,6 @@ func (AgentStatusServer) EnumDescriptor() ([]byte, []int) {
 	return file_controlplane_server_proto_rawDescGZIP(), []int{2}
 }
 
-type GetAgentConfigResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Config        string                 `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
-	Timezone      string                 `protobuf:"bytes,2,opt,name=timezone,proto3" json:"timezone,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetAgentConfigResponse) Reset() {
-	*x = GetAgentConfigResponse{}
-	mi := &file_controlplane_server_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetAgentConfigResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAgentConfigResponse) ProtoMessage() {}
-
-func (x *GetAgentConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAgentConfigResponse.ProtoReflect.Descriptor instead.
-func (*GetAgentConfigResponse) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *GetAgentConfigResponse) GetConfig() string {
-	if x != nil {
-		return x.Config
-	}
-	return ""
-}
-
-func (x *GetAgentConfigResponse) GetTimezone() string {
-	if x != nil {
-		return x.Timezone
-	}
-	return ""
-}
-
 type GetRealtimeStatsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
@@ -253,7 +201,7 @@ type GetRealtimeStatsRequest struct {
 
 func (x *GetRealtimeStatsRequest) Reset() {
 	*x = GetRealtimeStatsRequest{}
-	mi := &file_controlplane_server_proto_msgTypes[1]
+	mi := &file_controlplane_server_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -265,7 +213,7 @@ func (x *GetRealtimeStatsRequest) String() string {
 func (*GetRealtimeStatsRequest) ProtoMessage() {}
 
 func (x *GetRealtimeStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[1]
+	mi := &file_controlplane_server_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -278,7 +226,7 @@ func (x *GetRealtimeStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRealtimeStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetRealtimeStatsRequest) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{1}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GetRealtimeStatsRequest) GetServerId() string {
@@ -309,7 +257,7 @@ type ServerPing struct {
 
 func (x *ServerPing) Reset() {
 	*x = ServerPing{}
-	mi := &file_controlplane_server_proto_msgTypes[2]
+	mi := &file_controlplane_server_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -321,7 +269,7 @@ func (x *ServerPing) String() string {
 func (*ServerPing) ProtoMessage() {}
 
 func (x *ServerPing) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[2]
+	mi := &file_controlplane_server_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -334,7 +282,7 @@ func (x *ServerPing) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerPing.ProtoReflect.Descriptor instead.
 func (*ServerPing) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{2}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ServerPing) GetId() string {
@@ -388,7 +336,7 @@ type GetRealtimeStatsResponse struct {
 
 func (x *GetRealtimeStatsResponse) Reset() {
 	*x = GetRealtimeStatsResponse{}
-	mi := &file_controlplane_server_proto_msgTypes[3]
+	mi := &file_controlplane_server_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -400,7 +348,7 @@ func (x *GetRealtimeStatsResponse) String() string {
 func (*GetRealtimeStatsResponse) ProtoMessage() {}
 
 func (x *GetRealtimeStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[3]
+	mi := &file_controlplane_server_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -413,7 +361,7 @@ func (x *GetRealtimeStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRealtimeStatsResponse.ProtoReflect.Descriptor instead.
 func (*GetRealtimeStatsResponse) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{3}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetRealtimeStatsResponse) GetPings() []*ServerPing {
@@ -421,162 +369,6 @@ func (x *GetRealtimeStatsResponse) GetPings() []*ServerPing {
 		return x.Pings
 	}
 	return nil
-}
-
-type ConfigureAgentRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	Config        string                 `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ConfigureAgentRequest) Reset() {
-	*x = ConfigureAgentRequest{}
-	mi := &file_controlplane_server_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ConfigureAgentRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ConfigureAgentRequest) ProtoMessage() {}
-
-func (x *ConfigureAgentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ConfigureAgentRequest.ProtoReflect.Descriptor instead.
-func (*ConfigureAgentRequest) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *ConfigureAgentRequest) GetServerId() string {
-	if x != nil {
-		return x.ServerId
-	}
-	return ""
-}
-
-func (x *ConfigureAgentRequest) GetConfig() string {
-	if x != nil {
-		return x.Config
-	}
-	return ""
-}
-
-type UpdateAgentPortRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	Port          int32                  `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateAgentPortRequest) Reset() {
-	*x = UpdateAgentPortRequest{}
-	mi := &file_controlplane_server_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateAgentPortRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateAgentPortRequest) ProtoMessage() {}
-
-func (x *UpdateAgentPortRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateAgentPortRequest.ProtoReflect.Descriptor instead.
-func (*UpdateAgentPortRequest) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *UpdateAgentPortRequest) GetServerId() string {
-	if x != nil {
-		return x.ServerId
-	}
-	return ""
-}
-
-func (x *UpdateAgentPortRequest) GetPort() int32 {
-	if x != nil {
-		return x.Port
-	}
-	return 0
-}
-
-type UpdateServerTimeZoneRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	Timezone      string                 `protobuf:"bytes,2,opt,name=timezone,proto3" json:"timezone,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateServerTimeZoneRequest) Reset() {
-	*x = UpdateServerTimeZoneRequest{}
-	mi := &file_controlplane_server_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateServerTimeZoneRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateServerTimeZoneRequest) ProtoMessage() {}
-
-func (x *UpdateServerTimeZoneRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateServerTimeZoneRequest.ProtoReflect.Descriptor instead.
-func (*UpdateServerTimeZoneRequest) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *UpdateServerTimeZoneRequest) GetServerId() string {
-	if x != nil {
-		return x.ServerId
-	}
-	return ""
-}
-
-func (x *UpdateServerTimeZoneRequest) GetTimezone() string {
-	if x != nil {
-		return x.Timezone
-	}
-	return ""
 }
 
 type GetStatsRequest struct {
@@ -588,7 +380,7 @@ type GetStatsRequest struct {
 
 func (x *GetStatsRequest) Reset() {
 	*x = GetStatsRequest{}
-	mi := &file_controlplane_server_proto_msgTypes[7]
+	mi := &file_controlplane_server_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -600,7 +392,7 @@ func (x *GetStatsRequest) String() string {
 func (*GetStatsRequest) ProtoMessage() {}
 
 func (x *GetStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[7]
+	mi := &file_controlplane_server_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -613,7 +405,7 @@ func (x *GetStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetStatsRequest) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{7}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetStatsRequest) GetServerId() string {
@@ -639,7 +431,7 @@ type ServerStat struct {
 
 func (x *ServerStat) Reset() {
 	*x = ServerStat{}
-	mi := &file_controlplane_server_proto_msgTypes[8]
+	mi := &file_controlplane_server_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -651,7 +443,7 @@ func (x *ServerStat) String() string {
 func (*ServerStat) ProtoMessage() {}
 
 func (x *ServerStat) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[8]
+	mi := &file_controlplane_server_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -664,7 +456,7 @@ func (x *ServerStat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerStat.ProtoReflect.Descriptor instead.
 func (*ServerStat) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{8}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ServerStat) GetId() string {
@@ -732,7 +524,7 @@ type GetStatsResponse struct {
 
 func (x *GetStatsResponse) Reset() {
 	*x = GetStatsResponse{}
-	mi := &file_controlplane_server_proto_msgTypes[9]
+	mi := &file_controlplane_server_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -744,7 +536,7 @@ func (x *GetStatsResponse) String() string {
 func (*GetStatsResponse) ProtoMessage() {}
 
 func (x *GetStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[9]
+	mi := &file_controlplane_server_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -757,7 +549,7 @@ func (x *GetStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatsResponse.ProtoReflect.Descriptor instead.
 func (*GetStatsResponse) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{9}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetStatsResponse) GetStats() []*ServerStat {
@@ -765,234 +557,6 @@ func (x *GetStatsResponse) GetStats() []*ServerStat {
 		return x.Stats
 	}
 	return nil
-}
-
-type GetAccidentsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	StartDate     string                 `protobuf:"bytes,2,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
-	EndDate       string                 `protobuf:"bytes,3,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
-	Resolved      bool                   `protobuf:"varint,4,opt,name=resolved,proto3" json:"resolved,omitempty"`
-	Page          int32                  `protobuf:"varint,5,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize      int32                  `protobuf:"varint,6,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetAccidentsRequest) Reset() {
-	*x = GetAccidentsRequest{}
-	mi := &file_controlplane_server_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetAccidentsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAccidentsRequest) ProtoMessage() {}
-
-func (x *GetAccidentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAccidentsRequest.ProtoReflect.Descriptor instead.
-func (*GetAccidentsRequest) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *GetAccidentsRequest) GetServerId() string {
-	if x != nil {
-		return x.ServerId
-	}
-	return ""
-}
-
-func (x *GetAccidentsRequest) GetStartDate() string {
-	if x != nil {
-		return x.StartDate
-	}
-	return ""
-}
-
-func (x *GetAccidentsRequest) GetEndDate() string {
-	if x != nil {
-		return x.EndDate
-	}
-	return ""
-}
-
-func (x *GetAccidentsRequest) GetResolved() bool {
-	if x != nil {
-		return x.Resolved
-	}
-	return false
-}
-
-func (x *GetAccidentsRequest) GetPage() int32 {
-	if x != nil {
-		return x.Page
-	}
-	return 0
-}
-
-func (x *GetAccidentsRequest) GetPageSize() int32 {
-	if x != nil {
-		return x.PageSize
-	}
-	return 0
-}
-
-type ServerAccident struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ServerId      string                 `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
-	ResponseTime  int64                  `protobuf:"varint,3,opt,name=response_time,json=responseTime,proto3" json:"response_time,omitempty"`
-	Error         string                 `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
-	Details       string                 `protobuf:"bytes,5,opt,name=details,proto3" json:"details,omitempty"`
-	Resolved      bool                   `protobuf:"varint,6,opt,name=resolved,proto3" json:"resolved,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ServerAccident) Reset() {
-	*x = ServerAccident{}
-	mi := &file_controlplane_server_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ServerAccident) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ServerAccident) ProtoMessage() {}
-
-func (x *ServerAccident) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ServerAccident.ProtoReflect.Descriptor instead.
-func (*ServerAccident) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *ServerAccident) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *ServerAccident) GetServerId() string {
-	if x != nil {
-		return x.ServerId
-	}
-	return ""
-}
-
-func (x *ServerAccident) GetResponseTime() int64 {
-	if x != nil {
-		return x.ResponseTime
-	}
-	return 0
-}
-
-func (x *ServerAccident) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
-func (x *ServerAccident) GetDetails() string {
-	if x != nil {
-		return x.Details
-	}
-	return ""
-}
-
-func (x *ServerAccident) GetResolved() bool {
-	if x != nil {
-		return x.Resolved
-	}
-	return false
-}
-
-func (x *ServerAccident) GetCreatedAt() string {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return ""
-}
-
-type GetAccidentsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Accidents     []*ServerAccident      `protobuf:"bytes,1,rep,name=accidents,proto3" json:"accidents,omitempty"`
-	TotalCount    int64                  `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetAccidentsResponse) Reset() {
-	*x = GetAccidentsResponse{}
-	mi := &file_controlplane_server_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetAccidentsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAccidentsResponse) ProtoMessage() {}
-
-func (x *GetAccidentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAccidentsResponse.ProtoReflect.Descriptor instead.
-func (*GetAccidentsResponse) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *GetAccidentsResponse) GetAccidents() []*ServerAccident {
-	if x != nil {
-		return x.Accidents
-	}
-	return nil
-}
-
-func (x *GetAccidentsResponse) GetTotalCount() int64 {
-	if x != nil {
-		return x.TotalCount
-	}
-	return 0
 }
 
 type Id struct {
@@ -1004,7 +568,7 @@ type Id struct {
 
 func (x *Id) Reset() {
 	*x = Id{}
-	mi := &file_controlplane_server_proto_msgTypes[13]
+	mi := &file_controlplane_server_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1016,7 +580,7 @@ func (x *Id) String() string {
 func (*Id) ProtoMessage() {}
 
 func (x *Id) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[13]
+	mi := &file_controlplane_server_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1029,7 +593,7 @@ func (x *Id) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Id.ProtoReflect.Descriptor instead.
 func (*Id) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{13}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Id) GetId() string {
@@ -1051,7 +615,7 @@ type ServerResponse struct {
 
 func (x *ServerResponse) Reset() {
 	*x = ServerResponse{}
-	mi := &file_controlplane_server_proto_msgTypes[14]
+	mi := &file_controlplane_server_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1063,7 +627,7 @@ func (x *ServerResponse) String() string {
 func (*ServerResponse) ProtoMessage() {}
 
 func (x *ServerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[14]
+	mi := &file_controlplane_server_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1076,7 +640,7 @@ func (x *ServerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerResponse.ProtoReflect.Descriptor instead.
 func (*ServerResponse) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{14}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ServerResponse) GetStatus() StatusCode {
@@ -1119,7 +683,7 @@ type ServersResponse struct {
 
 func (x *ServersResponse) Reset() {
 	*x = ServersResponse{}
-	mi := &file_controlplane_server_proto_msgTypes[15]
+	mi := &file_controlplane_server_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1131,7 +695,7 @@ func (x *ServersResponse) String() string {
 func (*ServersResponse) ProtoMessage() {}
 
 func (x *ServersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[15]
+	mi := &file_controlplane_server_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1144,7 +708,7 @@ func (x *ServersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServersResponse.ProtoReflect.Descriptor instead.
 func (*ServersResponse) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{15}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ServersResponse) GetStatus() StatusCode {
@@ -1192,7 +756,7 @@ type Server struct {
 
 func (x *Server) Reset() {
 	*x = Server{}
-	mi := &file_controlplane_server_proto_msgTypes[16]
+	mi := &file_controlplane_server_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1204,7 +768,7 @@ func (x *Server) String() string {
 func (*Server) ProtoMessage() {}
 
 func (x *Server) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[16]
+	mi := &file_controlplane_server_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1217,7 +781,7 @@ func (x *Server) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Server.ProtoReflect.Descriptor instead.
 func (*Server) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{16}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Server) GetId() string {
@@ -1294,7 +858,7 @@ type ServerAgent struct {
 
 func (x *ServerAgent) Reset() {
 	*x = ServerAgent{}
-	mi := &file_controlplane_server_proto_msgTypes[17]
+	mi := &file_controlplane_server_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1306,7 +870,7 @@ func (x *ServerAgent) String() string {
 func (*ServerAgent) ProtoMessage() {}
 
 func (x *ServerAgent) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[17]
+	mi := &file_controlplane_server_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1319,7 +883,7 @@ func (x *ServerAgent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerAgent.ProtoReflect.Descriptor instead.
 func (*ServerAgent) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{17}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ServerAgent) GetPort() int32 {
@@ -1354,7 +918,7 @@ type ServerCredential struct {
 
 func (x *ServerCredential) Reset() {
 	*x = ServerCredential{}
-	mi := &file_controlplane_server_proto_msgTypes[18]
+	mi := &file_controlplane_server_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1366,7 +930,7 @@ func (x *ServerCredential) String() string {
 func (*ServerCredential) ProtoMessage() {}
 
 func (x *ServerCredential) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[18]
+	mi := &file_controlplane_server_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1379,7 +943,7 @@ func (x *ServerCredential) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerCredential.ProtoReflect.Descriptor instead.
 func (*ServerCredential) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{18}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ServerCredential) GetUsername() string {
@@ -1413,7 +977,7 @@ type MessageResponse struct {
 
 func (x *MessageResponse) Reset() {
 	*x = MessageResponse{}
-	mi := &file_controlplane_server_proto_msgTypes[19]
+	mi := &file_controlplane_server_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1425,7 +989,7 @@ func (x *MessageResponse) String() string {
 func (*MessageResponse) ProtoMessage() {}
 
 func (x *MessageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[19]
+	mi := &file_controlplane_server_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1438,7 +1002,7 @@ func (x *MessageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MessageResponse.ProtoReflect.Descriptor instead.
 func (*MessageResponse) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{19}
+	return file_controlplane_server_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *MessageResponse) GetStatus() StatusCode {
@@ -1455,58 +1019,11 @@ func (x *MessageResponse) GetMessage() string {
 	return ""
 }
 
-type BatchDeleteAccidentsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []string               `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *BatchDeleteAccidentsRequest) Reset() {
-	*x = BatchDeleteAccidentsRequest{}
-	mi := &file_controlplane_server_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BatchDeleteAccidentsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BatchDeleteAccidentsRequest) ProtoMessage() {}
-
-func (x *BatchDeleteAccidentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_controlplane_server_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BatchDeleteAccidentsRequest.ProtoReflect.Descriptor instead.
-func (*BatchDeleteAccidentsRequest) Descriptor() ([]byte, []int) {
-	return file_controlplane_server_proto_rawDescGZIP(), []int{20}
-}
-
-func (x *BatchDeleteAccidentsRequest) GetIds() []string {
-	if x != nil {
-		return x.Ids
-	}
-	return nil
-}
-
 var File_controlplane_server_proto protoreflect.FileDescriptor
 
 const file_controlplane_server_proto_rawDesc = "" +
 	"\n" +
 	"\x19controlplane/server.proto\x12\fcontrolplane\x1a\x17common/validation.proto\x1a\x13common/common.proto\"L\n" +
-	"\x16GetAgentConfigResponse\x12\x16\n" +
-	"\x06config\x18\x01 \x01(\tR\x06config\x12\x1a\n" +
-	"\btimezone\x18\x02 \x01(\tR\btimezone\"L\n" +
 	"\x17GetRealtimeStatsRequest\x12\x1b\n" +
 	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\"\xab\x01\n" +
@@ -1520,16 +1037,7 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x06 \x01(\tR\tcreatedAt\"J\n" +
 	"\x18GetRealtimeStatsResponse\x12.\n" +
-	"\x05pings\x18\x01 \x03(\v2\x18.controlplane.ServerPingR\x05pings\"L\n" +
-	"\x15ConfigureAgentRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x16\n" +
-	"\x06config\x18\x02 \x01(\tR\x06config\"I\n" +
-	"\x16UpdateAgentPortRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x12\n" +
-	"\x04port\x18\x02 \x01(\x05R\x04port\"V\n" +
-	"\x1bUpdateServerTimeZoneRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
-	"\btimezone\x18\x02 \x01(\tR\btimezone\".\n" +
+	"\x05pings\x18\x01 \x03(\v2\x18.controlplane.ServerPingR\x05pings\".\n" +
 	"\x0fGetStatsRequest\x12\x1b\n" +
 	"\tserver_id\x18\x01 \x01(\tR\bserverId\"\xa5\x02\n" +
 	"\n" +
@@ -1544,28 +1052,7 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\fsuccess_rate\x18\a \x01(\x01R\vsuccessRate\x12\x1c\n" +
 	"\ttimestamp\x18\b \x01(\tR\ttimestamp\"B\n" +
 	"\x10GetStatsResponse\x12.\n" +
-	"\x05stats\x18\x01 \x03(\v2\x18.controlplane.ServerStatR\x05stats\"\xb9\x01\n" +
-	"\x13GetAccidentsRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1d\n" +
-	"\n" +
-	"start_date\x18\x02 \x01(\tR\tstartDate\x12\x19\n" +
-	"\bend_date\x18\x03 \x01(\tR\aendDate\x12\x1a\n" +
-	"\bresolved\x18\x04 \x01(\bR\bresolved\x12\x12\n" +
-	"\x04page\x18\x05 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x06 \x01(\x05R\bpageSize\"\xcd\x01\n" +
-	"\x0eServerAccident\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
-	"\tserver_id\x18\x02 \x01(\tR\bserverId\x12#\n" +
-	"\rresponse_time\x18\x03 \x01(\x03R\fresponseTime\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05error\x12\x18\n" +
-	"\adetails\x18\x05 \x01(\tR\adetails\x12\x1a\n" +
-	"\bresolved\x18\x06 \x01(\bR\bresolved\x12\x1d\n" +
-	"\n" +
-	"created_at\x18\a \x01(\tR\tcreatedAt\"s\n" +
-	"\x14GetAccidentsResponse\x12:\n" +
-	"\taccidents\x18\x01 \x03(\v2\x1c.controlplane.ServerAccidentR\taccidents\x12\x1f\n" +
-	"\vtotal_count\x18\x02 \x01(\x03R\n" +
-	"totalCount\"\x14\n" +
+	"\x05stats\x18\x01 \x03(\v2\x18.controlplane.ServerStatR\x05stats\"\x14\n" +
 	"\x02Id\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\xc6\x01\n" +
 	"\x0eServerResponse\x120\n" +
@@ -1604,9 +1091,7 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\a_sshKey\"]\n" +
 	"\x0fMessageResponse\x120\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x18.controlplane.StatusCodeR\x06status\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"/\n" +
-	"\x1bBatchDeleteAccidentsRequest\x12\x10\n" +
-	"\x03ids\x18\x01 \x03(\tR\x03ids*\x83\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage*\x83\x01\n" +
 	"\n" +
 	"StatusCode\x12\x0f\n" +
 	"\vUNSPECIFIED\x10\x00\x12\a\n" +
@@ -1628,7 +1113,7 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\x10FINALIZING_SETUP\x10\x03\x12\v\n" +
 	"\aSUCCESS\x10\x04\x12\n" +
 	"\n" +
-	"\x06FAILED\x10\x052\xba\t\n" +
+	"\x06FAILED\x10\x052\xe4\x04\n" +
 	"\rServerService\x12<\n" +
 	"\x06Create\x12\x14.controlplane.Server\x1a\x1c.controlplane.ServerResponse\x125\n" +
 	"\x03Get\x12\x10.controlplane.Id\x1a\x1c.controlplane.ServerResponse\x123\n" +
@@ -1637,15 +1122,8 @@ const file_controlplane_server_proto_rawDesc = "" +
 	"\x06Delete\x12\x10.controlplane.Id\x1a\x1d.controlplane.MessageResponse\x12A\n" +
 	"\x0fRetryConnection\x12\x10.controlplane.Id\x1a\x1c.controlplane.ServerResponse\x12?\n" +
 	"\fInstallAgent\x12\x10.controlplane.Id\x1a\x1d.controlplane.MessageResponse\x12I\n" +
-	"\bGetStats\x12\x1d.controlplane.GetStatsRequest\x1a\x1e.controlplane.GetStatsResponse\x12U\n" +
-	"\fGetAccidents\x12!.controlplane.GetAccidentsRequest\x1a\".controlplane.GetAccidentsResponse\x12A\n" +
-	"\x0eDeleteAccident\x12\x10.controlplane.Id\x1a\x1d.controlplane.MessageResponse\x12`\n" +
-	"\x14BatchDeleteAccidents\x12).controlplane.BatchDeleteAccidentsRequest\x1a\x1d.controlplane.MessageResponse\x12a\n" +
-	"\x10GetRealtimeStats\x12%.controlplane.GetRealtimeStatsRequest\x1a&.controlplane.GetRealtimeStatsResponse\x12T\n" +
-	"\x0eConfigureAgent\x12#.controlplane.ConfigureAgentRequest\x1a\x1d.controlplane.MessageResponse\x12V\n" +
-	"\x0fUpdateAgentPort\x12$.controlplane.UpdateAgentPortRequest\x1a\x1d.controlplane.MessageResponse\x12`\n" +
-	"\x14UpdateServerTimeZone\x12).controlplane.UpdateServerTimeZoneRequest\x1a\x1d.controlplane.MessageResponse\x12H\n" +
-	"\x0eGetAgentConfig\x12\x10.controlplane.Id\x1a$.controlplane.GetAgentConfigResponseB;Z9github.com/zhinea/sylix/internal/infra/proto/controlplaneb\x06proto3"
+	"\bGetStats\x12\x1d.controlplane.GetStatsRequest\x1a\x1e.controlplane.GetStatsResponse\x12a\n" +
+	"\x10GetRealtimeStats\x12%.controlplane.GetRealtimeStatsRequest\x1a&.controlplane.GetRealtimeStatsResponseB;Z9github.com/zhinea/sylix/internal/infra/proto/controlplaneb\x06proto3"
 
 var (
 	file_controlplane_server_proto_rawDescOnce sync.Once
@@ -1660,87 +1138,64 @@ func file_controlplane_server_proto_rawDescGZIP() []byte {
 }
 
 var file_controlplane_server_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_controlplane_server_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_controlplane_server_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_controlplane_server_proto_goTypes = []any{
-	(StatusCode)(0),                     // 0: controlplane.StatusCode
-	(StatusServer)(0),                   // 1: controlplane.StatusServer
-	(AgentStatusServer)(0),              // 2: controlplane.AgentStatusServer
-	(*GetAgentConfigResponse)(nil),      // 3: controlplane.GetAgentConfigResponse
-	(*GetRealtimeStatsRequest)(nil),     // 4: controlplane.GetRealtimeStatsRequest
-	(*ServerPing)(nil),                  // 5: controlplane.ServerPing
-	(*GetRealtimeStatsResponse)(nil),    // 6: controlplane.GetRealtimeStatsResponse
-	(*ConfigureAgentRequest)(nil),       // 7: controlplane.ConfigureAgentRequest
-	(*UpdateAgentPortRequest)(nil),      // 8: controlplane.UpdateAgentPortRequest
-	(*UpdateServerTimeZoneRequest)(nil), // 9: controlplane.UpdateServerTimeZoneRequest
-	(*GetStatsRequest)(nil),             // 10: controlplane.GetStatsRequest
-	(*ServerStat)(nil),                  // 11: controlplane.ServerStat
-	(*GetStatsResponse)(nil),            // 12: controlplane.GetStatsResponse
-	(*GetAccidentsRequest)(nil),         // 13: controlplane.GetAccidentsRequest
-	(*ServerAccident)(nil),              // 14: controlplane.ServerAccident
-	(*GetAccidentsResponse)(nil),        // 15: controlplane.GetAccidentsResponse
-	(*Id)(nil),                          // 16: controlplane.Id
-	(*ServerResponse)(nil),              // 17: controlplane.ServerResponse
-	(*ServersResponse)(nil),             // 18: controlplane.ServersResponse
-	(*Server)(nil),                      // 19: controlplane.Server
-	(*ServerAgent)(nil),                 // 20: controlplane.ServerAgent
-	(*ServerCredential)(nil),            // 21: controlplane.ServerCredential
-	(*MessageResponse)(nil),             // 22: controlplane.MessageResponse
-	(*BatchDeleteAccidentsRequest)(nil), // 23: controlplane.BatchDeleteAccidentsRequest
-	(*common.ValidationError)(nil),      // 24: common.ValidationError
-	(*common.Empty)(nil),                // 25: common.Empty
+	(StatusCode)(0),                  // 0: controlplane.StatusCode
+	(StatusServer)(0),                // 1: controlplane.StatusServer
+	(AgentStatusServer)(0),           // 2: controlplane.AgentStatusServer
+	(*GetRealtimeStatsRequest)(nil),  // 3: controlplane.GetRealtimeStatsRequest
+	(*ServerPing)(nil),               // 4: controlplane.ServerPing
+	(*GetRealtimeStatsResponse)(nil), // 5: controlplane.GetRealtimeStatsResponse
+	(*GetStatsRequest)(nil),          // 6: controlplane.GetStatsRequest
+	(*ServerStat)(nil),               // 7: controlplane.ServerStat
+	(*GetStatsResponse)(nil),         // 8: controlplane.GetStatsResponse
+	(*Id)(nil),                       // 9: controlplane.Id
+	(*ServerResponse)(nil),           // 10: controlplane.ServerResponse
+	(*ServersResponse)(nil),          // 11: controlplane.ServersResponse
+	(*Server)(nil),                   // 12: controlplane.Server
+	(*ServerAgent)(nil),              // 13: controlplane.ServerAgent
+	(*ServerCredential)(nil),         // 14: controlplane.ServerCredential
+	(*MessageResponse)(nil),          // 15: controlplane.MessageResponse
+	(*common.ValidationError)(nil),   // 16: common.ValidationError
+	(*common.Empty)(nil),             // 17: common.Empty
 }
 var file_controlplane_server_proto_depIdxs = []int32{
-	5,  // 0: controlplane.GetRealtimeStatsResponse.pings:type_name -> controlplane.ServerPing
-	11, // 1: controlplane.GetStatsResponse.stats:type_name -> controlplane.ServerStat
-	14, // 2: controlplane.GetAccidentsResponse.accidents:type_name -> controlplane.ServerAccident
-	0,  // 3: controlplane.ServerResponse.status:type_name -> controlplane.StatusCode
-	19, // 4: controlplane.ServerResponse.server:type_name -> controlplane.Server
-	24, // 5: controlplane.ServerResponse.errors:type_name -> common.ValidationError
-	0,  // 6: controlplane.ServersResponse.status:type_name -> controlplane.StatusCode
-	19, // 7: controlplane.ServersResponse.servers:type_name -> controlplane.Server
-	24, // 8: controlplane.ServersResponse.errors:type_name -> common.ValidationError
-	21, // 9: controlplane.Server.credential:type_name -> controlplane.ServerCredential
-	1,  // 10: controlplane.Server.status:type_name -> controlplane.StatusServer
-	20, // 11: controlplane.Server.agent:type_name -> controlplane.ServerAgent
-	2,  // 12: controlplane.ServerAgent.status:type_name -> controlplane.AgentStatusServer
-	0,  // 13: controlplane.MessageResponse.status:type_name -> controlplane.StatusCode
-	19, // 14: controlplane.ServerService.Create:input_type -> controlplane.Server
-	16, // 15: controlplane.ServerService.Get:input_type -> controlplane.Id
-	25, // 16: controlplane.ServerService.All:input_type -> common.Empty
-	19, // 17: controlplane.ServerService.Update:input_type -> controlplane.Server
-	16, // 18: controlplane.ServerService.Delete:input_type -> controlplane.Id
-	16, // 19: controlplane.ServerService.RetryConnection:input_type -> controlplane.Id
-	16, // 20: controlplane.ServerService.InstallAgent:input_type -> controlplane.Id
-	10, // 21: controlplane.ServerService.GetStats:input_type -> controlplane.GetStatsRequest
-	13, // 22: controlplane.ServerService.GetAccidents:input_type -> controlplane.GetAccidentsRequest
-	16, // 23: controlplane.ServerService.DeleteAccident:input_type -> controlplane.Id
-	23, // 24: controlplane.ServerService.BatchDeleteAccidents:input_type -> controlplane.BatchDeleteAccidentsRequest
-	4,  // 25: controlplane.ServerService.GetRealtimeStats:input_type -> controlplane.GetRealtimeStatsRequest
-	7,  // 26: controlplane.ServerService.ConfigureAgent:input_type -> controlplane.ConfigureAgentRequest
-	8,  // 27: controlplane.ServerService.UpdateAgentPort:input_type -> controlplane.UpdateAgentPortRequest
-	9,  // 28: controlplane.ServerService.UpdateServerTimeZone:input_type -> controlplane.UpdateServerTimeZoneRequest
-	16, // 29: controlplane.ServerService.GetAgentConfig:input_type -> controlplane.Id
-	17, // 30: controlplane.ServerService.Create:output_type -> controlplane.ServerResponse
-	17, // 31: controlplane.ServerService.Get:output_type -> controlplane.ServerResponse
-	18, // 32: controlplane.ServerService.All:output_type -> controlplane.ServersResponse
-	17, // 33: controlplane.ServerService.Update:output_type -> controlplane.ServerResponse
-	22, // 34: controlplane.ServerService.Delete:output_type -> controlplane.MessageResponse
-	17, // 35: controlplane.ServerService.RetryConnection:output_type -> controlplane.ServerResponse
-	22, // 36: controlplane.ServerService.InstallAgent:output_type -> controlplane.MessageResponse
-	12, // 37: controlplane.ServerService.GetStats:output_type -> controlplane.GetStatsResponse
-	15, // 38: controlplane.ServerService.GetAccidents:output_type -> controlplane.GetAccidentsResponse
-	22, // 39: controlplane.ServerService.DeleteAccident:output_type -> controlplane.MessageResponse
-	22, // 40: controlplane.ServerService.BatchDeleteAccidents:output_type -> controlplane.MessageResponse
-	6,  // 41: controlplane.ServerService.GetRealtimeStats:output_type -> controlplane.GetRealtimeStatsResponse
-	22, // 42: controlplane.ServerService.ConfigureAgent:output_type -> controlplane.MessageResponse
-	22, // 43: controlplane.ServerService.UpdateAgentPort:output_type -> controlplane.MessageResponse
-	22, // 44: controlplane.ServerService.UpdateServerTimeZone:output_type -> controlplane.MessageResponse
-	3,  // 45: controlplane.ServerService.GetAgentConfig:output_type -> controlplane.GetAgentConfigResponse
-	30, // [30:46] is the sub-list for method output_type
-	14, // [14:30] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	4,  // 0: controlplane.GetRealtimeStatsResponse.pings:type_name -> controlplane.ServerPing
+	7,  // 1: controlplane.GetStatsResponse.stats:type_name -> controlplane.ServerStat
+	0,  // 2: controlplane.ServerResponse.status:type_name -> controlplane.StatusCode
+	12, // 3: controlplane.ServerResponse.server:type_name -> controlplane.Server
+	16, // 4: controlplane.ServerResponse.errors:type_name -> common.ValidationError
+	0,  // 5: controlplane.ServersResponse.status:type_name -> controlplane.StatusCode
+	12, // 6: controlplane.ServersResponse.servers:type_name -> controlplane.Server
+	16, // 7: controlplane.ServersResponse.errors:type_name -> common.ValidationError
+	14, // 8: controlplane.Server.credential:type_name -> controlplane.ServerCredential
+	1,  // 9: controlplane.Server.status:type_name -> controlplane.StatusServer
+	13, // 10: controlplane.Server.agent:type_name -> controlplane.ServerAgent
+	2,  // 11: controlplane.ServerAgent.status:type_name -> controlplane.AgentStatusServer
+	0,  // 12: controlplane.MessageResponse.status:type_name -> controlplane.StatusCode
+	12, // 13: controlplane.ServerService.Create:input_type -> controlplane.Server
+	9,  // 14: controlplane.ServerService.Get:input_type -> controlplane.Id
+	17, // 15: controlplane.ServerService.All:input_type -> common.Empty
+	12, // 16: controlplane.ServerService.Update:input_type -> controlplane.Server
+	9,  // 17: controlplane.ServerService.Delete:input_type -> controlplane.Id
+	9,  // 18: controlplane.ServerService.RetryConnection:input_type -> controlplane.Id
+	9,  // 19: controlplane.ServerService.InstallAgent:input_type -> controlplane.Id
+	6,  // 20: controlplane.ServerService.GetStats:input_type -> controlplane.GetStatsRequest
+	3,  // 21: controlplane.ServerService.GetRealtimeStats:input_type -> controlplane.GetRealtimeStatsRequest
+	10, // 22: controlplane.ServerService.Create:output_type -> controlplane.ServerResponse
+	10, // 23: controlplane.ServerService.Get:output_type -> controlplane.ServerResponse
+	11, // 24: controlplane.ServerService.All:output_type -> controlplane.ServersResponse
+	10, // 25: controlplane.ServerService.Update:output_type -> controlplane.ServerResponse
+	15, // 26: controlplane.ServerService.Delete:output_type -> controlplane.MessageResponse
+	10, // 27: controlplane.ServerService.RetryConnection:output_type -> controlplane.ServerResponse
+	15, // 28: controlplane.ServerService.InstallAgent:output_type -> controlplane.MessageResponse
+	8,  // 29: controlplane.ServerService.GetStats:output_type -> controlplane.GetStatsResponse
+	5,  // 30: controlplane.ServerService.GetRealtimeStats:output_type -> controlplane.GetRealtimeStatsResponse
+	22, // [22:31] is the sub-list for method output_type
+	13, // [13:22] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_controlplane_server_proto_init() }
@@ -1748,16 +1203,16 @@ func file_controlplane_server_proto_init() {
 	if File_controlplane_server_proto != nil {
 		return
 	}
-	file_controlplane_server_proto_msgTypes[14].OneofWrappers = []any{}
-	file_controlplane_server_proto_msgTypes[15].OneofWrappers = []any{}
-	file_controlplane_server_proto_msgTypes[18].OneofWrappers = []any{}
+	file_controlplane_server_proto_msgTypes[7].OneofWrappers = []any{}
+	file_controlplane_server_proto_msgTypes[8].OneofWrappers = []any{}
+	file_controlplane_server_proto_msgTypes[11].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_controlplane_server_proto_rawDesc), len(file_controlplane_server_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   21,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

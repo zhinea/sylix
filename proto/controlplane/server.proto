@@ -16,19 +16,7 @@ service ServerService {
     rpc RetryConnection(Id) returns (ServerResponse);
     rpc InstallAgent(Id) returns (MessageResponse);
     rpc GetStats(GetStatsRequest) returns (GetStatsResponse);
-    rpc GetAccidents(GetAccidentsRequest) returns (GetAccidentsResponse);
-    rpc DeleteAccident(Id) returns (MessageResponse);
-    rpc BatchDeleteAccidents(BatchDeleteAccidentsRequest) returns (MessageResponse);
     rpc GetRealtimeStats(GetRealtimeStatsRequest) returns (GetRealtimeStatsResponse);
-    rpc ConfigureAgent(ConfigureAgentRequest) returns (MessageResponse);
-    rpc UpdateAgentPort(UpdateAgentPortRequest) returns (MessageResponse);
-    rpc UpdateServerTimeZone(UpdateServerTimeZoneRequest) returns (MessageResponse);
-    rpc GetAgentConfig(Id) returns (GetAgentConfigResponse);
-}
-
-message GetAgentConfigResponse {
-    string config = 1;
-    string timezone = 2;
 }
 
 message GetRealtimeStatsRequest {
@@ -49,21 +37,6 @@ message GetRealtimeStatsResponse {
     repeated ServerPing pings = 1;
 }
 
-message ConfigureAgentRequest {
-    string server_id = 1;
-    string config = 2;
-}
-
-message UpdateAgentPortRequest {
-    string server_id = 1;
-    int32 port = 2;
-}
-
-message UpdateServerTimeZoneRequest {
-    string server_id = 1;
-    string timezone = 2;
-}
-
 message GetStatsRequest {
     string server_id = 1;
 }
@@ -81,30 +54,6 @@ message ServerStat {
 
 message GetStatsResponse {
     repeated ServerStat stats = 1;
-}
-
-message GetAccidentsRequest {
-    string server_id = 1;
-    string start_date = 2;
-    string end_date = 3;
-    bool resolved = 4;
-    int32 page = 5;
-    int32 page_size = 6;
-}
-
-message ServerAccident {
-    string id = 1;
-    string server_id = 2;
-    int64 response_time = 3;
-    string error = 4;
-    string details = 5;
-    bool resolved = 6;
-    string created_at = 7;
-}
-
-message GetAccidentsResponse {
-    repeated ServerAccident accidents = 1;
-    int64 total_count = 2;
 }
 
 enum StatusCode {
@@ -178,8 +127,4 @@ message ServerCredential {
 message MessageResponse {
     StatusCode status = 1;
     string message = 2;
-}
-
-message BatchDeleteAccidentsRequest {
-    repeated string ids = 1;
 }

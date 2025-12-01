@@ -12,16 +12,14 @@ import (
 )
 
 type BackupService struct {
-	repo         repository.BackupStorageRepository
-	serverRepo   repository.ServerRepository
-	agentService *AgentService
+	repo       repository.BackupStorageRepository
+	serverRepo repository.ServerRepository
 }
 
-func NewBackupService(repo repository.BackupStorageRepository, serverRepo repository.ServerRepository, agentService *AgentService) *BackupService {
+func NewBackupService(repo repository.BackupStorageRepository, serverRepo repository.ServerRepository) *BackupService {
 	return &BackupService{
-		repo:         repo,
-		serverRepo:   serverRepo,
-		agentService: agentService,
+		repo:       repo,
+		serverRepo: serverRepo,
 	}
 }
 
@@ -86,29 +84,16 @@ func (s *BackupService) Update(ctx context.Context, backup *entity.BackupStorage
 		affectedServerIDs[s.Id] = true
 	}
 
-	for serverID := range affectedServerIDs {
-		if err := s.syncAgentStorage(ctx, serverID); err != nil {
-			// log error
-		}
-	}
-
 	return updatedBackup, nil
 }
 
 func (s *BackupService) Delete(ctx context.Context, id string) error {
-	backup, err := s.repo.GetByID(ctx, id)
-	if err != nil {
+	if _, err := s.repo.GetByID(ctx, id); err != nil {
 		return err
 	}
 
 	if err := s.repo.Delete(ctx, id); err != nil {
 		return err
-	}
-
-	for _, server := range backup.Servers {
-		if err := s.syncAgentStorage(ctx, server.Id); err != nil {
-			// log error
-		}
 	}
 
 	return nil
@@ -124,21 +109,6 @@ func (s *BackupService) fetchServers(ctx context.Context, ids []string) ([]*enti
 		servers = append(servers, server)
 	}
 	return servers, nil
-}
-
-func (s *BackupService) syncAgentStorage(ctx context.Context, serverID string) error {
-	if serverID == "" {
-		return nil
-	}
-	server, err := s.serverRepo.GetByID(ctx, serverID)
-	if err != nil {
-		return err
-	}
-	storages, err := s.repo.GetByServerID(ctx, serverID)
-	if err != nil {
-		return err
-	}
-	return s.agentService.SyncStorage(ctx, server, storages)
 }
 
 func (s *BackupService) TestConnection(ctx context.Context, backup *entity.BackupStorage) error {

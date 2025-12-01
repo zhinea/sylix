@@ -39,13 +39,7 @@ const portSchema = z.object({
   port: z.coerce.number().min(1).max(65535),
 });
 
-const timezoneSchema = z.object({
-  timezone: z.string().min(1),
-});
 
-const configSchema = z.object({
-  config: z.string().min(1),
-});
 
 export function ServerManagementModal({ server, open, onOpenChange }: ServerManagementModalProps) {
   const [activeTab, setActiveTab] = useState("overview");
@@ -89,25 +83,24 @@ export function ServerManagementModal({ server, open, onOpenChange }: ServerMana
 
           <TabsContent value="configuration" className="flex-1 overflow-auto p-4 space-y-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Agent Port</h3>
-              <AgentPortForm serverId={server.id} initialPort={server.agent?.port ?? 8083} />
-            </div>
-            
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Timezone (Chrony)</h3>
-              <TimezoneForm serverId={server.id} />
+              <h3 className="text-lg font-medium">WireGuard Configuration</h3>
+              <div className="grid grid-cols-[150px_1fr] gap-2 text-sm border rounded-lg p-4 bg-muted/50">
+                <span className="font-medium">Internal IP:</span>
+                <span className="font-mono">{server.internalIp || "Not assigned"}</span>
+                <span className="font-medium">Public Key:</span>
+                <span className="font-mono break-all">{server.wireGuard?.publicKey || "Not generated"}</span>
+                <span className="font-medium">Listen Port:</span>
+                <span className="font-mono">{server.wireGuard?.listenPort || "Default"}</span>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Agent Configuration</h3>
-              <AgentConfigForm serverId={server.id} />
-            </div>
+
           </TabsContent>
 
           <TabsContent value="logs" className="flex-1 overflow-auto p-4">
-             <div className="text-muted-foreground text-center py-10">
-                Agent logs viewer coming soon...
-             </div>
+            <div className="text-muted-foreground text-center py-10">
+              Agent logs viewer coming soon...
+            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>
@@ -115,168 +108,6 @@ export function ServerManagementModal({ server, open, onOpenChange }: ServerMana
   );
 }
 
-function AgentPortForm({ serverId, initialPort }: { serverId: string, initialPort: number }) {
-  const form = useForm<z.infer<typeof portSchema>>({
-    resolver: zodResolver(portSchema as any),
-    defaultValues: { port: initialPort || 8083 },
-  });
 
-  async function onSubmit(values: z.infer<typeof portSchema>) {
-    try {
-      await serverService.UpdateAgentPort({ serverId, port: values.port });
-      toast.success("Agent port updated successfully");
-    } catch (error) {
-      toast.error("Failed to update agent port");
-      console.error(error);
-    }
-  }
 
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-end gap-4">
-        <FormField
-          control={form.control}
-          name="port"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Port</FormLabel>
-              <FormControl>
-                <Input {...field} type="number" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Update Port
-        </Button>
-      </form>
-    </Form>
-  );
-}
 
-function TimezoneForm({ serverId }: { serverId: string }) {
-  const form = useForm<z.infer<typeof timezoneSchema>>({
-    resolver: zodResolver(timezoneSchema as any),
-    defaultValues: { timezone: "UTC" },
-  });
-
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const response = await serverService.GetAgentConfig({ id: serverId });
-        if (response.timezone) {
-          form.setValue("timezone", response.timezone);
-        }
-      } catch (error) {
-        console.error("Failed to fetch agent config", error);
-      }
-    };
-    fetchConfig();
-  }, [serverId, form]);
-
-  async function onSubmit(values: z.infer<typeof timezoneSchema>) {
-    try {
-      await serverService.UpdateServerTimeZone({ serverId, timezone: values.timezone });
-      toast.success("Timezone updated successfully");
-    } catch (error) {
-      toast.error("Failed to update timezone");
-      console.error(error);
-    }
-  }
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-end gap-4">
-        <FormField
-          control={form.control}
-          name="timezone"
-          render={({ field }) => (
-            <FormItem className="w-[200px]">
-              <FormLabel>Timezone</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select timezone" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="UTC">UTC</SelectItem>
-                  <SelectItem value="Asia/Jakarta">Asia/Jakarta</SelectItem>
-                  <SelectItem value="America/New_York">America/New_York</SelectItem>
-                  <SelectItem value="Europe/London">Europe/London</SelectItem>
-                  {/* Add more timezones as needed */}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Set Timezone
-        </Button>
-      </form>
-    </Form>
-  );
-}
-
-function AgentConfigForm({ serverId }: { serverId: string }) {
-  const form = useForm<z.infer<typeof configSchema>>({
-    resolver: zodResolver(configSchema as any),
-    defaultValues: { config: "" },
-  });
-
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const response = await serverService.GetAgentConfig({ id: serverId });
-        if (response.config) {
-          form.setValue("config", response.config);
-        }
-      } catch (error) {
-        console.error("Failed to fetch agent config", error);
-      }
-    };
-    fetchConfig();
-  }, [serverId, form]);
-
-  async function onSubmit(values: z.infer<typeof configSchema>) {
-    try {
-      await serverService.ConfigureAgent({ serverId, config: values.config });
-      toast.success("Configuration applied successfully");
-    } catch (error) {
-      toast.error("Failed to apply configuration");
-      console.error(error);
-    }
-  }
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="config"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Configuration (YAML/JSON)</FormLabel>
-              <FormControl>
-                <Textarea {...field} className="font-mono min-h-[200px]" />
-              </FormControl>
-              <FormDescription>
-                Enter the agent configuration content.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          <Save className="mr-2 h-4 w-4" />
-          Apply Configuration
-        </Button>
-      </form>
-    </Form>
-  );
-}
